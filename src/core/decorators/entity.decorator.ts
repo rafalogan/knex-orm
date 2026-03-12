@@ -1,18 +1,9 @@
-import type { EntityMetadata } from '../types/entity-metadata';
+import type { EntityMetadata } from "../types/entity-metadata";
 import {
   setEntityMetadata,
   getEntityMetadata as getFromStorage,
-} from '../metadata/metadata-storage';
-
-/**
- * Converts PascalCase/camelCase to snake_case.
- * @example "User" -> "user", "UserProfile" -> "user_profile"
- */
-function toSnakeCase(str: string): string {
-  return str
-    .replace(/([A-Z])/g, (_, letter) => `_${letter.toLowerCase()}`)
-    .replace(/^_/, '');
-}
+} from "../metadata/metadata-storage";
+import { toSnakeCase } from "../utils/string";
 
 /**
  * Decorator that maps a class to a database table.
@@ -20,12 +11,12 @@ function toSnakeCase(str: string): string {
  */
 export function Entity(tableName?: string): ClassDecorator {
   return (target: object): void => {
-    if (typeof target !== 'function') {
-      throw new TypeError('@Entity can only be applied to class constructors');
+    if (typeof target !== "function") {
+      throw new TypeError("@Entity can only be applied to class constructors");
     }
 
     const constructor = target as new (...args: unknown[]) => object;
-    const name = constructor.name ?? '';
+    const name = constructor.name ?? "";
     const resolvedTableName = tableName ?? toSnakeCase(name);
 
     setEntityMetadata(target, { tableName: resolvedTableName });
