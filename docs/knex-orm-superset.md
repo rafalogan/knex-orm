@@ -20,14 +20,14 @@ O **KnexORM Superset** adiciona essa camada sem substituir o Knex: o usuário co
 
 ### 1.2 Diferencial vs TypeORM / Prisma / MikroORM
 
-| Aspecto | KnexORM Superset | TypeORM | Prisma | MikroORM |
-|--------|------------------|---------|--------|----------|
-| **Base** | Knex.js (query builder) | Próprio driver | Prisma Client | Próprio driver |
-| **Schema** | Decorators em classes TS | Decorators | `.prisma` declarativo | Decorators |
-| **Migrations** | Geração a partir de entidades + Knex nativo | Sincronização ou migrations manuais | `prisma migrate` | Migrations manuais |
-| **SQL raw** | Acesso direto ao Knex | `QueryRunner` | Limitado | `em.getConnection()` |
-| **Multi-DB** | Via Knex (PG, MySQL, SQLite, MSSQL, Oracle) | Nativo | Nativo | Nativo |
-| **NestJS** | DynamicModule dedicado | Módulo oficial | Módulo oficial | Módulo oficial |
+| Aspecto        | KnexORM Superset                            | TypeORM                             | Prisma                | MikroORM             |
+| -------------- | ------------------------------------------- | ----------------------------------- | --------------------- | -------------------- |
+| **Base**       | Knex.js (query builder)                     | Próprio driver                      | Prisma Client         | Próprio driver       |
+| **Schema**     | Decorators em classes TS                    | Decorators                          | `.prisma` declarativo | Decorators           |
+| **Migrations** | Geração a partir de entidades + Knex nativo | Sincronização ou migrations manuais | `prisma migrate`      | Migrations manuais   |
+| **SQL raw**    | Acesso direto ao Knex                       | `QueryRunner`                       | Limitado              | `em.getConnection()` |
+| **Multi-DB**   | Via Knex (PG, MySQL, SQLite, MSSQL, Oracle) | Nativo                              | Nativo                | Nativo               |
+| **NestJS**     | DynamicModule dedicado                      | Módulo oficial                      | Módulo oficial        | Módulo oficial       |
 
 **Diferencial principal**: quem já usa Knex mantém o ecossistema e ganha convenções de ORM sem migrar para outra stack.
 
@@ -123,13 +123,13 @@ flowchart LR
 
 ### 2.3 Princípios SOLID Aplicados
 
-| Princípio | Onde aparece na lib |
-|-----------|----------------------|
+| Princípio                 | Onde aparece na lib                                                                                              |
+| ------------------------- | ---------------------------------------------------------------------------------------------------------------- |
 | **S**ingle Responsibility | `MetadataStorage` só armazena metadata; `GenericRepository` só persiste; `MigrationGenerator` só gera migrations |
-| **O**pen/Closed | Novos tipos de coluna via extensão de `ColumnType`; novos drivers via `IConnection` |
-| **L**iskov Substitution | Qualquer implementação de `IRepository` pode substituir outra sem quebrar contratos |
-| **I**nterface Segregation | `IRepository` expõe apenas métodos CRUD; `IConnection` apenas conexão; interfaces pequenas e focadas |
-| **D**ependency Inversion | Core depende de `IRepository`, `IConnection`; adapters implementam essas interfaces |
+| **O**pen/Closed           | Novos tipos de coluna via extensão de `ColumnType`; novos drivers via `IConnection`                              |
+| **L**iskov Substitution   | Qualquer implementação de `IRepository` pode substituir outra sem quebrar contratos                              |
+| **I**nterface Segregation | `IRepository` expõe apenas métodos CRUD; `IConnection` apenas conexão; interfaces pequenas e focadas             |
+| **D**ependency Inversion  | Core depende de `IRepository`, `IConnection`; adapters implementam essas interfaces                              |
 
 ### 2.4 Estrutura de Pastas do Projeto
 
@@ -162,16 +162,16 @@ knex-orm/
 
 ### 3.1 Especificação Completa
 
-| Decorator | Descrição | Exemplo |
-|-----------|-----------|---------|
-| `@Entity(tableName?)` | Mapeia classe para tabela. Se omitido, usa nome da classe em snake_case | `@Entity('users')` |
-| `@PrimaryKey(options?)` | Define PK. Opções: `autoincrement`, `uuid` | `@PrimaryKey()` ou `@PrimaryKey({ uuid: true })` |
-| `@Column(options)` | Define coluna. Opções: `type`, `nullable`, `default`, `unique`, `index` | `@Column({ type: 'string', nullable: false })` |
-| `@CreatedAt()` | Campo `created_at` com default `CURRENT_TIMESTAMP` | `@CreatedAt()` |
-| `@UpdatedAt()` | Campo `updated_at` com default `CURRENT_TIMESTAMP` | `@UpdatedAt()` |
-| `@SoftDelete()` | Campo `deleted_at`, habilita `disable()` no repositório | `@SoftDelete()` |
-| `@Index(fields[])` | Índice composto na tabela | `@Index(['email', 'tenant_id'])` |
-| `@Relation` | Placeholder para v2 (OneToMany, ManyToOne, ManyToMany) | — |
+| Decorator               | Descrição                                                               | Exemplo                                          |
+| ----------------------- | ----------------------------------------------------------------------- | ------------------------------------------------ |
+| `@Entity(tableName?)`   | Mapeia classe para tabela. Se omitido, usa nome da classe em snake_case | `@Entity('users')`                               |
+| `@PrimaryKey(options?)` | Define PK. Opções: `autoincrement`, `uuid`                              | `@PrimaryKey()` ou `@PrimaryKey({ uuid: true })` |
+| `@Column(options)`      | Define coluna. Opções: `type`, `nullable`, `default`, `unique`, `index` | `@Column({ type: 'string', nullable: false })`   |
+| `@CreatedAt()`          | Campo `created_at` com default `CURRENT_TIMESTAMP`                      | `@CreatedAt()`                                   |
+| `@UpdatedAt()`          | Campo `updated_at` com default `CURRENT_TIMESTAMP`                      | `@UpdatedAt()`                                   |
+| `@SoftDelete()`         | Campo `deleted_at`, habilita `disable()` no repositório                 | `@SoftDelete()`                                  |
+| `@Index(fields[])`      | Índice composto na tabela                                               | `@Index(['email', 'tenant_id'])`                 |
+| `@Relation`             | Placeholder para v2 (OneToMany, ManyToOne, ManyToMany)                  | —                                                |
 
 ### 3.2 Tipos de Coluna Suportados (ColumnType)
 
@@ -189,20 +189,27 @@ Mapeamento para métodos do Knex Schema Builder:
 ### 3.3 Exemplo de Entidade Anêmica
 
 ```typescript
-import { Entity, PrimaryKey, Column, CreatedAt, UpdatedAt, SoftDelete } from 'knex-orm';
+import {
+  Entity,
+  PrimaryKey,
+  Column,
+  CreatedAt,
+  UpdatedAt,
+  SoftDelete,
+} from "knex-orm";
 
-@Entity('users')
+@Entity("users")
 export class User {
   @PrimaryKey()
   id: number;
 
-  @Column({ type: 'string', nullable: false, unique: true })
+  @Column({ type: "string", nullable: false, unique: true })
   email: string;
 
-  @Column({ type: 'string' })
+  @Column({ type: "string" })
   name: string;
 
-  @Column({ type: 'boolean', default: true })
+  @Column({ type: "boolean", default: true })
   active: boolean;
 
   @CreatedAt()
@@ -249,15 +256,15 @@ interface IRepository<T> {
 
 ### 4.2 Semântica dos Métodos
 
-| Método | Comportamento |
-|--------|----------------|
-| `save(entity, where?)` | Sem `where` → INSERT; com `where` → UPDATE |
-| `find(options?)` | Suporta `select`, `where`, `orderBy`, `limit`, `offset`, `withDeleted` |
-| `findOne(where)` | `where` obrigatório em nível de tipo (TypeScript) |
-| `create(data)` | INSERT e retorna entidade com PK preenchida |
-| `update(where, data)` | UPDATE e retorna entidade atualizada |
-| `delete(where)` | DELETE físico |
-| `disable(where)` | Seta `deleted_at`; requer `@SoftDelete()` na entidade |
+| Método                 | Comportamento                                                          |
+| ---------------------- | ---------------------------------------------------------------------- |
+| `save(entity, where?)` | Sem `where` → INSERT; com `where` → UPDATE                             |
+| `find(options?)`       | Suporta `select`, `where`, `orderBy`, `limit`, `offset`, `withDeleted` |
+| `findOne(where)`       | `where` obrigatório em nível de tipo (TypeScript)                      |
+| `create(data)`         | INSERT e retorna entidade com PK preenchida                            |
+| `update(where, data)`  | UPDATE e retorna entidade atualizada                                   |
+| `delete(where)`        | DELETE físico                                                          |
+| `disable(where)`       | Seta `deleted_at`; requer `@SoftDelete()` na entidade                  |
 
 Todos os métodos retornam a entidade mapeada (não row bruta).
 
@@ -268,13 +275,13 @@ class GenericRepository<T> implements IRepository<T> {
   constructor(
     private readonly connection: IConnection,
     private readonly entityClass: new () => T,
-    private readonly metadata: EntityMetadata
+    private readonly metadata: EntityMetadata,
   ) {}
 
   async find(options?: FindOptions<T>): Promise<T[]> {
     let qb = this.connection.knex(this.metadata.tableName).select();
     if (this.metadata.softDelete && !options?.withDeleted) {
-      qb = qb.whereNull('deleted_at');
+      qb = qb.whereNull("deleted_at");
     }
     // ... apply where, orderBy, limit, offset
     const rows = await qb;
@@ -283,9 +290,10 @@ class GenericRepository<T> implements IRepository<T> {
 
   async disable(where: WhereClause<T>): Promise<void> {
     if (!this.metadata.softDelete) {
-      throw new Error('Entity does not support soft delete');
+      throw new Error("Entity does not support soft delete");
     }
-    await this.connection.knex(this.metadata.tableName)
+    await this.connection
+      .knex(this.metadata.tableName)
       .where(where)
       .update({ deleted_at: new Date() });
   }
@@ -314,11 +322,11 @@ class GenericRepository<T> implements IRepository<T> {
 
 ### 5.2 Comandos
 
-| Comando | Descrição |
-|---------|-----------|
+| Comando                                      | Descrição                           |
+| -------------------------------------------- | ----------------------------------- |
 | `knex-orm migration:generate <NomeEntidade>` | Cria migration a partir da entidade |
-| `knex-orm migration:run` | Executa `knex.migrate.latest()` |
-| `knex-orm migration:rollback` | Executa `knex.migrate.rollback()` |
+| `knex-orm migration:run`                     | Executa `knex.migrate.latest()`     |
+| `knex-orm migration:rollback`                | Executa `knex.migrate.rollback()`   |
 
 ### 5.3 Diff de Schema
 
@@ -335,22 +343,22 @@ Operações suportadas:
 
 ```typescript
 // migrations/20250311120000_create_users.ts
-import type { Knex } from 'knex';
+import type { Knex } from "knex";
 
 export async function up(knex: Knex): Promise<void> {
-  await knex.schema.createTable('users', (table) => {
-    table.increments('id').primary();
-    table.string('email', 255).notNullable().unique();
-    table.string('name', 255);
-    table.boolean('active').defaultTo(true);
-    table.timestamp('created_at').defaultTo(knex.fn.now());
-    table.timestamp('updated_at').defaultTo(knex.fn.now());
-    table.timestamp('deleted_at');
+  await knex.schema.createTable("users", (table) => {
+    table.increments("id").primary();
+    table.string("email", 255).notNullable().unique();
+    table.string("name", 255);
+    table.boolean("active").defaultTo(true);
+    table.timestamp("created_at").defaultTo(knex.fn.now());
+    table.timestamp("updated_at").defaultTo(knex.fn.now());
+    table.timestamp("deleted_at");
   });
 }
 
 export async function down(knex: Knex): Promise<void> {
-  await knex.schema.dropTableIfExists('users');
+  await knex.schema.dropTableIfExists("users");
 }
 ```
 
@@ -361,13 +369,13 @@ export async function down(knex: Knex): Promise<void> {
 ### 6.1 knex-orm.config.ts
 
 ```typescript
-import { KnexORM } from 'knex-orm';
+import { KnexORM } from "knex-orm";
 
 export default KnexORM.configure({
-  default: 'primary',
+  default: "primary",
   connections: {
     primary: {
-      client: 'postgresql',
+      client: "postgresql",
       connection: {
         host: process.env.DB_HOST,
         port: Number(process.env.DB_PORT),
@@ -377,7 +385,7 @@ export default KnexORM.configure({
       },
     },
     secondary: {
-      client: 'mysql2',
+      client: "mysql2",
       connection: {
         host: process.env.MYSQL_HOST,
         user: process.env.MYSQL_USER,
@@ -386,8 +394,8 @@ export default KnexORM.configure({
       },
     },
     analytics: {
-      client: 'sqlite3',
-      connection: { filename: './analytics.db' },
+      client: "sqlite3",
+      connection: { filename: "./analytics.db" },
     },
   },
 });
@@ -413,17 +421,19 @@ export default KnexORM.configure({
 ### 7.1 Configuração do Módulo
 
 ```typescript
-import { Module } from '@nestjs/common';
-import { KnexOrmModule } from 'knex-orm';
+import { Module } from "@nestjs/common";
+import { KnexOrmModule } from "knex-orm";
 
 @Module({
   imports: [
     KnexOrmModule.forRoot({
-      default: 'primary',
+      default: "primary",
       connections: {
         primary: {
-          client: 'postgresql',
-          connection: { /* ... */ },
+          client: "postgresql",
+          connection: {
+            /* ... */
+          },
         },
       },
     }),
@@ -436,10 +446,10 @@ export class AppModule {}
 ### 7.2 Uso nos Serviços
 
 ```typescript
-import { Injectable } from '@nestjs/common';
-import type { IRepository } from 'knex-orm';
-import { InjectRepository } from 'knex-orm/nestjs';
-import { User } from './user.entity';
+import { Injectable } from "@nestjs/common";
+import type { IRepository } from "knex-orm";
+import { InjectRepository } from "knex-orm/nestjs";
+import { User } from "./user.entity";
 
 @Injectable()
 export class UserService {
@@ -469,17 +479,17 @@ export class UserService {
 ## 8. Integração Node Vanilla
 
 ```typescript
-import 'reflect-metadata';
-import { KnexORM } from 'knex-orm';
-import { User } from './entities/user';
+import "reflect-metadata";
+import { KnexORM } from "knex-orm";
+import { User } from "./entities/user";
 
 async function main() {
   const orm = await KnexORM.initialize({
-    default: 'primary',
+    default: "primary",
     connections: {
       primary: {
-        client: 'sqlite3',
-        connection: { filename: ':memory:' },
+        client: "sqlite3",
+        connection: { filename: ":memory:" },
       },
     },
   });
@@ -497,14 +507,14 @@ async function main() {
 
 ### 9.1 Estrutura por Camada
 
-| Camada | Tipo | Ferramentas | Estratégia |
-|--------|------|-------------|------------|
-| Decorators | Unit | Jest, ts-jest ou Bun test | Mock de `Reflect.defineMetadata` |
-| MetadataStorage | Unit | Jest ou Bun test | Verificar armazenamento e leitura de metadata |
-| Query Builder / Mapper | Unit | Jest, jest-mock-extended ou Bun test | Mock de `knex` |
-| GenericRepository | Integration | Jest, SQLite in-memory (Node) | Ciclo CRUD completo |
-| GenericRepository | Integration | Bun test, pg/mysql (Bun) | Ciclo CRUD completo |
-| MigrationGenerator | Integration | Jest, SQLite in-memory | Gerar migration e executar |
+| Camada                 | Tipo        | Ferramentas                          | Estratégia                                    |
+| ---------------------- | ----------- | ------------------------------------ | --------------------------------------------- |
+| Decorators             | Unit        | Jest, ts-jest ou Bun test            | Mock de `Reflect.defineMetadata`              |
+| MetadataStorage        | Unit        | Jest ou Bun test                     | Verificar armazenamento e leitura de metadata |
+| Query Builder / Mapper | Unit        | Jest, jest-mock-extended ou Bun test | Mock de `knex`                                |
+| GenericRepository      | Integration | Jest, SQLite in-memory (Node)        | Ciclo CRUD completo                           |
+| GenericRepository      | Integration | Bun test, pg/mysql (Bun)             | Ciclo CRUD completo                           |
+| MigrationGenerator     | Integration | Jest, SQLite in-memory               | Gerar migration e executar                    |
 
 ### 9.2 Configuração Recomendada
 
@@ -517,10 +527,10 @@ async function main() {
 
 A suite suporta **Jest** (Node) e **Bun test** com instruções claras:
 
-| Runner | Comando | Runtime | SQLite |
-|--------|---------|---------|--------|
-| Jest | `npm test` | Node | ✅ in-memory |
-| Bun test | `bun test` | Bun | ❌ |
+| Runner   | Comando    | Runtime | SQLite       |
+| -------- | ---------- | ------- | ------------ |
+| Jest     | `npm test` | Node    | ✅ in-memory |
+| Bun test | `bun test` | Bun     | ❌           |
 
 **Jest:** padrão para CI e publicação NPM; usa `ts-jest` para TypeScript.
 
@@ -682,7 +692,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: "20"
       - run: npm ci
       - run: npm test
   test-bun:
@@ -719,41 +729,41 @@ A detecção programática segue a [documentação oficial do Bun](https://bun.s
  * Funciona em TypeScript sem @types/bun.
  */
 export function isBun(): boolean {
-  return typeof process !== 'undefined' && !!process.versions?.bun;
+  return typeof process !== "undefined" && !!process.versions?.bun;
 }
 
 /**
  * Detecta se o código está rodando em Node.js.
  */
 export function isNode(): boolean {
-  return typeof process !== 'undefined' && !process.versions?.bun;
+  return typeof process !== "undefined" && !process.versions?.bun;
 }
 
 /**
  * Retorna o runtime atual.
  */
-export type Runtime = 'node' | 'bun';
+export type Runtime = "node" | "bun";
 
 export function getRuntime(): Runtime {
-  return isBun() ? 'bun' : 'node';
+  return isBun() ? "bun" : "node";
 }
 ```
 
 Alternativa via global `Bun` (requer `@types/bun` em projetos TypeScript):
 
 ```typescript
-if (typeof Bun !== 'undefined') {
+if (typeof Bun !== "undefined") {
   // Executando em Bun
 }
 ```
 
 ### 13.2 Driver Strategy por Runtime
 
-| Banco      | Node.js              | Bun                    |
-|-----------|----------------------|------------------------|
-| PostgreSQL| `pg` (pure JS)       | `pg` ✅                |
-| MySQL     | `mysql2` (pure JS)  | `mysql2` ✅            |
-| SQLite    | `sqlite3` ou `better-sqlite3` | **Limitação** ⚠️ |
+| Banco      | Node.js                       | Bun              |
+| ---------- | ----------------------------- | ---------------- |
+| PostgreSQL | `pg` (pure JS)                | `pg` ✅          |
+| MySQL      | `mysql2` (pure JS)            | `mysql2` ✅      |
+| SQLite     | `sqlite3` ou `better-sqlite3` | **Limitação** ⚠️ |
 
 **Limitação conhecida — SQLite em Bun:** Os drivers `sqlite3` e `better-sqlite3` são native addons (node-gyp) e **não funcionam em Bun** (Bun usa JavaScriptCore, não V8). O Knex ainda não suporta `bun:sqlite` ([issue #6049](https://github.com/knex/knex/issues/6049)). Enquanto isso:
 
@@ -763,18 +773,18 @@ if (typeof Bun !== 'undefined') {
 ```typescript
 // Exemplo: configuração condicional para testes
 const connection = isBun()
-  ? { client: 'postgresql', connection: process.env.TEST_DATABASE_URL }
-  : { client: 'sqlite3', connection: { filename: ':memory:' } };
+  ? { client: "postgresql", connection: process.env.TEST_DATABASE_URL }
+  : { client: "sqlite3", connection: { filename: ":memory:" } };
 ```
 
 ### 13.3 Build e Bundle
 
 A lib usa `tsc` para compilação e publicação no NPM. Para projetos que consomem a lib em Bun:
 
-| Ferramenta | Uso                    | Saída                          |
-|------------|------------------------|---------------------------------|
-| `tsc`      | Build da lib (NPM)     | `dist/` com ESM + CJS + `.d.ts` |
-| `bun build`| Projetos consumidores  | Bundle para deploy em Bun       |
+| Ferramenta  | Uso                   | Saída                           |
+| ----------- | --------------------- | ------------------------------- |
+| `tsc`       | Build da lib (NPM)    | `dist/` com ESM + CJS + `.d.ts` |
+| `bun build` | Projetos consumidores | Bundle para deploy em Bun       |
 
 Coexistência no `package.json` da lib:
 
@@ -791,12 +801,12 @@ O build principal permanece `tsc` para garantir compatibilidade NPM. Projetos qu
 
 ### 13.4 Performance Delta
 
-| Operação              | Node.js | Bun     | Delta aproximado |
-|-----------------------|---------|---------|------------------|
-| Startup (cold)        | ~200ms  | ~50ms   | ~4x mais rápido  |
-| Queries PostgreSQL    | baseline| ~1.1x   | Leve ganho       |
-| Queries paralelas     | baseline| ~2x     | Ganho significativo |
-| Testes (50 specs)     | ~1.2s   | ~0.08s  | ~15x mais rápido |
+| Operação           | Node.js  | Bun    | Delta aproximado    |
+| ------------------ | -------- | ------ | ------------------- |
+| Startup (cold)     | ~200ms   | ~50ms  | ~4x mais rápido     |
+| Queries PostgreSQL | baseline | ~1.1x  | Leve ganho          |
+| Queries paralelas  | baseline | ~2x    | Ganho significativo |
+| Testes (50 specs)  | ~1.2s    | ~0.08s | ~15x mais rápido    |
 
 Os drivers `pg` e `mysql2` são pure JavaScript e funcionam em ambos os runtimes com desempenho similar; Bun tende a se destacar em startup e concorrência.
 
@@ -804,15 +814,15 @@ Os drivers `pg` e `mysql2` são pure JavaScript e funcionam em ambos os runtimes
 
 O Bun implementa as APIs Node.js relevantes ao Knex:
 
-| API Node.js      | Suporte Bun | Observação                    |
-|------------------|-------------|-------------------------------|
-| `process`        | ✅          | `process.versions.bun` existe  |
-| `Buffer`         | ✅          | Compatível                    |
-| `fs` / `fs/promises` | ✅     | Mais rápido em Bun            |
-| `path`, `url`    | ✅          | Compatível                    |
-| `http`, `https`  | ✅          | Compatível                    |
-| `stream`, `crypto` | ✅        | Maioria dos casos             |
-| Native addons    | ❌          | `sqlite3`, `better-sqlite3` incompatíveis |
+| API Node.js          | Suporte Bun | Observação                                |
+| -------------------- | ----------- | ----------------------------------------- |
+| `process`            | ✅          | `process.versions.bun` existe             |
+| `Buffer`             | ✅          | Compatível                                |
+| `fs` / `fs/promises` | ✅          | Mais rápido em Bun                        |
+| `path`, `url`        | ✅          | Compatível                                |
+| `http`, `https`      | ✅          | Compatível                                |
+| `stream`, `crypto`   | ✅          | Maioria dos casos                         |
+| Native addons        | ❌          | `sqlite3`, `better-sqlite3` incompatíveis |
 
 ### 13.6 Variáveis de Ambiente
 
@@ -821,14 +831,14 @@ O Bun implementa as APIs Node.js relevantes ao Knex:
 ```typescript
 // Abstração opcional para acesso unificado
 function getEnv(key: string): string | undefined {
-  if (typeof Bun !== 'undefined' && Bun.env) {
+  if (typeof Bun !== "undefined" && Bun.env) {
     return Bun.env[key];
   }
   return process.env[key];
 }
 
 // Na prática: process.env é suficiente em ambos
-const dbHost = process.env.DB_HOST ?? 'localhost';
+const dbHost = process.env.DB_HOST ?? "localhost";
 ```
 
 Bun carrega `.env` automaticamente; em Node, use `dotenv` ou equivalente.
@@ -854,10 +864,10 @@ Para a lib publicada no NPM, consumidores escolhem o runtime ao executar (`node`
 
 A suite de testes suporta **Jest** (Node) e **Bun test** com instruções claras:
 
-| Runner    | Comando      | Quando usar                          |
-|-----------|--------------|--------------------------------------|
-| Jest      | `npm test`   | CI, Node, cobertura, ecossistema Jest |
-| Bun test  | `bun test`   | Desenvolvimento em Bun, velocidade    |
+| Runner   | Comando    | Quando usar                           |
+| -------- | ---------- | ------------------------------------- |
+| Jest     | `npm test` | CI, Node, cobertura, ecossistema Jest |
+| Bun test | `bun test` | Desenvolvimento em Bun, velocidade    |
 
 **Jest (padrão):** mantém `jest.config.ts` e `ts-jest`. Testes de integração com SQLite in-memory em Node.
 
@@ -865,7 +875,7 @@ A suite de testes suporta **Jest** (Node) e **Bun test** com instruções claras
 
 ```typescript
 /// <reference types="bun-types" />
-import { describe, test, expect, beforeEach } from 'bun:test';
+import { describe, test, expect, beforeEach } from "bun:test";
 ```
 
 Ou use a diretiva para globals:
@@ -879,8 +889,8 @@ Para integração em Bun, use PostgreSQL ou MySQL (SQLite não suportado):
 ```typescript
 // tests/integration/user.repository.bun.test.ts
 const knex = Knex({
-  client: 'postgresql',
-  connection: process.env.TEST_DATABASE_URL ?? 'postgres://localhost:5432/test',
+  client: "postgresql",
+  connection: process.env.TEST_DATABASE_URL ?? "postgres://localhost:5432/test",
 });
 ```
 
@@ -902,21 +912,21 @@ jobs:
 
 ### 13.9 Casos de Incompatibilidade e Workarounds
 
-| Caso                    | Workaround                                                                 |
-|-------------------------|----------------------------------------------------------------------------|
-| SQLite em Bun           | Use PostgreSQL/MySQL ou aguarde suporte do Knex a `bun:sqlite`             |
-| `better-sqlite3` em Bun | Incompatível; use `bun:sqlite` diretamente se não depender do Knex         |
-| Build Knex com Bun      | Evite `bun build` na lib; use `tsc` para publicar no NPM                    |
+| Caso                    | Workaround                                                                    |
+| ----------------------- | ----------------------------------------------------------------------------- |
+| SQLite em Bun           | Use PostgreSQL/MySQL ou aguarde suporte do Knex a `bun:sqlite`                |
+| `better-sqlite3` em Bun | Incompatível; use `bun:sqlite` diretamente se não depender do Knex            |
+| Build Knex com Bun      | Evite `bun build` na lib; use `tsc` para publicar no NPM                      |
 | `jest.mock` em Bun test | Bun test tem API compatível; `jest.mock()` foi adicionado em versões recentes |
 
 ### 13.10 Padrão Recomendado
 
-| Cenário                    | Recomendação                                                |
-|----------------------------|-------------------------------------------------------------|
-| **Projeto novo em Node**   | Node + KnexORM; SQLite para dev/teste                        |
-| **Projeto novo em Bun**    | Bun + KnexORM; PostgreSQL/MySQL para dev/teste               |
-| **Migração Node → Bun**    | Trocar runtime; manter pg/mysql; migrar testes para Bun test |
-| **Lib consumida no NPM**   | Build com `tsc`; consumidores usam Node ou Bun sem mudanças  |
+| Cenário                  | Recomendação                                                 |
+| ------------------------ | ------------------------------------------------------------ |
+| **Projeto novo em Node** | Node + KnexORM; SQLite para dev/teste                        |
+| **Projeto novo em Bun**  | Bun + KnexORM; PostgreSQL/MySQL para dev/teste               |
+| **Migração Node → Bun**  | Trocar runtime; manter pg/mysql; migrar testes para Bun test |
+| **Lib consumida no NPM** | Build com `tsc`; consumidores usam Node ou Bun sem mudanças  |
 
 ### 13.11 Diagrama de Decisão
 
@@ -937,16 +947,16 @@ flowchart TD
 
 ## Decisões Arquiteturais (Resumo da FASE 1)
 
-| Decisão | Escolha | Justificativa |
-|---------|---------|---------------|
-| Data Mapper vs Active Record | **Data Mapper** | Entidades anêmicas, testabilidade, alinhado a TypeORM/MikroORM |
-| Decorators → Schema Knex | Metadata via `reflect-metadata` + mapeamento para `table.string()`, etc. | Padrão consolidado em TypeScript |
-| Migrations | Diff de schema (entidade vs DB) + geração de arquivo Knex | Reutiliza `knex.migrate.latest/rollback` |
-| NestJS | DynamicModule com `forRoot`/`forFeature` | Padrão oficial de libs NestJS |
-| Multi-connection | Connection Registry com nomes | Alinhado a TypeORM DataSource e Sequelize |
-| Testes | SQLite in-memory (integração) + mocks (unit) | Rápido, isolado, sem dependência externa |
-| Dual runtime | Node.js + Bun | Publicação NPM; compatibilidade com pg/mysql em ambos; SQLite em Bun aguarda Knex bun:sqlite |
+| Decisão                      | Escolha                                                                  | Justificativa                                                                                |
+| ---------------------------- | ------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------- |
+| Data Mapper vs Active Record | **Data Mapper**                                                          | Entidades anêmicas, testabilidade, alinhado a TypeORM/MikroORM                               |
+| Decorators → Schema Knex     | Metadata via `reflect-metadata` + mapeamento para `table.string()`, etc. | Padrão consolidado em TypeScript                                                             |
+| Migrations                   | Diff de schema (entidade vs DB) + geração de arquivo Knex                | Reutiliza `knex.migrate.latest/rollback`                                                     |
+| NestJS                       | DynamicModule com `forRoot`/`forFeature`                                 | Padrão oficial de libs NestJS                                                                |
+| Multi-connection             | Connection Registry com nomes                                            | Alinhado a TypeORM DataSource e Sequelize                                                    |
+| Testes                       | SQLite in-memory (integração) + mocks (unit)                             | Rápido, isolado, sem dependência externa                                                     |
+| Dual runtime                 | Node.js + Bun                                                            | Publicação NPM; compatibilidade com pg/mysql em ambos; SQLite em Bun aguarda Knex bun:sqlite |
 
 ---
 
-*Documento gerado com base em pesquisa web (Knex.js, TypeORM, MikroORM, Prisma, NPM, NestJS, SOLID, TDD, Clean Architecture) e decisões arquiteturais documentadas.*
+_Documento gerado com base em pesquisa web (Knex.js, TypeORM, MikroORM, Prisma, NPM, NestJS, SOLID, TDD, Clean Architecture) e decisões arquiteturais documentadas._

@@ -18,19 +18,19 @@
 
 ## Types
 
-| Type | Description |
-|------|-------------|
-| `feat` | New feature |
-| `fix` | Bug fix |
-| `docs` | Documentation only |
+| Type       | Description                                             |
+| ---------- | ------------------------------------------------------- |
+| `feat`     | New feature                                             |
+| `fix`      | Bug fix                                                 |
+| `docs`     | Documentation only                                      |
 | `refactor` | Code change that neither fixes a bug nor adds a feature |
-| `perf` | Performance improvement |
-| `test` | Adding or updating tests |
-| `build` | Build system, dependencies |
-| `ci` | CI/CD configuration |
-| `chore` | Maintenance (e.g. tooling) |
-| `revert` | Revert a previous commit |
-| `security` | Security fix or hardening |
+| `perf`     | Performance improvement                                 |
+| `test`     | Adding or updating tests                                |
+| `build`    | Build system, dependencies                              |
+| `ci`       | CI/CD configuration                                     |
+| `chore`    | Maintenance (e.g. tooling)                              |
+| `revert`   | Revert a previous commit                                |
+| `security` | Security fix or hardening                               |
 
 ## Rules
 

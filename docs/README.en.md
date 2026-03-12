@@ -36,14 +36,14 @@ KnexORM Superset adds an ORM layer on top of Knex.js without replacing it: decor
 
 ## Stack
 
-| Layer | Technology |
-|-------|------------|
-| Runtimes | Node.js ≥18, Bun ≥1.0 |
-| Language | TypeScript 4.5+ |
-| Base | Knex.js |
-| Frameworks | NestJS 9–11 (optional) |
-| Databases | PostgreSQL, MySQL/MySQL2, SQLite3, MSSQL, Oracle |
-| Testing | Jest, Bun test |
+| Layer      | Technology                                       |
+| ---------- | ------------------------------------------------ |
+| Runtimes   | Node.js ≥18, Bun ≥1.0                            |
+| Language   | TypeScript 4.5+                                  |
+| Base       | Knex.js                                          |
+| Frameworks | NestJS 9–11 (optional)                           |
+| Databases  | PostgreSQL, MySQL/MySQL2, SQLite3, MSSQL, Oracle |
+| Testing    | Jest, Bun test                                   |
 
 ## Prerequisites
 
@@ -64,13 +64,13 @@ bun add knex-orm knex reflect-metadata
 
 Typical environment variables (for consumer projects):
 
-| Variable | Description |
-|----------|-------------|
-| `DB_HOST` | Database host |
-| `DB_PORT` | Port |
-| `DB_USER` | User |
-| `DB_PASSWORD` | Password |
-| `DB_NAME` | Database name |
+| Variable       | Description                     |
+| -------------- | ------------------------------- |
+| `DB_HOST`      | Database host                   |
+| `DB_PORT`      | Port                            |
+| `DB_USER`      | User                            |
+| `DB_PASSWORD`  | Password                        |
+| `DB_NAME`      | Database name                   |
 | `DATABASE_URL` | Connection string (alternative) |
 
 ## Running the Project
@@ -134,28 +134,28 @@ knex-orm/
 
 ## TypeScript Paths / Aliases
 
-| Alias | Target |
-|-------|--------|
-| `@core/*` | `./src/core/*` |
+| Alias         | Target             |
+| ------------- | ------------------ |
+| `@core/*`     | `./src/core/*`     |
 | `@adapters/*` | `./src/adapters/*` |
-| `@nestjs/*` | `./src/nestjs/*` |
-| `@cli/*` | `./src/cli/*` |
-| `@test/*` | `./test/*` |
+| `@nestjs/*`   | `./src/nestjs/*`   |
+| `@cli/*`      | `./src/cli/*`      |
+| `@test/*`     | `./test/*`         |
 
 Example:
 
 ```typescript
-import { Entity } from '@core/decorators';
-import { GenericRepository } from '@adapters/repository';
+import { Entity } from "@core/decorators";
+import { GenericRepository } from "@adapters/repository";
 ```
 
 ## Documentation
 
-| File | Description |
-|------|-------------|
+| File                                           | Description                                                                                                                             |
+| ---------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
 | [knex-orm-superset.md](./knex-orm-superset.md) | Full architecture document: overview, decorators, GenericRepository, migrations, multi-connection, NestJS, Bun, testing, NPM publishing |
-| [README.md](../README.md) | README in Portuguese |
-| [COMMITS_RULES.md](./COMMITS_RULES.md) | Conventional commit rules for agents and humans |
+| [README.md](../README.md)                      | README in Portuguese                                                                                                                    |
+| [COMMITS_RULES.md](./COMMITS_RULES.md)         | Conventional commit rules for agents and humans                                                                                         |
 
 ## Commit Rules
 
