@@ -7,11 +7,13 @@ dist/
 
 # Coverage
 coverage/
+**/.agents
 
 # Environment
 .env
 .env.local
 .env.*.local
+.rules
 
 # OS
 .DS_Store
