@@ -3,19 +3,19 @@
  * Maps to table.string(), table.integer(), etc.
  */
 export type ColumnType =
-  | "string"
-  | "integer"
-  | "bigInteger"
-  | "boolean"
-  | "text"
-  | "float"
-  | "decimal"
-  | "date"
-  | "datetime"
-  | "timestamp"
-  | "json"
-  | "jsonb"
-  | "uuid";
+  | 'string'
+  | 'integer'
+  | 'bigInteger'
+  | 'boolean'
+  | 'text'
+  | 'float'
+  | 'decimal'
+  | 'date'
+  | 'datetime'
+  | 'timestamp'
+  | 'json'
+  | 'jsonb'
+  | 'uuid';
 
 /**
  * Metadata for a single column/property of an entity.

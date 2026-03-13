@@ -1,4 +1,4 @@
-import type { ColumnMetadata, PrimaryKeyOptions } from "./column-metadata";
+import type { ColumnMetadata, PrimaryKeyOptions } from './column-metadata';
 
 /**
  * Metadata stored for an entity class decorated with @Entity.

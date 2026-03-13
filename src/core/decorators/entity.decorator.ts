@@ -1,9 +1,6 @@
-import type { EntityMetadata } from "../types/entity-metadata";
-import {
-  setEntityMetadata,
-  getEntityMetadata as getFromStorage,
-} from "../metadata/metadata-storage";
-import { toSnakeCase } from "../utils/string";
+import type { EntityMetadata } from '../types/entity-metadata';
+import { setEntityMetadata, getEntityMetadata as getFromStorage } from '../metadata/metadata-storage';
+import { toSnakeCase } from '../utils/string';
 
 /**
  * Decorator that maps a class to a database table.
@@ -11,12 +8,12 @@ import { toSnakeCase } from "../utils/string";
  */
 export function Entity(tableName?: string): ClassDecorator {
   return (target: object): void => {
-    if (typeof target !== "function") {
-      throw new TypeError("@Entity can only be applied to class constructors");
+    if (typeof target !== 'function') {
+      throw new TypeError('@Entity can only be applied to class constructors');
     }
 
     const constructor = target as new (...args: unknown[]) => object;
-    const name = constructor.name ?? "";
+    const name = constructor.name ?? '';
     const resolvedTableName = tableName ?? toSnakeCase(name);
 
     setEntityMetadata(target, { tableName: resolvedTableName });

@@ -1,6 +1,6 @@
-import type { ColumnOptions } from "../types/column-metadata";
-import { addColumnMetadata } from "../metadata/metadata-storage";
-import { toSnakeCase } from "../utils/string";
+import type { ColumnOptions } from '../types/column-metadata';
+import { addColumnMetadata } from '../metadata/metadata-storage';
+import { getPrototypeConstructor, toSnakeCase } from '../utils/string';
 
 /**
  * Decorator that defines a column of an entity.
@@ -10,10 +10,11 @@ import { toSnakeCase } from "../utils/string";
  */
 export function Column(options: ColumnOptions): PropertyDecorator {
   return (target: object, propertyKey: string | symbol): void => {
+    const constructor = getPrototypeConstructor(target);
+    if (!constructor) return;
+
     const propertyName = String(propertyKey);
     const columnName = toSnakeCase(propertyName);
-    const constructor = (target as { constructor?: object }).constructor;
-    if (!constructor) return;
 
     addColumnMetadata(constructor, propertyName, {
       columnName,

@@ -1,8 +1,25 @@
-import {
-  addColumnMetadata,
-  setSoftDeleteMetadata,
-} from "../metadata/metadata-storage";
-import { toSnakeCase } from "../utils/string";
+import type { ColumnMetadata } from '../types/column-metadata';
+import { addColumnMetadata, setSoftDeleteMetadata } from '../metadata/metadata-storage';
+import { getPrototypeConstructor, toSnakeCase } from '../utils/string';
+
+function createTimestampDecorator(
+  metadata: Omit<ColumnMetadata, 'columnName'> & { columnName?: string },
+  onApply?: (constructor: object, propertyName: string, columnName: string) => void,
+): PropertyDecorator {
+  return (target: object, propertyKey: string | symbol): void => {
+    const constructor = getPrototypeConstructor(target);
+    if (!constructor) return;
+
+    const propertyName = String(propertyKey);
+    const columnName = metadata.columnName ?? toSnakeCase(propertyName);
+
+    addColumnMetadata(constructor, propertyName, {
+      ...metadata,
+      columnName,
+    });
+    onApply?.(constructor, propertyName, columnName);
+  };
+}
 
 /**
  * Decorator for created_at column with default CURRENT_TIMESTAMP.
@@ -10,18 +27,10 @@ import { toSnakeCase } from "../utils/string";
  * @example @CreatedAt() createdAt: Date;
  */
 export function CreatedAt(): PropertyDecorator {
-  return (target: object, propertyKey: string | symbol): void => {
-    const propertyName = String(propertyKey);
-    const columnName = toSnakeCase(propertyName);
-    const constructor = (target as { constructor?: object }).constructor;
-    if (!constructor) return;
-
-    addColumnMetadata(constructor, propertyName, {
-      columnName,
-      type: "timestamp",
-      default: "CURRENT_TIMESTAMP",
-    });
-  };
+  return createTimestampDecorator({
+    type: 'timestamp',
+    default: 'CURRENT_TIMESTAMP',
+  });
 }
 
 /**
@@ -30,18 +39,10 @@ export function CreatedAt(): PropertyDecorator {
  * @example @UpdatedAt() updatedAt: Date;
  */
 export function UpdatedAt(): PropertyDecorator {
-  return (target: object, propertyKey: string | symbol): void => {
-    const propertyName = String(propertyKey);
-    const columnName = toSnakeCase(propertyName);
-    const constructor = (target as { constructor?: object }).constructor;
-    if (!constructor) return;
-
-    addColumnMetadata(constructor, propertyName, {
-      columnName,
-      type: "timestamp",
-      default: "CURRENT_TIMESTAMP",
-    });
-  };
+  return createTimestampDecorator({
+    type: 'timestamp',
+    default: 'CURRENT_TIMESTAMP',
+  });
 }
 
 /**
@@ -50,17 +51,7 @@ export function UpdatedAt(): PropertyDecorator {
  * @example @SoftDelete() deletedAt?: Date;
  */
 export function SoftDelete(): PropertyDecorator {
-  return (target: object, propertyKey: string | symbol): void => {
-    const propertyName = String(propertyKey);
-    const columnName = toSnakeCase(propertyName);
-    const constructor = (target as { constructor?: object }).constructor;
-    if (!constructor) return;
-
-    addColumnMetadata(constructor, propertyName, {
-      columnName,
-      type: "timestamp",
-      nullable: true,
-    });
+  return createTimestampDecorator({ type: 'timestamp', nullable: true }, (constructor, propertyName, columnName) => {
     setSoftDeleteMetadata(constructor, propertyName, columnName);
-  };
+  });
 }

@@ -1,39 +1,31 @@
-import type {
-  ColumnMetadata,
-  PrimaryKeyOptions,
-} from "../types/column-metadata";
-import type { EntityMetadata } from "../types/entity-metadata";
+import type { ColumnMetadata, PrimaryKeyOptions } from '../types/column-metadata';
+import type { EntityMetadata } from '../types/entity-metadata';
 
-const entityRegistry = new Map<object, Pick<EntityMetadata, "tableName">>();
+const entityRegistry = new Map<object, Pick<EntityMetadata, 'tableName'>>();
 const columnRegistry = new Map<object, Map<string, ColumnMetadata>>();
-const primaryKeyRegistry = new Map<
-  object,
-  { propertyName: string; columnName: string; options?: PrimaryKeyOptions }
->();
-const softDeleteRegistry = new Map<
-  object,
-  { propertyName: string; columnName: string }
->();
+const primaryKeyRegistry = new Map<object, { propertyName: string; columnName: string; options?: PrimaryKeyOptions }>();
+const softDeleteRegistry = new Map<object, { propertyName: string; columnName: string }>();
 const indexRegistry = new Map<object, Array<{ fields: string[] }>>();
+
+function mapToRecord<V>(map: Map<string, V>): Record<string, V> {
+  const record: Record<string, V> = {};
+  for (const [key, value] of map) {
+    record[key] = value;
+  }
+  return record;
+}
 
 /**
  * Stores entity metadata for a class. Used internally by @Entity decorator.
  */
-export function setEntityMetadata(
-  target: object,
-  metadata: Pick<EntityMetadata, "tableName">,
-): void {
+export function setEntityMetadata(target: object, metadata: Pick<EntityMetadata, 'tableName'>): void {
   entityRegistry.set(target, metadata);
 }
 
 /**
  * Adds column metadata for a property. Used by @Column and related decorators.
  */
-export function addColumnMetadata(
-  constructor: object,
-  propertyName: string,
-  metadata: ColumnMetadata,
-): void {
+export function addColumnMetadata(constructor: object, propertyName: string, metadata: ColumnMetadata): void {
   let columns = columnRegistry.get(constructor);
   if (!columns) {
     columns = new Map();
@@ -61,11 +53,7 @@ export function setPrimaryKeyMetadata(
 /**
  * Sets soft delete metadata. Used by @SoftDelete decorator.
  */
-export function setSoftDeleteMetadata(
-  constructor: object,
-  propertyName: string,
-  columnName: string,
-): void {
+export function setSoftDeleteMetadata(constructor: object, propertyName: string, columnName: string): void {
   softDeleteRegistry.set(constructor, { propertyName, columnName });
 }
 
@@ -86,12 +74,7 @@ export function getEntityMetadata(target: object): EntityMetadata | undefined {
   if (!base) return undefined;
 
   const columnsMap = columnRegistry.get(target);
-  const columns: Record<string, ColumnMetadata> = {};
-  if (columnsMap) {
-    for (const [key, value] of columnsMap) {
-      columns[key] = value;
-    }
-  }
+  const columns = columnsMap ? mapToRecord(columnsMap) : {};
 
   const primaryKey = primaryKeyRegistry.get(target);
   const softDelete = softDeleteRegistry.get(target);

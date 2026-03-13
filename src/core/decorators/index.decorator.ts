@@ -1,4 +1,4 @@
-import { addIndexMetadata } from "../metadata/metadata-storage";
+import { addIndexMetadata } from '../metadata/metadata-storage';
 
 /**
  * Decorator that defines a composite index on the table.
@@ -7,8 +7,8 @@ import { addIndexMetadata } from "../metadata/metadata-storage";
  */
 export function Index(fields: string[]): ClassDecorator {
   return (target: object): void => {
-    if (typeof target !== "function") {
-      throw new TypeError("@Index can only be applied to class constructors");
+    if (typeof target !== 'function') {
+      throw new TypeError('@Index can only be applied to class constructors');
     }
     addIndexMetadata(target, fields);
   };
