@@ -189,27 +189,20 @@ Mapeamento para métodos do Knex Schema Builder:
 ### 3.3 Exemplo de Entidade Anêmica
 
 ```typescript
-import {
-  Entity,
-  PrimaryKey,
-  Column,
-  CreatedAt,
-  UpdatedAt,
-  SoftDelete,
-} from "knex-orm";
+import { Entity, PrimaryKey, Column, CreatedAt, UpdatedAt, SoftDelete } from 'knex-orm';
 
-@Entity("users")
+@Entity('users')
 export class User {
   @PrimaryKey()
   id: number;
 
-  @Column({ type: "string", nullable: false, unique: true })
+  @Column({ type: 'string', nullable: false, unique: true })
   email: string;
 
-  @Column({ type: "string" })
+  @Column({ type: 'string' })
   name: string;
 
-  @Column({ type: "boolean", default: true })
+  @Column({ type: 'boolean', default: true })
   active: boolean;
 
   @CreatedAt()
@@ -281,7 +274,7 @@ class GenericRepository<T> implements IRepository<T> {
   async find(options?: FindOptions<T>): Promise<T[]> {
     let qb = this.connection.knex(this.metadata.tableName).select();
     if (this.metadata.softDelete && !options?.withDeleted) {
-      qb = qb.whereNull("deleted_at");
+      qb = qb.whereNull('deleted_at');
     }
     // ... apply where, orderBy, limit, offset
     const rows = await qb;
@@ -290,12 +283,9 @@ class GenericRepository<T> implements IRepository<T> {
 
   async disable(where: WhereClause<T>): Promise<void> {
     if (!this.metadata.softDelete) {
-      throw new Error("Entity does not support soft delete");
+      throw new Error('Entity does not support soft delete');
     }
-    await this.connection
-      .knex(this.metadata.tableName)
-      .where(where)
-      .update({ deleted_at: new Date() });
+    await this.connection.knex(this.metadata.tableName).where(where).update({ deleted_at: new Date() });
   }
 
   private mapRowToEntity(row: Record<string, unknown>): T {
@@ -343,22 +333,22 @@ Operações suportadas:
 
 ```typescript
 // migrations/20250311120000_create_users.ts
-import type { Knex } from "knex";
+import type { Knex } from 'knex';
 
 export async function up(knex: Knex): Promise<void> {
-  await knex.schema.createTable("users", (table) => {
-    table.increments("id").primary();
-    table.string("email", 255).notNullable().unique();
-    table.string("name", 255);
-    table.boolean("active").defaultTo(true);
-    table.timestamp("created_at").defaultTo(knex.fn.now());
-    table.timestamp("updated_at").defaultTo(knex.fn.now());
-    table.timestamp("deleted_at");
+  await knex.schema.createTable('users', (table) => {
+    table.increments('id').primary();
+    table.string('email', 255).notNullable().unique();
+    table.string('name', 255);
+    table.boolean('active').defaultTo(true);
+    table.timestamp('created_at').defaultTo(knex.fn.now());
+    table.timestamp('updated_at').defaultTo(knex.fn.now());
+    table.timestamp('deleted_at');
   });
 }
 
 export async function down(knex: Knex): Promise<void> {
-  await knex.schema.dropTableIfExists("users");
+  await knex.schema.dropTableIfExists('users');
 }
 ```
 
@@ -369,13 +359,13 @@ export async function down(knex: Knex): Promise<void> {
 ### 6.1 knex-orm.config.ts
 
 ```typescript
-import { KnexORM } from "knex-orm";
+import { KnexORM } from 'knex-orm';
 
 export default KnexORM.configure({
-  default: "primary",
+  default: 'primary',
   connections: {
     primary: {
-      client: "postgresql",
+      client: 'postgresql',
       connection: {
         host: process.env.DB_HOST,
         port: Number(process.env.DB_PORT),
@@ -385,7 +375,7 @@ export default KnexORM.configure({
       },
     },
     secondary: {
-      client: "mysql2",
+      client: 'mysql2',
       connection: {
         host: process.env.MYSQL_HOST,
         user: process.env.MYSQL_USER,
@@ -394,8 +384,8 @@ export default KnexORM.configure({
       },
     },
     analytics: {
-      client: "sqlite3",
-      connection: { filename: "./analytics.db" },
+      client: 'sqlite3',
+      connection: { filename: './analytics.db' },
     },
   },
 });
@@ -421,16 +411,16 @@ export default KnexORM.configure({
 ### 7.1 Configuração do Módulo
 
 ```typescript
-import { Module } from "@nestjs/common";
-import { KnexOrmModule } from "knex-orm";
+import { Module } from '@nestjs/common';
+import { KnexOrmModule } from 'knex-orm';
 
 @Module({
   imports: [
     KnexOrmModule.forRoot({
-      default: "primary",
+      default: 'primary',
       connections: {
         primary: {
-          client: "postgresql",
+          client: 'postgresql',
           connection: {
             /* ... */
           },
@@ -446,16 +436,14 @@ export class AppModule {}
 ### 7.2 Uso nos Serviços
 
 ```typescript
-import { Injectable } from "@nestjs/common";
-import type { IRepository } from "knex-orm";
-import { InjectRepository } from "knex-orm/nestjs";
-import { User } from "./user.entity";
+import { Injectable } from '@nestjs/common';
+import type { IRepository } from 'knex-orm';
+import { InjectRepository } from 'knex-orm/nestjs';
+import { User } from './user.entity';
 
 @Injectable()
 export class UserService {
-  constructor(
-    @InjectRepository(User) private readonly userRepo: IRepository<User>,
-  ) {}
+  constructor(@InjectRepository(User) private readonly userRepo: IRepository<User>) {}
 
   async findActiveUsers() {
     return this.userRepo.find({ where: { active: true } });
@@ -479,17 +467,17 @@ export class UserService {
 ## 8. Integração Node Vanilla
 
 ```typescript
-import "reflect-metadata";
-import { KnexORM } from "knex-orm";
-import { User } from "./entities/user";
+import 'reflect-metadata';
+import { KnexORM } from 'knex-orm';
+import { User } from './entities/user';
 
 async function main() {
   const orm = await KnexORM.initialize({
-    default: "primary",
+    default: 'primary',
     connections: {
       primary: {
-        client: "sqlite3",
-        connection: { filename: ":memory:" },
+        client: 'sqlite3',
+        connection: { filename: ':memory:' },
       },
     },
   });
@@ -692,7 +680,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: '20'
       - run: npm ci
       - run: npm test
   test-bun:
@@ -729,30 +717,30 @@ A detecção programática segue a [documentação oficial do Bun](https://bun.s
  * Funciona em TypeScript sem @types/bun.
  */
 export function isBun(): boolean {
-  return typeof process !== "undefined" && !!process.versions?.bun;
+  return typeof process !== 'undefined' && !!process.versions?.bun;
 }
 
 /**
  * Detecta se o código está rodando em Node.js.
  */
 export function isNode(): boolean {
-  return typeof process !== "undefined" && !process.versions?.bun;
+  return typeof process !== 'undefined' && !process.versions?.bun;
 }
 
 /**
  * Retorna o runtime atual.
  */
-export type Runtime = "node" | "bun";
+export type Runtime = 'node' | 'bun';
 
 export function getRuntime(): Runtime {
-  return isBun() ? "bun" : "node";
+  return isBun() ? 'bun' : 'node';
 }
 ```
 
 Alternativa via global `Bun` (requer `@types/bun` em projetos TypeScript):
 
 ```typescript
-if (typeof Bun !== "undefined") {
+if (typeof Bun !== 'undefined') {
   // Executando em Bun
 }
 ```
@@ -773,8 +761,8 @@ if (typeof Bun !== "undefined") {
 ```typescript
 // Exemplo: configuração condicional para testes
 const connection = isBun()
-  ? { client: "postgresql", connection: process.env.TEST_DATABASE_URL }
-  : { client: "sqlite3", connection: { filename: ":memory:" } };
+  ? { client: 'postgresql', connection: process.env.TEST_DATABASE_URL }
+  : { client: 'sqlite3', connection: { filename: ':memory:' } };
 ```
 
 ### 13.3 Build e Bundle
@@ -831,14 +819,14 @@ O Bun implementa as APIs Node.js relevantes ao Knex:
 ```typescript
 // Abstração opcional para acesso unificado
 function getEnv(key: string): string | undefined {
-  if (typeof Bun !== "undefined" && Bun.env) {
+  if (typeof Bun !== 'undefined' && Bun.env) {
     return Bun.env[key];
   }
   return process.env[key];
 }
 
 // Na prática: process.env é suficiente em ambos
-const dbHost = process.env.DB_HOST ?? "localhost";
+const dbHost = process.env.DB_HOST ?? 'localhost';
 ```
 
 Bun carrega `.env` automaticamente; em Node, use `dotenv` ou equivalente.
@@ -875,7 +863,7 @@ A suite de testes suporta **Jest** (Node) e **Bun test** com instruções claras
 
 ```typescript
 /// <reference types="bun-types" />
-import { describe, test, expect, beforeEach } from "bun:test";
+import { describe, test, expect, beforeEach } from 'bun:test';
 ```
 
 Ou use a diretiva para globals:
@@ -889,8 +877,8 @@ Para integração em Bun, use PostgreSQL ou MySQL (SQLite não suportado):
 ```typescript
 // tests/integration/user.repository.bun.test.ts
 const knex = Knex({
-  client: "postgresql",
-  connection: process.env.TEST_DATABASE_URL ?? "postgres://localhost:5432/test",
+  client: 'postgresql',
+  connection: process.env.TEST_DATABASE_URL ?? 'postgres://localhost:5432/test',
 });
 ```
 

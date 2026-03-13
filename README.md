@@ -113,7 +113,12 @@ Saída em `dist/` com `.js` e `.d.ts`.
 
 ## Lint & Format
 
-[A DEFINIR] — ESLint e Prettier podem ser configurados conforme necessidade do projeto.
+```bash
+npm run lint        # Verifica código com ESLint
+npm run lint:fix    # Corrige automaticamente
+npm run format      # Formata com Prettier
+npm run format:check # Verifica formatação (CI)
+```
 
 ## Estrutura de Pastas
 
@@ -142,11 +147,32 @@ knex-orm/
 | `@cli/*`      | `./src/cli/*`      |
 | `@test/*`     | `./test/*`         |
 
-Exemplo:
+Exemplo de entidade com decorators:
 
 ```typescript
-import { Entity } from "@core/decorators";
-import { GenericRepository } from "@adapters/repository";
+import { Entity, PrimaryKey, Column, CreatedAt, UpdatedAt, SoftDelete, Index } from '@core/decorators';
+
+@Entity('users')
+@Index(['email', 'tenant_id'])
+export class User {
+  @PrimaryKey()
+  id!: number;
+
+  @Column({ type: 'string', nullable: false, unique: true })
+  email!: string;
+
+  @Column({ type: 'string' })
+  name!: string;
+
+  @CreatedAt()
+  createdAt!: Date;
+
+  @UpdatedAt()
+  updatedAt!: Date;
+
+  @SoftDelete()
+  deletedAt?: Date;
+}
 ```
 
 ## Documentação
@@ -154,6 +180,7 @@ import { GenericRepository } from "@adapters/repository";
 | Arquivo                                             | Descrição                                                                                                                                        |
 | --------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
 | [knex-orm-superset.md](./docs/knex-orm-superset.md) | Documento de arquitetura completo: visão geral, decorators, GenericRepository, migrations, multi-connection, NestJS, Bun, testes, publicação NPM |
+| [DEVELOPMENT.md](./docs/DEVELOPMENT.md)             | Guia de desenvolvimento: TDD, regras (.rules), boas práticas                                                                                     |
 | [README.en.md](./docs/README.en.md)                 | README em inglês                                                                                                                                 |
 | [COMMITS_RULES.md](./docs/COMMITS_RULES.md)         | Regras de commits convencionais para agentes e humanos                                                                                           |
 

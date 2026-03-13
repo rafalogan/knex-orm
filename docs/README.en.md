@@ -113,7 +113,12 @@ Output in `dist/` with `.js` and `.d.ts`.
 
 ## Lint & Format
 
-[TBD] — ESLint and Prettier can be configured as needed for the project.
+```bash
+npm run lint        # Run ESLint
+npm run lint:fix    # Fix automatically
+npm run format      # Format with Prettier
+npm run format:check # Check formatting (CI)
+```
 
 ## Folder Structure
 
@@ -142,11 +147,32 @@ knex-orm/
 | `@cli/*`      | `./src/cli/*`      |
 | `@test/*`     | `./test/*`         |
 
-Example:
+Example entity with decorators:
 
 ```typescript
-import { Entity } from "@core/decorators";
-import { GenericRepository } from "@adapters/repository";
+import { Entity, PrimaryKey, Column, CreatedAt, UpdatedAt, SoftDelete, Index } from '@core/decorators';
+
+@Entity('users')
+@Index(['email', 'tenant_id'])
+export class User {
+  @PrimaryKey()
+  id!: number;
+
+  @Column({ type: 'string', nullable: false, unique: true })
+  email!: string;
+
+  @Column({ type: 'string' })
+  name!: string;
+
+  @CreatedAt()
+  createdAt!: Date;
+
+  @UpdatedAt()
+  updatedAt!: Date;
+
+  @SoftDelete()
+  deletedAt?: Date;
+}
 ```
 
 ## Documentation
@@ -154,6 +180,7 @@ import { GenericRepository } from "@adapters/repository";
 | File                                           | Description                                                                                                                             |
 | ---------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
 | [knex-orm-superset.md](./knex-orm-superset.md) | Full architecture document: overview, decorators, GenericRepository, migrations, multi-connection, NestJS, Bun, testing, NPM publishing |
+| [DEVELOPMENT.md](./DEVELOPMENT.md)             | Development guide: TDD, rules (.rules), best practices                                                                                  |
 | [README.md](../README.md)                      | README in Portuguese                                                                                                                    |
 | [COMMITS_RULES.md](./COMMITS_RULES.md)         | Conventional commit rules for agents and humans                                                                                         |
 
