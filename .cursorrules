@@ -1,0 +1,48 @@
+# REGRAS DE DESENVOLVIMENTO — TDD OBRIGATÓRIO
+
+## FLUXO OBRIGATÓRIO PARA TODA TAREFA DE DESENVOLVIMENTO
+Toda implementação DEVE seguir esta ordem. Nunca pule etapas.
+
+### ETAPA 0 — LEITURA E ANÁLISE
+- Leia os arquivos relevantes em `./docs` antes de qualquer código
+- Leia testes existentes em `./test/unit` e `./test/integration` para entender padrões do projeto
+- Pesquise na web: documentação oficial, boas práticas, patterns e soluções da comunidade com foco em **performance e segurança**
+- Se encontrar ambiguidade, dúvida ou oportunidade de melhoria → **PARE e pergunte ao usuário antes de prosseguir**
+
+### ETAPA 1 — RED (escreva o teste primeiro)
+- Crie o(s) arquivo(s) de teste ANTES de qualquer implementação
+- Testes unitários: `./test/unit/<módulo>/<arquivo>.spec.ts`
+- Testes de integração: `./test/integration/<módulo>/<arquivo>.spec.ts`
+- Cubra: caminho feliz, erros esperados, edge cases, dados inválidos
+- Execute os testes → devem **FALHAR** (confirme o red antes de continuar)
+
+### ETAPA 2 — GREEN (implemente o mínimo)
+- Escreva apenas o código necessário para os testes passarem
+- Sem over-engineering nesta etapa
+- Execute os testes → devem **PASSAR**
+
+### ETAPA 3 — REFACTOR (melhore sem quebrar)
+- Aplique boas práticas, tipagem estrita, princípios SOLID
+- Sem `any` em TypeScript
+- Atualize barrels/index.ts se necessário
+- Execute os testes novamente → devem continuar **PASSANDO**
+
+---
+
+## PATHS DO PROJETO
+| Recurso | Path |
+|---|---|
+| Testes unitários | `./test/unit` |
+| Testes de integração | `./test/integration` |
+| Documentação interna | `./docs` |
+
+---
+
+## REGRAS GERAIS
+- TypeScript strict — proibido `any`
+- Cada teste deve ser 100% independente (sem estado compartilhado entre `it`)
+- `beforeEach` para reset de estado/mocks
+- Nomes de teste: `"deve [resultado] quando [condição]"`
+- Não instale dependências novas sem perguntar ao usuário
+- Consulte `./docs` antes de assumir comportamentos não documentados
+- **Dúvida ou melhoria identificada → pergunte antes de agir**
