@@ -27,6 +27,7 @@
     }
   },
   "scripts": {
+    "prepublishOnly": "npm run build && npm test",
     "build": "tsc",
     "migrate:generate": "node dist/cli/migrate-generate.js migrate:generate",
     "migrate:run": "node dist/cli/migrate-generate.js migrate:run",
@@ -35,8 +36,9 @@
     "connection:test": "node dist/cli/migrate-generate.js connection:test",
     "connection:list": "node dist/cli/migrate-generate.js connection:list",
     "test": "jest",
+    "test:coverage": "jest --coverage",
     "test:node": "jest",
-    "test:bun": "bun test",
+    "test:bun": "bun test --tsconfig-override=tsconfig.test.json",
     "lint": "npx eslint .",
     "lint:fix": "npx eslint . --fix",
     "format": "npx prettier --write .",
@@ -83,6 +85,11 @@
     "dist"
   ],
   "engines": {
-    "node": ">=18.0.0"
+    "node": ">=18.0.0",
+    "bun": ">=1.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/knex-orm/knex-orm.git"
   }
 }

@@ -11,7 +11,19 @@ module.exports = {
     '^@cli/(.*)$': '<rootDir>/src/cli/$1',
     '^@test/(.*)$': '<rootDir>/test/$1',
   },
-  collectCoverageFrom: ['src/**/*.ts', '!src/**/*.d.ts'],
+  collectCoverageFrom: [
+    'src/**/*.ts',
+    '!src/**/*.d.ts',
+    '!src/core/decorators/relation.decorator.ts',
+  ],
   coverageDirectory: 'coverage',
   coverageReporters: ['text', 'lcov'],
+  coverageThreshold: {
+    global: {
+      statements: 85,
+      branches: 63,
+      functions: 85,
+      lines: 85,
+    },
+  },
 };
