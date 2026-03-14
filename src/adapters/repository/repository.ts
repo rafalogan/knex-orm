@@ -1,13 +1,7 @@
 import type { Knex } from 'knex';
 import type { EntityMetadata } from '@core/types/entity-metadata';
 import { getEntityMetadata } from '@core/decorators';
-import type {
-  PaginateOptions,
-  PaginateResult,
-  FindManyOptions,
-  FindOptions,
-  WhereClause,
-} from './types';
+import type { PaginateOptions, PaginateResult, FindManyOptions, FindOptions, WhereClause } from './types';
 
 /**
  * Repository genérico com CRUD, query builder e raw queries.
@@ -23,9 +17,7 @@ export class Repository<T extends Record<string, unknown>> {
     this.entityClass = entityClass;
     this.metadata = metadata ?? (getEntityMetadata(entityClass) as EntityMetadata);
     if (!this.metadata?.tableName) {
-      throw new TypeError(
-        `Entity ${entityClass.name} must be decorated with @Entity`,
-      );
+      throw new TypeError(`Entity ${entityClass.name} must be decorated with @Entity`);
     }
   }
 
@@ -60,17 +52,12 @@ export class Repository<T extends Record<string, unknown>> {
     bindings?: Knex.RawBinding | readonly Knex.RawBinding[] | Knex.ValueDict,
   ): Knex.Raw<TR> {
     return bindings !== undefined
-      ? (this.knexInstance.raw as (s: string, b: unknown) => Knex.Raw<TR>)(
-          sql,
-          bindings,
-        )
+      ? (this.knexInstance.raw as (s: string, b: unknown) => Knex.Raw<TR>)(sql, bindings)
       : (this.knexInstance.raw as (s: string) => Knex.Raw<TR>)(sql);
   }
 
   /** Runs operations inside a transaction. */
-  async transaction<R>(
-    fn: (trx: Knex.Transaction) => Promise<R>,
-  ): Promise<R> {
+  async transaction<R>(fn: (trx: Knex.Transaction) => Promise<R>): Promise<R> {
     return this.knexInstance.transaction(fn);
   }
 
@@ -99,10 +86,7 @@ export class Repository<T extends Record<string, unknown>> {
   }
 
   /** Applies WhereClause (including $eq, $ne, $in, $like) to query builder. */
-  private applyWhereClause(
-    qb: Knex.QueryBuilder,
-    where: WhereClause<T>,
-  ): Knex.QueryBuilder {
+  private applyWhereClause(qb: Knex.QueryBuilder, where: WhereClause<T>): Knex.QueryBuilder {
     const entries = Object.entries(where) as [keyof T & string, unknown][];
     for (const [prop, val] of entries) {
       if (val === undefined) continue;
@@ -110,12 +94,9 @@ export class Repository<T extends Record<string, unknown>> {
       if (val !== null && typeof val === 'object' && !Array.isArray(val) && !(val instanceof Date)) {
         const op = val as { $eq?: unknown; $ne?: unknown; $in?: unknown[]; $like?: string };
         if ('$eq' in op && op.$eq !== undefined) qb = qb.where(col, op.$eq);
-        else if ('$ne' in op && op.$ne !== undefined)
-          qb = qb.whereNot(col, op.$ne);
-        else if ('$in' in op && Array.isArray(op.$in))
-          qb = qb.whereIn(col, op.$in as readonly (string | number)[]);
-        else if ('$like' in op && typeof op.$like === 'string')
-          qb = qb.where(col, 'like', op.$like);
+        else if ('$ne' in op && op.$ne !== undefined) qb = qb.whereNot(col, op.$ne);
+        else if ('$in' in op && Array.isArray(op.$in)) qb = qb.whereIn(col, op.$in as readonly (string | number)[]);
+        else if ('$like' in op && typeof op.$like === 'string') qb = qb.where(col, 'like', op.$like);
       } else {
         qb = qb.where(col, val);
       }
@@ -142,21 +123,15 @@ export class Repository<T extends Record<string, unknown>> {
 
   async create(data: Partial<T>): Promise<T> {
     const row = this.toRow(data);
-    const [inserted] = await this.query()
-      .insert(row)
-      .returning('*');
+    const [inserted] = await this.query().insert(row).returning('*');
     return this.mapRowToEntity(inserted as Record<string, unknown>);
   }
 
   async createMany(data: Partial<T>[]): Promise<T[]> {
     if (data.length === 0) return [];
     const rows = data.map((d) => this.toRow(d));
-    const inserted = await this.query()
-      .insert(rows)
-      .returning('*');
-    return (inserted as Record<string, unknown>[]).map((r) =>
-      this.mapRowToEntity(r),
-    );
+    const inserted = await this.query().insert(rows).returning('*');
+    return (inserted as Record<string, unknown>[]).map((r) => this.mapRowToEntity(r));
   }
 
   /** Sem where → INSERT; com where → UPDATE. */
@@ -165,16 +140,11 @@ export class Repository<T extends Record<string, unknown>> {
       return this.create(entity);
     }
     const whereRow = this.toRow(where as Partial<T>);
-    return this.update(
-      whereRow as Partial<T> & { [key: string]: string | number },
-      entity,
-    );
+    return this.update(whereRow as Partial<T> & { [key: string]: string | number }, entity);
   }
 
   async findById(id: string | number): Promise<T | null> {
-    const row = await this.query()
-      .where(this.primaryKeyColumn, id)
-      .first();
+    const row = await this.query().where(this.primaryKeyColumn, id).first();
     if (!row) return null;
     return this.mapRowToEntity(row as Record<string, unknown>);
   }
@@ -183,8 +153,7 @@ export class Repository<T extends Record<string, unknown>> {
   async find(options?: FindOptions<T>): Promise<T[]> {
     let qb = this.query();
     const cols = this.metadata.columns ?? {};
-    const selectCols =
-      options?.select?.map((p) => this.propToColumn(String(p))) ?? ['*'];
+    const selectCols = options?.select?.map((p) => this.propToColumn(String(p))) ?? ['*'];
     qb = qb.select(selectCols as [string, ...string[]]);
     if (this.metadata.softDelete && !options?.withDeleted) {
       qb = qb.whereNull(this.metadata.softDelete.columnName);
@@ -200,9 +169,7 @@ export class Repository<T extends Record<string, unknown>> {
     if (options?.limit) qb = qb.limit(options.limit);
     if (options?.offset) qb = qb.offset(options.offset);
     const rows = await qb;
-    return (rows as Record<string, unknown>[]).map((r) =>
-      this.mapRowToEntity(r),
-    );
+    return (rows as Record<string, unknown>[]).map((r) => this.mapRowToEntity(r));
   }
 
   /** findOne(where): where obrigatório, retorna primeiro ou null. */
@@ -221,44 +188,26 @@ export class Repository<T extends Record<string, unknown>> {
     if (options?.offset) qb = qb.offset(options.offset);
     if (options?.orderBy) {
       const col =
-        typeof options.orderBy === 'string' &&
-        options.orderBy in (this.metadata.columns ?? {})
-          ? (this.metadata.columns as Record<string, { columnName: string }>)[
-              options.orderBy
-            ]?.columnName ?? options.orderBy
+        typeof options.orderBy === 'string' && options.orderBy in (this.metadata.columns ?? {})
+          ? ((this.metadata.columns as Record<string, { columnName: string }>)[options.orderBy]?.columnName ??
+            options.orderBy)
           : String(options.orderBy);
       qb = qb.orderBy(col, options.order ?? 'asc');
     }
     const rows = await qb;
-    return (rows as Record<string, unknown>[]).map((r) =>
-      this.mapRowToEntity(r),
-    );
+    return (rows as Record<string, unknown>[]).map((r) => this.mapRowToEntity(r));
   }
 
-  async update(
-    where: Partial<T> | { [key: string]: string | number },
-    data: Partial<T>,
-  ): Promise<T> {
-    const whereRow =
-      'id' in where || this.primaryKeyColumn in where
-        ? where
-        : this.toRow(where as Partial<T>);
+  async update(where: Partial<T> | { [key: string]: string | number }, data: Partial<T>): Promise<T> {
+    const whereRow = 'id' in where || this.primaryKeyColumn in where ? where : this.toRow(where as Partial<T>);
     const updateRow = this.toRow(data);
-    const [updated] = await this.query()
-      .where(whereRow)
-      .update(updateRow)
-      .returning('*');
+    const [updated] = await this.query().where(whereRow).update(updateRow).returning('*');
     return this.mapRowToEntity(updated as Record<string, unknown>);
   }
 
-  async updateMany(
-    where: { ids: (string | number)[] },
-    data: Partial<T>,
-  ): Promise<number> {
+  async updateMany(where: { ids: (string | number)[] }, data: Partial<T>): Promise<number> {
     const updateRow = this.toRow(data);
-    const count = await this.query()
-      .whereIn(this.primaryKeyColumn, where.ids)
-      .update(updateRow);
+    const count = await this.query().whereIn(this.primaryKeyColumn, where.ids).update(updateRow);
     return typeof count === 'number' ? count : 0;
   }
 
@@ -275,20 +224,13 @@ export class Repository<T extends Record<string, unknown>> {
       });
   }
 
-  async delete(
-    where: Partial<T> | { [key: string]: string | number },
-  ): Promise<void> {
-    const whereRow =
-      'id' in where || this.primaryKeyColumn in where
-        ? where
-        : this.toRow(where as Partial<T>);
+  async delete(where: Partial<T> | { [key: string]: string | number }): Promise<void> {
+    const whereRow = 'id' in where || this.primaryKeyColumn in where ? where : this.toRow(where as Partial<T>);
     await this.query().where(whereRow).del();
   }
 
   async deleteMany(where: { ids: (string | number)[] }): Promise<number> {
-    const count = await this.query()
-      .whereIn(this.primaryKeyColumn, where.ids)
-      .del();
+    const count = await this.query().whereIn(this.primaryKeyColumn, where.ids).del();
     return typeof count === 'number' ? count : 0;
   }
 
@@ -302,10 +244,7 @@ export class Repository<T extends Record<string, unknown>> {
         .select('*')
         .limit(limit)
         .offset(offset)
-        .orderBy(
-          options.orderBy ?? this.primaryKeyColumn,
-          options.order ?? 'desc',
-        ),
+        .orderBy(options.orderBy ?? this.primaryKeyColumn, options.order ?? 'desc'),
       this.query().count(`* as count`).first(),
     ]);
 
@@ -313,9 +252,7 @@ export class Repository<T extends Record<string, unknown>> {
     const totalPages = Math.ceil(total / limit);
 
     return {
-      data: (data as Record<string, unknown>[]).map((r) =>
-        this.mapRowToEntity(r),
-      ),
+      data: (data as Record<string, unknown>[]).map((r) => this.mapRowToEntity(r)),
       meta: { page, limit, total, totalPages },
     };
   }

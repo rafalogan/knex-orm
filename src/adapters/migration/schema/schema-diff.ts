@@ -44,12 +44,7 @@ export class SchemaDiff {
     return ops;
   }
 
-  private diffTable(
-    ops: MigrationOp[],
-    tableName: string,
-    curr: TableSchema,
-    prev: TableSchema,
-  ): void {
+  private diffTable(ops: MigrationOp[], tableName: string, curr: TableSchema, prev: TableSchema): void {
     const prevCols = prev.columns ?? {};
     const currCols = curr.columns ?? {};
 
@@ -76,12 +71,7 @@ export class SchemaDiff {
     this.diffIndexes(ops, tableName, curr, prev);
   }
 
-  private diffIndexes(
-    ops: MigrationOp[],
-    tableName: string,
-    curr: TableSchema,
-    prev: TableSchema,
-  ): void {
+  private diffIndexes(ops: MigrationOp[], tableName: string, curr: TableSchema, prev: TableSchema): void {
     const prevIdx = prev.indexes ?? [];
     const currIdx = curr.indexes ?? [];
 

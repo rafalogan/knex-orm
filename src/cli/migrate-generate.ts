@@ -60,8 +60,7 @@ async function main(): Promise<void> {
 
 async function runMigrateGenerate(args: string[]): Promise<void> {
   const entitiesPath = args.find((a) => a.startsWith('--entities='))?.split('=')[1];
-  const migrationsDir =
-    args.find((a) => a.startsWith('--migrations-dir='))?.split('=')[1] ?? 'migrations';
+  const migrationsDir = args.find((a) => a.startsWith('--migrations-dir='))?.split('=')[1] ?? 'migrations';
 
   if (!entitiesPath) {
     console.error(
@@ -109,12 +108,8 @@ async function loadKnexForMigrate(configPath?: string): Promise<import('knex').K
   const { createRequire } = await import('node:module');
 
   const cwd = process.cwd();
-  const { ConnectionConfigLoader } = await import(
-    '../adapters/connection/connection-config.js'
-  );
-  const { ConnectionFactory } = await import(
-    '../adapters/connection/connection-factory.js'
-  );
+  const { ConnectionConfigLoader } = await import('../adapters/connection/connection-config.js');
+  const { ConnectionFactory } = await import('../adapters/connection/connection-factory.js');
   const loader = new ConnectionConfigLoader();
 
   const path = configPath ? resolve(cwd, configPath) : loader.findConfigPath();
@@ -129,10 +124,7 @@ async function loadKnexForMigrate(configPath?: string): Promise<import('knex').K
     const env = process.env.NODE_ENV ?? 'development';
     const ormConfig = loader.resolveForEnv(raw, env);
     const defaultName = ormConfig?.default;
-    const defaultConn =
-      defaultName && ormConfig?.connections
-        ? ormConfig.connections[defaultName]
-        : undefined;
+    const defaultConn = defaultName && ormConfig?.connections ? ormConfig.connections[defaultName] : undefined;
     if (defaultConn) {
       const factory = new ConnectionFactory();
       return factory.create(defaultConn);
@@ -147,9 +139,7 @@ async function loadKnexForMigrate(configPath?: string): Promise<import('knex').K
     }
   }
 
-  throw new Error(
-    'Config not found. Run: kor connection:init or create knexfile.js',
-  );
+  throw new Error('Config not found. Run: kor connection:init or create knexfile.js');
 }
 
 async function runMigrateRun(args: string[]): Promise<void> {

@@ -17,7 +17,9 @@ import { KnexOrmModule } from 'knex-orm/nestjs';
 
 @Module({
   imports: [
-    KnexOrmModule.forRoot({ /* orm config */ }),
+    KnexOrmModule.forRoot({
+      /* orm config */
+    }),
     KnexOrmModule.forFeature([User, Product]),
   ],
 })

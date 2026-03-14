@@ -22,12 +22,7 @@ export interface GenerateResult {
  */
 export class MigrationEngine {
   async generate(options: GenerateOptions): Promise<GenerateResult> {
-    const {
-      entities,
-      migrationsDir = 'migrations',
-      schemaPath = '.orm-schema.json',
-      migrationName = 'auto',
-    } = options;
+    const { entities, migrationsDir = 'migrations', schemaPath = '.orm-schema.json', migrationName = 'auto' } = options;
 
     const builder = new SchemaBuilder();
     const registry = new SchemaRegistry(schemaPath);

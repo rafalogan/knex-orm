@@ -36,9 +36,7 @@ export class KnexORM {
     const loader = new ConnectionConfigLoader();
     const path = configPath ?? loader.findConfigPath();
     if (!path) {
-      throw new Error(
-        'No config file found. Create orm.config.js or pass --config=path',
-      );
+      throw new Error('No config file found. Create orm.config.js or pass --config=path');
     }
     await orm.manager.initializeFromPath(path);
     KnexORM.instance = orm;
@@ -62,9 +60,7 @@ export class KnexORM {
   /**
    * Get repository for entity. Uses default connection.
    */
-  getRepository<T extends Record<string, unknown>>(
-    entityClass: new () => T,
-  ): Repository<T> {
+  getRepository<T extends Record<string, unknown>>(entityClass: new () => T): Repository<T> {
     const knex = this.manager.getConnection();
     return new Repository(knex, entityClass);
   }
@@ -90,9 +86,7 @@ export class KnexORM {
   static getConnection(name?: string): Knex {
     const orm = KnexORM.getInstance();
     if (!orm) {
-      throw new Error(
-        'KnexORM not initialized. Call KnexORM.initialize() or KnexORM.initializeFromPath() first.',
-      );
+      throw new Error('KnexORM not initialized. Call KnexORM.initialize() or KnexORM.initializeFromPath() first.');
     }
     return orm.getConnection(name);
   }

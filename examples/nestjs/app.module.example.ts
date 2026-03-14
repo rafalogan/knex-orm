@@ -6,17 +6,8 @@
  * Instale: npm i knex-orm @nestjs/core @nestjs/common knex reflect-metadata
  */
 import { Module, Injectable } from '@nestjs/common';
-import {
-  KnexOrmModule,
-  InjectRepository,
-  InjectConnection,
-} from 'knex-orm/nestjs';
-import {
-  Entity,
-  PrimaryKey,
-  Column,
-  type IRepository,
-} from 'knex-orm';
+import { KnexOrmModule, InjectRepository, InjectConnection } from 'knex-orm/nestjs';
+import { Entity, PrimaryKey, Column, type IRepository } from 'knex-orm';
 
 @Entity('users')
 class User {
@@ -28,9 +19,7 @@ class User {
 
 @Injectable()
 export class UserService {
-  constructor(
-    @InjectRepository(User) private readonly userRepo: IRepository<User>,
-  ) {}
+  constructor(@InjectRepository(User) private readonly userRepo: IRepository<User>) {}
 
   async findActive() {
     return this.userRepo.find({ where: { name: 'test' } });

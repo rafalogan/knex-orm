@@ -48,19 +48,13 @@ export class MigrationGenerator {
 export async function up(knex: Knex): Promise<void> {
 `;
 
-    const upBody =
-      upStatements.length > 0
-        ? upStatements.map((s) => `  ${s}`).join('\n')
-        : '  // No changes';
+    const upBody = upStatements.length > 0 ? upStatements.map((s) => `  ${s}`).join('\n') : '  // No changes';
 
     const downHeader = `
 export async function down(knex: Knex): Promise<void> {
 `;
 
-    const downBody =
-      downStatements.length > 0
-        ? downStatements.map((s) => `  ${s}`).join('\n')
-        : '  // No changes';
+    const downBody = downStatements.length > 0 ? downStatements.map((s) => `  ${s}`).join('\n') : '  // No changes';
 
     const content = header + upBody + '\n}\n' + downHeader + downBody + '\n}\n';
     return { content, up: upBody, down: downBody };

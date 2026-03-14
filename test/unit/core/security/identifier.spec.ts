@@ -25,9 +25,7 @@ describe('identifier security', () => {
     });
 
     it('should throw TypeError for invalid identifiers', () => {
-      expect(() => assertValidSqlIdentifier("'; DROP TABLE users--")).toThrow(
-        TypeError,
-      );
+      expect(() => assertValidSqlIdentifier("'; DROP TABLE users--")).toThrow(TypeError);
       expect(() => assertValidSqlIdentifier('', '@Entity')).toThrow(TypeError);
     });
   });

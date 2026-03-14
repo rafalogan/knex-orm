@@ -65,9 +65,7 @@ describe('MigrationGenerator', () => {
   });
 
   it('should generate dropColumn migration', () => {
-    const ops: MigrationOp[] = [
-      { type: 'dropColumn', table: 'users', column: 'nickname' },
-    ];
+    const ops: MigrationOp[] = [{ type: 'dropColumn', table: 'users', column: 'nickname' }];
     const { up, down } = generator.generate(ops, 'drop_nickname_from_users');
 
     expect(up).toContain("dropColumn('nickname')");
@@ -75,9 +73,7 @@ describe('MigrationGenerator', () => {
   });
 
   it('should generate valid migration file with imports', () => {
-    const ops: MigrationOp[] = [
-      { type: 'createTable', table: 'test', schema: { tableName: 'test', columns: {} } },
-    ];
+    const ops: MigrationOp[] = [{ type: 'createTable', table: 'test', schema: { tableName: 'test', columns: {} } }];
     const { content } = generator.generate(ops, 'test');
 
     expect(content).toContain("import type { Knex } from 'knex'");
@@ -86,9 +82,7 @@ describe('MigrationGenerator', () => {
   });
 
   it('should generate addIndex migration', () => {
-    const ops: MigrationOp[] = [
-      { type: 'addIndex', table: 'users', fields: ['email', 'tenant_id'] },
-    ];
+    const ops: MigrationOp[] = [{ type: 'addIndex', table: 'users', fields: ['email', 'tenant_id'] }];
     const { up, down } = generator.generate(ops, 'add_index');
 
     expect(up).toContain("alterTable('users'");

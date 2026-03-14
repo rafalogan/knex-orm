@@ -36,9 +36,7 @@ export type OrmConfigModule =
 function hasEnvKeys(
   config: OrmConfigModule,
 ): config is { development?: OrmConfig; test?: OrmConfig; production?: OrmConfig } {
-  return (
-    'development' in config || 'test' in config || 'production' in config
-  );
+  return 'development' in config || 'test' in config || 'production' in config;
 }
 
 /** Config file names to search (in order). */

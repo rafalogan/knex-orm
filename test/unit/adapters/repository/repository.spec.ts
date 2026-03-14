@@ -48,8 +48,7 @@ function createThenableChain<T>(defaultValue: T) {
     first: jest.fn().mockResolvedValue(null),
     count: jest.fn().mockImplementation(() => chain),
   };
-  chain.then = (fn?: (v: T) => unknown) =>
-    Promise.resolve(typeof fn === 'function' ? fn(resolveValue) : resolveValue);
+  chain.then = (fn?: (v: T) => unknown) => Promise.resolve(typeof fn === 'function' ? fn(resolveValue) : resolveValue);
   chain.catch = () => chain;
   return chain as typeof chain & PromiseLike<T>;
 }
@@ -59,9 +58,9 @@ function createMockKnex(): Knex {
 
   const knexFn = jest.fn((_tableName: string) => chain);
   (knexFn as Knex).raw = jest.fn().mockResolvedValue([]);
-  (knexFn as Knex).transaction = jest.fn().mockImplementation(async (fn: (trx: Knex.Transaction) => unknown) =>
-    fn(knexFn as unknown as Knex.Transaction),
-  );
+  (knexFn as Knex).transaction = jest
+    .fn()
+    .mockImplementation(async (fn: (trx: Knex.Transaction) => unknown) => fn(knexFn as unknown as Knex.Transaction));
 
   return knexFn as unknown as Knex;
 }
@@ -102,10 +101,7 @@ describe('Repository', () => {
     it('should execute raw query when raw() is called', async () => {
       await repo.raw('SELECT * FROM users WHERE id = ?', [1]);
 
-      expect((mockKnex as Knex & { raw: jest.Mock }).raw).toHaveBeenCalledWith(
-        'SELECT * FROM users WHERE id = ?',
-        [1],
-      );
+      expect((mockKnex as Knex & { raw: jest.Mock }).raw).toHaveBeenCalledWith('SELECT * FROM users WHERE id = ?', [1]);
     });
   });
 
@@ -130,9 +126,7 @@ describe('Repository', () => {
       const result = await repo.create({ email: 'a@b.com', name: 'Alice' });
 
       expect(mockKnex).toHaveBeenCalledWith('users');
-      expect(chain.insert).toHaveBeenCalledWith(
-        expect.objectContaining({ email: 'a@b.com', name: 'Alice' }),
-      );
+      expect(chain.insert).toHaveBeenCalledWith(expect.objectContaining({ email: 'a@b.com', name: 'Alice' }));
       expect(chain.returning).toHaveBeenCalledWith('*');
       expect(result).toMatchObject({ id: 1, email: 'a@b.com', name: 'Alice' });
     });
@@ -263,9 +257,7 @@ describe('Repository', () => {
 
       const result = await repo.save({ email: 'a@b.com', name: 'Alice' });
 
-      expect(chain.insert).toHaveBeenCalledWith(
-        expect.objectContaining({ email: 'a@b.com', name: 'Alice' }),
-      );
+      expect(chain.insert).toHaveBeenCalledWith(expect.objectContaining({ email: 'a@b.com', name: 'Alice' }));
       expect(result).toMatchObject({ id: 1, email: 'a@b.com', name: 'Alice' });
     });
 
@@ -276,14 +268,9 @@ describe('Repository', () => {
       chain.update.mockImplementation(() => chain);
       chain._setResolve([{ id: 1, email: 'updated@b.com', name: 'Alice' }]);
 
-      const result = await repo.save(
-        { email: 'updated@b.com', name: 'Alice' },
-        { [pkColumn]: 1 } as { id: number },
-      );
+      const result = await repo.save({ email: 'updated@b.com', name: 'Alice' }, { [pkColumn]: 1 } as { id: number });
 
-      expect(chain.update).toHaveBeenCalledWith(
-        expect.objectContaining({ email: 'updated@b.com', name: 'Alice' }),
-      );
+      expect(chain.update).toHaveBeenCalledWith(expect.objectContaining({ email: 'updated@b.com', name: 'Alice' }));
       expect(result).toMatchObject({ id: 1, email: 'updated@b.com' });
     });
   });
@@ -345,9 +332,7 @@ describe('Repository', () => {
 
   describe('disable', () => {
     it('should throw when disable() is called on entity without SoftDelete', async () => {
-      await expect(repo.disable({ id: 1 } as { id: number })).rejects.toThrow(
-        'Entity does not support soft delete',
-      );
+      await expect(repo.disable({ id: 1 } as { id: number })).rejects.toThrow('Entity does not support soft delete');
     });
 
     it('should set deleted_at when disable() is called on entity with SoftDelete', async () => {
@@ -370,7 +355,10 @@ describe('Repository', () => {
   describe('paginate', () => {
     it('should return paginated result when paginate() is called', async () => {
       const chain = (mockKnex as jest.Mock)();
-      chain._setResolve([{ id: 1, email: 'a@b.com', name: 'Alice' }, { id: 2, email: 'b@b.com', name: 'Bob' }]);
+      chain._setResolve([
+        { id: 1, email: 'a@b.com', name: 'Alice' },
+        { id: 2, email: 'b@b.com', name: 'Bob' },
+      ]);
       chain.count.mockImplementation(() => ({ first: () => Promise.resolve({ count: 25 }) }));
 
       const result = await repo.paginate({ page: 2, limit: 10 });

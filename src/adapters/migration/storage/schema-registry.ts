@@ -33,10 +33,6 @@ export class SchemaRegistry {
   private validateSchema(schema: unknown): schema is OrmSchema {
     if (!schema || typeof schema !== 'object') return false;
     const s = schema as Record<string, unknown>;
-    return (
-      typeof s.version === 'number' &&
-      s.tables !== null &&
-      typeof s.tables === 'object'
-    );
+    return typeof s.version === 'number' && s.tables !== null && typeof s.tables === 'object';
   }
 }

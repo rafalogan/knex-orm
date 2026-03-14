@@ -7,14 +7,14 @@
 
 ## 1. Resumo Executivo
 
-| Área | Status | Observações |
-|------|--------|-------------|
-| CLI | ✅ Corrigido | migrate:generate, migrate:run, migrate:rollback implementados |
-| Migrations | ✅ Corrigido | addIndex/dropIndex implementados; alterColumn continua como TODO |
-| Schema tracking | ✅ OK | .orm-schema.json implementado e funcional |
-| Entity scan | ✅ OK | EntityScanner + decorators + metadata funcionam |
-| NestJS | ❌ Não implementado | Documentado como roadmap |
-| KnexORM (configure/initialize) | ❌ Não implementado | Documentado como roadmap |
+| Área                           | Status              | Observações                                                      |
+| ------------------------------ | ------------------- | ---------------------------------------------------------------- |
+| CLI                            | ✅ Corrigido        | migrate:generate, migrate:run, migrate:rollback implementados    |
+| Migrations                     | ✅ Corrigido        | addIndex/dropIndex implementados; alterColumn continua como TODO |
+| Schema tracking                | ✅ OK               | .orm-schema.json implementado e funcional                        |
+| Entity scan                    | ✅ OK               | EntityScanner + decorators + metadata funcionam                  |
+| NestJS                         | ❌ Não implementado | Documentado como roadmap                                         |
+| KnexORM (configure/initialize) | ❌ Não implementado | Documentado como roadmap                                         |
 
 ---
 
@@ -22,11 +22,11 @@
 
 ### 2.1 Comandos Documentados (Seção 5.2)
 
-| Comando | Doc | Implementado | Observação |
-|---------|-----|--------------|------------|
-| migration:generate | ✅ | ✅ | Funciona com `--entities=<path>` |
-| migration:run | ✅ | ❌ | Não existe no CLI |
-| migration:rollback | ✅ | ❌ | Não existe no CLI |
+| Comando            | Doc | Implementado | Observação                       |
+| ------------------ | --- | ------------ | -------------------------------- |
+| migration:generate | ✅  | ✅           | Funciona com `--entities=<path>` |
+| migration:run      | ✅  | ❌           | Não existe no CLI                |
+| migration:rollback | ✅  | ❌           | Não existe no CLI                |
 
 ### 2.2 Nome do binário
 
@@ -50,15 +50,15 @@
 
 ### 3.1 Operações de diff (Seção 5.3)
 
-| Operação | Doc | SchemaDiff | MigrationGenerator |
-|----------|-----|------------|--------------------|
-| createTable | ✅ | ✅ | ✅ |
-| addColumn | ✅ | ✅ | ✅ |
-| alterColumn | ✅ | ✅ | ⚠️ Gera TODO comentário (não altera coluna) |
-| dropColumn | ✅ | ✅ | ✅ |
-| dropTable | ✅ | ✅ | ✅ |
-| addIndex | ✅ | ❌ | ❌ (ignorado no switch) |
-| dropIndex | ✅ | ❌ | ❌ (ignorado no switch) |
+| Operação    | Doc | SchemaDiff | MigrationGenerator                          |
+| ----------- | --- | ---------- | ------------------------------------------- |
+| createTable | ✅  | ✅         | ✅                                          |
+| addColumn   | ✅  | ✅         | ✅                                          |
+| alterColumn | ✅  | ✅         | ⚠️ Gera TODO comentário (não altera coluna) |
+| dropColumn  | ✅  | ✅         | ✅                                          |
+| dropTable   | ✅  | ✅         | ✅                                          |
+| addIndex    | ✅  | ❌         | ❌ (ignorado no switch)                     |
+| dropIndex   | ✅  | ❌         | ❌ (ignorado no switch)                     |
 
 ### 3.2 Schema tracking
 
@@ -70,17 +70,17 @@
 
 ## 4. Entity Scan e Core
 
-| Item | Status |
-|------|--------|
-| EntityScanner | ✅ Implementado |
-| @Entity | ✅ |
-| @PrimaryKey | ✅ |
-| @Column | ✅ |
-| @CreatedAt, @UpdatedAt, @SoftDelete | ✅ |
-| @Index | ✅ (metadata registrado; diff de índices não) |
-| @Relation | ✅ (placeholder) |
-| MetadataStorage | ✅ |
-| getEntityMetadata | ✅ |
+| Item                                | Status                                        |
+| ----------------------------------- | --------------------------------------------- |
+| EntityScanner                       | ✅ Implementado                               |
+| @Entity                             | ✅                                            |
+| @PrimaryKey                         | ✅                                            |
+| @Column                             | ✅                                            |
+| @CreatedAt, @UpdatedAt, @SoftDelete | ✅                                            |
+| @Index                              | ✅ (metadata registrado; diff de índices não) |
+| @Relation                           | ✅ (placeholder)                              |
+| MetadataStorage                     | ✅                                            |
+| getEntityMetadata                   | ✅                                            |
 
 ---
 

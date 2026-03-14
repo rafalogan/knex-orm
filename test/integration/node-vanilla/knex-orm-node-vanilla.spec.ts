@@ -56,9 +56,7 @@ describe('Node Vanilla integration (Module 8)', () => {
   });
 
   it('should support initializeFromPath for orm.config.js', async () => {
-    const orm = await KnexORM.initializeFromPath(
-      join(__dirname, '../../fixtures/connection/config-flat.js'),
-    );
+    const orm = await KnexORM.initializeFromPath(join(__dirname, '../../fixtures/connection/config-flat.js'));
     expect(orm).toBeDefined();
     expect(orm.getConnection()).toBeDefined();
     await orm.close();

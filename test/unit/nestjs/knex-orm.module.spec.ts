@@ -1,10 +1,6 @@
 import 'reflect-metadata';
 import { Test } from '@nestjs/testing';
-import {
-  KnexOrmModule,
-  InjectRepository,
-  InjectConnection,
-} from 'knex-orm/nestjs';
+import { KnexOrmModule, InjectRepository, InjectConnection } from 'knex-orm/nestjs';
 import { Injectable } from '@nestjs/common';
 import { Entity, PrimaryKey, Column } from '@core/decorators';
 import type { Repository } from '@adapters/repository';
@@ -20,9 +16,7 @@ class User {
 
 @Injectable()
 class UserService {
-  constructor(
-    @InjectRepository(User) public readonly userRepo: Repository<User>,
-  ) {}
+  constructor(@InjectRepository(User) public readonly userRepo: Repository<User>) {}
 }
 
 @Injectable()
@@ -77,9 +71,7 @@ describe('KnexOrmModule', () => {
   it('should provide named connection when InjectConnection(name) is used', async () => {
     @Injectable()
     class SecondaryConnectionService {
-      constructor(
-        @InjectConnection('secondary') public readonly knex: Knex,
-      ) {}
+      constructor(@InjectConnection('secondary') public readonly knex: Knex) {}
     }
 
     const module = await Test.createTestingModule({

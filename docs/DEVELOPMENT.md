@@ -111,11 +111,11 @@ knex-orm/
 
 Estratégia conforme Módulo 9 (`docs/knex-orm-superset.md`):
 
-| Comando | Descrição |
-|---------|-----------|
-| `npm test` | Jest — suite completa |
+| Comando                 | Descrição                       |
+| ----------------------- | ------------------------------- |
+| `npm test`              | Jest — suite completa           |
 | `npm run test:coverage` | Jest com relatório de cobertura |
-| `bun test` | Bun test (requer Bun instalado) |
+| `bun test`              | Bun test (requer Bun instalado) |
 
 Estrutura: `test/unit/` (mocks) e `test/integration/` (SQLite in-memory).
 

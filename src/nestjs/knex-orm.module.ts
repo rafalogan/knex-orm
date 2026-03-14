@@ -1,17 +1,8 @@
-import {
-  type DynamicModule,
-  type OnModuleDestroy,
-  type Type,
-  Module,
-} from '@nestjs/common';
+import { type DynamicModule, type OnModuleDestroy, type Type, Module } from '@nestjs/common';
 import { ConnectionManager } from '@adapters/connection/connection-manager';
 import type { OrmConfig } from '@adapters/connection/connection-config';
 import { Repository } from '@adapters/repository';
-import {
-  KNEX_ORM_CONNECTION_MANAGER,
-  getConnectionToken,
-  getRepositoryToken,
-} from './constants';
+import { KNEX_ORM_CONNECTION_MANAGER, getConnectionToken, getRepositoryToken } from './constants';
 
 /**
  * Closes all connections when the NestJS application shuts down.
@@ -73,18 +64,12 @@ export class KnexOrmModule {
   /**
    * Registers repositories for entities. Call in feature modules.
    */
-  static forFeature(
-    entities: Type<object>[],
-    connectionName?: string,
-  ): DynamicModule {
-    const token = connectionName
-      ? getConnectionToken(connectionName)
-      : getConnectionToken();
+  static forFeature(entities: Type<object>[], connectionName?: string): DynamicModule {
+    const token = connectionName ? getConnectionToken(connectionName) : getConnectionToken();
 
     const repoProviders = entities.map((entity) => ({
       provide: getRepositoryToken(entity as new () => object),
-      useFactory: (knex: import('knex').Knex) =>
-        new Repository(knex, entity as new () => Record<string, unknown>),
+      useFactory: (knex: import('knex').Knex) => new Repository(knex, entity as new () => Record<string, unknown>),
       inject: [token],
     }));
 
