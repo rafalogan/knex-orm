@@ -111,4 +111,40 @@ describe('SchemaDiff', () => {
     const ops = diff.diff(schema, schema);
     expect(ops).toHaveLength(0);
   });
+
+  it('should return addIndex when index added to table', () => {
+    const prevTable: TableSchema = { ...userTable, indexes: [] };
+    const currTable: TableSchema = {
+      ...userTable,
+      indexes: [{ fields: ['email', 'tenant_id'] }],
+    };
+    const previous: OrmSchema = { version: 1, tables: { users: prevTable } };
+    const current: OrmSchema = { version: 1, tables: { users: currTable } };
+    const ops = diff.diff(current, previous);
+
+    expect(ops).toHaveLength(1);
+    expect(ops[0]).toMatchObject({
+      type: 'addIndex',
+      table: 'users',
+      fields: ['email', 'tenant_id'],
+    });
+  });
+
+  it('should return dropIndex when index removed from table', () => {
+    const prevTable: TableSchema = {
+      ...userTable,
+      indexes: [{ fields: ['email'] }],
+    };
+    const currTable: TableSchema = { ...userTable, indexes: [] };
+    const previous: OrmSchema = { version: 1, tables: { users: prevTable } };
+    const current: OrmSchema = { version: 1, tables: { users: currTable } };
+    const ops = diff.diff(current, previous);
+
+    expect(ops).toHaveLength(1);
+    expect(ops[0]).toMatchObject({
+      type: 'dropIndex',
+      table: 'users',
+      fields: ['email'],
+    });
+  });
 });

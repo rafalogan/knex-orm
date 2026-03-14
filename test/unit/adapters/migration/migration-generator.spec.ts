@@ -84,4 +84,23 @@ describe('MigrationGenerator', () => {
     expect(content).toContain('export async function up');
     expect(content).toContain('export async function down');
   });
+
+  it('should generate addIndex migration', () => {
+    const ops: MigrationOp[] = [
+      { type: 'addIndex', table: 'users', fields: ['email', 'tenant_id'] },
+    ];
+    const { up, down } = generator.generate(ops, 'add_index');
+
+    expect(up).toContain("alterTable('users'");
+    expect(up).toContain("table.index(['email', 'tenant_id'])");
+    expect(down).toContain("dropIndex(['email', 'tenant_id'])");
+  });
+
+  it('should generate dropIndex migration', () => {
+    const ops: MigrationOp[] = [{ type: 'dropIndex', table: 'users', fields: ['email'] }];
+    const { up, down } = generator.generate(ops, 'drop_index');
+
+    expect(up).toContain("dropIndex(['email'])");
+    expect(down).toContain("table.index(['email'])");
+  });
 });
