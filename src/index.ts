@@ -1,12 +1,5 @@
 // Decorators
-export {
-  Entity,
-  Column,
-  PrimaryKey,
-  CreatedAt,
-  UpdatedAt,
-  getEntityMetadata,
-} from '@core/decorators';
+export { Entity, Column, PrimaryKey, CreatedAt, UpdatedAt, getEntityMetadata } from '@core/decorators';
 
 // Metadata / types
 export type { EntityMetadata } from '@core/types/entity-metadata';
@@ -41,7 +34,7 @@ export type { GenerateOptions, GenerateResult, MigrationOp, OrmSchema } from '@a
 export { KnexAdapter } from '@adapters/knex';
 
 // Runtime detection (Node/Bun)
-export { isBun, isNode, getRuntime, type Runtime } from '@core/runtime';
+export { isBun, isNode, getRuntime, getEnv, type Runtime } from '@core/runtime';
 
 // Security utilities
 export { redactConnectionConfig, isValidSqlIdentifier } from '@core/security';
@@ -54,8 +47,4 @@ export {
   ConnectionFactory,
   ConnectionRegistry,
 } from '@adapters/connection';
-export type {
-  OrmConfig,
-  OrmConfigModule,
-  ConnectionEntry,
-} from '@adapters/connection';
+export type { OrmConfig, OrmConfigModule, ConnectionEntry } from '@adapters/connection';

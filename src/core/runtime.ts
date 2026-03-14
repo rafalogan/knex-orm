@@ -26,3 +26,18 @@ export function isNode(): boolean {
 export function getRuntime(): Runtime {
   return isBun() ? 'bun' : 'node';
 }
+
+/**
+ * Unified env access for Node and Bun.
+ * Bun loads .env automatically; in Node use dotenv or equivalent.
+ * @param key - Environment variable name
+ * @returns Value or undefined
+ */
+export function getEnv(key: string): string | undefined {
+  const g = globalThis as { Bun?: { env?: Record<string, string> } };
+  const bunEnv = g.Bun?.env;
+  if (bunEnv) {
+    return bunEnv[key];
+  }
+  return process.env[key];
+}
