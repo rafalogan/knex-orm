@@ -138,22 +138,26 @@ knex-orm/
 ├── src/
 │   ├── core/
 │   │   ├── decorators/      # @Entity, @Column, @PrimaryKey, @Index, @Relation
-│   │   ├── interfaces/      # IRepository, IConnection, IMigrationGenerator
-│   │   ├── metadata/        # MetadataStorage (reflect-metadata)
-│   │   └── types/           # ColumnType, RelationType, QueryOptions
+│   │   ├── interfaces/      # IConnection, IRepository (ports)
+│   │   ├── metadata/        # MetadataStorage, EntityScanner
+│   │   ├── types/           # ColumnType, EntityMetadata, QueryOptions
+│   │   └── utils/           # toSnakeCase, getPrototypeConstructor
 │   ├── adapters/
 │   │   ├── knex/            # KnexAdapter implementa IConnection
-│   │   ├── migration/       # MigrationGenerator, MigrationRunner
-│   │   └── repository/      # GenericRepository<T>
+│   │   ├── migration/       # MigrationEngine, MigrationGenerator, SchemaBuilder, SchemaDiff, SchemaRegistry
+│   │   │   ├── schema/      # schema-types, schema-builder, schema-diff
+│   │   │   └── storage/     # schema-registry (.orm-schema.json)
+│   │   └── repository/      # Repository<T> (GenericRepository)
 │   ├── nestjs/              # DynamicModule, providers, decorators NestJS
-│   ├── cli/                 # knex-orm generate:migration, generate:repository
+│   ├── cli/                 # knex-orm migrate:generate
 │   └── index.ts             # exports públicos da lib
-├── tests/
+├── test/
 │   ├── unit/
 │   └── integration/         # SQLite in-memory
+├── examples/                # exemplos de entidades para migrate:generate
 ├── package.json
 ├── tsconfig.json
-└── jest.config.ts
+└── jest.config.js
 ```
 
 ---
@@ -875,7 +879,7 @@ Ou use a diretiva para globals:
 Para integração em Bun, use PostgreSQL ou MySQL (SQLite não suportado):
 
 ```typescript
-// tests/integration/user.repository.bun.test.ts
+// test/integration/user.repository.bun.test.ts
 const knex = Knex({
   client: 'postgresql',
   connection: process.env.TEST_DATABASE_URL ?? 'postgres://localhost:5432/test',
