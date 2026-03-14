@@ -1,6 +1,7 @@
 import type { ColumnOptions } from '../types/column-metadata';
 import { addColumnMetadata } from '../metadata/metadata-storage';
 import { getPrototypeConstructor, toSnakeCase } from '../utils/string';
+import { assertValidSqlIdentifier } from '../security/identifier';
 
 /**
  * Decorator that defines a column of an entity.
@@ -15,6 +16,7 @@ export function Column(options: ColumnOptions): PropertyDecorator {
 
     const propertyName = String(propertyKey);
     const columnName = toSnakeCase(propertyName);
+    assertValidSqlIdentifier(columnName, `@Column for "${propertyName}"`);
 
     addColumnMetadata(constructor, propertyName, {
       columnName,

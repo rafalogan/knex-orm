@@ -49,7 +49,12 @@ export class Repository<T extends Record<string, unknown>> {
     return this.knexInstance;
   }
 
-  /** Executes raw SQL. */
+  /**
+   * Executes raw SQL. Use parameterized queries (bindings) to prevent SQL injection.
+   * Never concatenate user input into the sql string.
+   * @param sql - SQL string with ? placeholders for bindings
+   * @param bindings - Values to bind (escaped by Knex)
+   */
   raw<TR = unknown>(
     sql: string,
     bindings?: Knex.RawBinding | readonly Knex.RawBinding[] | Knex.ValueDict,

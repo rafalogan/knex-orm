@@ -5,6 +5,7 @@ import type { Knex } from 'knex';
 
 /**
  * Single connection configuration (Knex-compatible).
+ * For production: use pool (e.g. { min: 2, max: 10 }) and env vars for secrets.
  */
 export interface ConnectionEntry {
   client: string;

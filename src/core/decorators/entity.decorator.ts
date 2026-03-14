@@ -1,6 +1,7 @@
 import type { EntityMetadata } from '../types/entity-metadata';
 import { setEntityMetadata, getEntityMetadata as getFromStorage } from '../metadata/metadata-storage';
 import { toSnakeCase } from '../utils/string';
+import { assertValidSqlIdentifier } from '../security/identifier';
 
 /**
  * Decorator that maps a class to a database table.
@@ -15,6 +16,7 @@ export function Entity(tableName?: string): ClassDecorator {
     const constructor = target as new (...args: unknown[]) => object;
     const name = constructor.name ?? '';
     const resolvedTableName = tableName ?? toSnakeCase(name);
+    assertValidSqlIdentifier(resolvedTableName, '@Entity tableName');
 
     setEntityMetadata(target, { tableName: resolvedTableName });
   };
