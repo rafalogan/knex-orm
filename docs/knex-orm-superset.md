@@ -323,11 +323,11 @@ class GenericRepository<T> implements IRepository<T> {
 
 **Binário CLI:** `kor` (atalho recomendado) ou `knex-orm`. Ambos disponíveis após `npm install knex-orm`.
 
-| Comando | Descrição |
-| ------- | --------- |
+| Comando                                  | Descrição                             |
+| ---------------------------------------- | ------------------------------------- |
 | `kor migrate:generate --entities=<path>` | Gera migration a partir das entidades |
-| `kor migrate:run` | Executa `knex.migrate.latest()` |
-| `kor migrate:rollback` | Executa `knex.migrate.rollback()` |
+| `kor migrate:run`                        | Executa `knex.migrate.latest()`       |
+| `kor migrate:rollback`                   | Executa `knex.migrate.rollback()`     |
 
 **Exemplos:**
 
@@ -431,7 +431,7 @@ module.exports = {
     connections: {
       primary: {
         client: 'postgresql',
-        connection: { host: process.env.DB_HOST, /* ... */ },
+        connection: { host: process.env.DB_HOST /* ... */ },
       },
     },
   },
@@ -472,11 +472,11 @@ const knex = KnexORM.getConnection('secondary');
 
 ### 6.4 CLI de Conexões
 
-| Comando | Descrição |
-| ------- | --------- |
-| `kor connection:init` | Cria `orm.config.js` com template |
+| Comando               | Descrição                             |
+| --------------------- | ------------------------------------- |
+| `kor connection:init` | Cria `orm.config.js` com template     |
 | `kor connection:test` | Valida todas as conexões configuradas |
-| `kor connection:list` | Lista nomes das conexões |
+| `kor connection:list` | Lista nomes das conexões              |
 
 ---
 
@@ -569,13 +569,13 @@ async function main() {
 
 ### 8.1 API Node Vanilla
 
-| Método | Descrição |
-|--------|-----------|
-| `KnexORM.initialize(config)` | Inicializa conexões e retorna instância |
-| `KnexORM.initializeFromPath(path?)` | Carrega config de `orm.config.js` ou `knexfile.js` |
-| `orm.getRepository(Entity)` | Retorna `Repository<Entity>` para a conexão default |
-| `orm.getConnection(name?)` | Retorna instância Knex (conexão nomeada) |
-| `orm.close()` | Fecha todas as conexões |
+| Método                              | Descrição                                           |
+| ----------------------------------- | --------------------------------------------------- |
+| `KnexORM.initialize(config)`        | Inicializa conexões e retorna instância             |
+| `KnexORM.initializeFromPath(path?)` | Carrega config de `orm.config.js` ou `knexfile.js`  |
+| `orm.getRepository(Entity)`         | Retorna `Repository<Entity>` para a conexão default |
+| `orm.getConnection(name?)`          | Retorna instância Knex (conexão nomeada)            |
+| `orm.close()`                       | Fecha todas as conexões                             |
 
 ### 8.2 Compatibilidade
 
@@ -635,15 +635,15 @@ A suite suporta **Jest** (Node) e **Bun test** com instruções claras:
 
 ### 9.6 Implementação (Módulo 9)
 
-| Recurso | Status |
-|---------|--------|
-| Jest + ts-jest | ✅ `npm test` |
-| Coverage thresholds | ✅ statements 85%, branches 63%, functions 85%, lines 85% |
-| Bun test | ✅ `bun test --tsconfig-override=tsconfig.test.json` |
-| Repository CRUD integration | ✅ `test/integration/repository/repository-crud.spec.ts` |
+| Recurso                        | Status                                                         |
+| ------------------------------ | -------------------------------------------------------------- |
+| Jest + ts-jest                 | ✅ `npm test`                                                  |
+| Coverage thresholds            | ✅ statements 85%, branches 63%, functions 85%, lines 85%      |
+| Bun test                       | ✅ `bun test --tsconfig-override=tsconfig.test.json`           |
+| Repository CRUD integration    | ✅ `test/integration/repository/repository-crud.spec.ts`       |
 | MigrationGenerator integration | ✅ `test/integration/migration/migration-generate-run.spec.ts` |
-| Node Vanilla integration | ✅ `test/integration/node-vanilla/` |
-| Isolamento por suite | ✅ `beforeEach` / `beforeAll` / `afterAll` |
+| Node Vanilla integration       | ✅ `test/integration/node-vanilla/`                            |
+| Isolamento por suite           | ✅ `beforeEach` / `beforeAll` / `afterAll`                     |
 
 ---
 
@@ -697,13 +697,13 @@ A suite suporta **Jest** (Node) e **Bun test** com instruções claras:
 
 ### 10.4 Implementação Módulo 10 (Roadmap e Escalabilidade)
 
-| Item | Status |
-|------|--------|
-| Runtime detection (`isBun`, `isNode`, `getRuntime`) | ✅ `src/core/runtime.ts` |
-| package.json: prepublishOnly, engines.bun, repository | ✅ |
-| CI/CD: Node + Bun + build | ✅ `.github/workflows/ci.yml` |
-| SemVer + Conventional Commits | ✅ `docs/COMMITS_RULES.md` |
-| Estrutura extensível para v1.x/v2.0 | ✅ Clean Architecture, ports/adapters |
+| Item                                                  | Status                                |
+| ----------------------------------------------------- | ------------------------------------- |
+| Runtime detection (`isBun`, `isNode`, `getRuntime`)   | ✅ `src/core/runtime.ts`              |
+| package.json: prepublishOnly, engines.bun, repository | ✅                                    |
+| CI/CD: Node + Bun + build                             | ✅ `.github/workflows/ci.yml`         |
+| SemVer + Conventional Commits                         | ✅ `docs/COMMITS_RULES.md`            |
+| Estrutura extensível para v1.x/v2.0                   | ✅ Clean Architecture, ports/adapters |
 
 ---
 
@@ -744,14 +744,14 @@ Configuração recomendada por banco (via Knex `pool`):
 
 ### 11.6 Implementação Módulo 11
 
-| Item | Status |
-|------|--------|
-| Validação de identificadores SQL | ✅ `assertValidSqlIdentifier` em @Entity, @Column, @PrimaryKey, @Index |
-| Repository.raw() JSDoc (parameterized queries) | ✅ |
-| Connection pooling (pool min/max) | ✅ ConnectionEntry.pool documentado |
-| Redact config para log seguro | ✅ `redactConnectionConfig()` exportado |
-| Índices (PK, unique, @Index) | ✅ Já implementado |
-| Soft delete | ✅ Já implementado |
+| Item                                           | Status                                                                 |
+| ---------------------------------------------- | ---------------------------------------------------------------------- |
+| Validação de identificadores SQL               | ✅ `assertValidSqlIdentifier` em @Entity, @Column, @PrimaryKey, @Index |
+| Repository.raw() JSDoc (parameterized queries) | ✅                                                                     |
+| Connection pooling (pool min/max)              | ✅ ConnectionEntry.pool documentado                                    |
+| Redact config para log seguro                  | ✅ `redactConnectionConfig()` exportado                                |
+| Índices (PK, unique, @Index)                   | ✅ Já implementado                                                     |
+| Soft delete                                    | ✅ Já implementado                                                     |
 
 ---
 
@@ -813,8 +813,8 @@ Configuração recomendada por banco (via Knex `pool`):
 
 ### 12.2 Build
 
-- `tsc` para compilação
-- Saída: `dist/` com `.js`, `.cjs`, `.mjs` e `.d.ts` conforme exports
+- `tsup` para compilação (ESM + CJS)
+- Saída: `dist/` com `.mjs` (ESM), `.js` (CJS) e `.d.mts`/`.d.ts` conforme exports
 
 ### 12.3 Versionamento
 
@@ -850,6 +850,17 @@ jobs:
       - run: npm ci && npm run build
       # npm publish --access public (executar apenas em release/tag)
 ```
+
+### 12.5 Implementação Módulo 12
+
+| Item                                                 | Status                    |
+| ---------------------------------------------------- | ------------------------- |
+| LICENSE (MIT)                                        | ✅ `LICENSE`              |
+| package.json: license, homepage, bugs, publishConfig | ✅                        |
+| files: dist, LICENSE, README.md                      | ✅                        |
+| prepublishOnly (build + test)                        | ✅                        |
+| pack:dry-run (validação sem publicar)                | ✅ `npm run pack:dry-run` |
+| .npmignore (exclusões)                               | ✅                        |
 
 ---
 
@@ -1061,14 +1072,27 @@ jobs:
 
 ### 13.10 Padrão Recomendado
 
-| Cenário                  | Recomendação                                                 |
-| ------------------------ | ------------------------------------------------------------ |
-| **Projeto novo em Node** | Node + KnexORM; SQLite para dev/teste                        |
-| **Projeto novo em Bun**  | Bun + KnexORM; PostgreSQL/MySQL para dev/teste               |
-| **Migração Node → Bun**  | Trocar runtime; manter pg/mysql; migrar testes para Bun test |
-| **Lib consumida no NPM** | Build com `tsc`; consumidores usam Node ou Bun sem mudanças  |
+| Cenário                  | Recomendação                                                             |
+| ------------------------ | ------------------------------------------------------------------------ |
+| **Projeto novo em Node** | Node + KnexORM; SQLite para dev/teste                                    |
+| **Projeto novo em Bun**  | Bun + KnexORM; PostgreSQL/MySQL para dev/teste                           |
+| **Migração Node → Bun**  | Trocar runtime; manter pg/mysql; migrar testes para Bun test             |
+| **Lib consumida no NPM** | Build com `tsup` (ESM + CJS); consumidores usam Node ou Bun sem mudanças |
 
-### 13.11 Diagrama de Decisão
+### 13.11 Implementação Módulo 13
+
+| Item                                                  | Status                              |
+| ----------------------------------------------------- | ----------------------------------- |
+| Detecção de runtime (`isBun`, `isNode`, `getRuntime`) | ✅ `src/core/runtime.ts`            |
+| Abstração env (`getEnv`)                              | ✅ `src/core/runtime.ts`            |
+| Build dual ESM + CJS (tsup)                           | ✅ `.mjs` (ESM), `.js` (CJS)        |
+| package.json exports condicionais                     | ✅ `import` → .mjs, `require` → .js |
+| Typings .d.mts e .d.ts                                | ✅                                  |
+| Scripts test:node, test:bun, dev, start, start:bun    | ✅                                  |
+| CI: Node (Jest) + Bun (unit) + build                  | ✅ `.github/workflows/ci.yml`       |
+| Testes Bun: apenas test/unit (SQLite incompatível)    | ✅                                  |
+
+### 13.12 Diagrama de Decisão
 
 ```mermaid
 flowchart TD
