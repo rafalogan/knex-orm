@@ -72,6 +72,37 @@ export class SchemaDiff {
         ops.push({ type: 'dropColumn', table: tableName, column: colName });
       }
     }
+
+    this.diffIndexes(ops, tableName, curr, prev);
+  }
+
+  private diffIndexes(
+    ops: MigrationOp[],
+    tableName: string,
+    curr: TableSchema,
+    prev: TableSchema,
+  ): void {
+    const prevIdx = prev.indexes ?? [];
+    const currIdx = curr.indexes ?? [];
+
+    const prevKey = (fields: string[]) => [...fields].sort().join(',');
+    const currKeys = new Set(currIdx.map((i) => prevKey(i.fields)));
+
+    for (const idx of currIdx) {
+      const key = prevKey(idx.fields);
+      const exists = prevIdx.some((p) => prevKey(p.fields) === key);
+      if (!exists) {
+        ops.push({ type: 'addIndex', table: tableName, fields: idx.fields });
+      }
+    }
+
+    const prevKeys = new Set(prevIdx.map((i) => prevKey(i.fields)));
+    for (const idx of prevIdx) {
+      const key = prevKey(idx.fields);
+      if (!currKeys.has(key)) {
+        ops.push({ type: 'dropIndex', table: tableName, fields: idx.fields });
+      }
+    }
   }
 
   private columnsEqual(a: ColumnSchema, b: ColumnSchema): boolean {

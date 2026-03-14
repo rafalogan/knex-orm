@@ -60,7 +60,13 @@ export class SchemaBuilder {
         autoincrement: meta.primaryKey.options?.autoincrement ?? true,
       };
     }
-    if (meta.indexes && meta.indexes.length > 0) table.indexes = meta.indexes;
+    const indexes: Array<{ fields: string[] }> = [...(meta.indexes ?? [])];
+    for (const [_, colMeta] of Object.entries(cols)) {
+      if (colMeta.index) {
+        indexes.push({ fields: [colMeta.columnName] });
+      }
+    }
+    if (indexes.length > 0) table.indexes = indexes;
     return table;
   }
 }

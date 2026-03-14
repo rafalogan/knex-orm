@@ -30,6 +30,14 @@ export class MigrationGenerator {
         case 'alterColumn':
           upStatements.push(this.genAlterColumn(op.table, op.column, op.changes));
           break;
+        case 'addIndex':
+          upStatements.push(this.genAddIndex(op.table, op.fields));
+          downStatements.unshift(this.genDropIndex(op.table, op.fields));
+          break;
+        case 'dropIndex':
+          upStatements.push(this.genDropIndex(op.table, op.fields));
+          downStatements.unshift(this.genAddIndex(op.table, op.fields));
+          break;
         default:
           break;
       }
@@ -72,6 +80,12 @@ export async function down(knex: Knex): Promise<void> {
       } else {
         lines.push('  ' + this.genColumnBuilder(col));
       }
+    }
+
+    const indexes = schema.indexes ?? [];
+    for (const idx of indexes) {
+      const fieldsStr = idx.fields.map((f) => `'${f}'`).join(', ');
+      lines.push(`  table.index([${fieldsStr}]);`);
     }
 
     lines.push('});');
@@ -164,5 +178,15 @@ export async function down(knex: Knex): Promise<void> {
 
   private genAlterColumn(table: string, column: string, changes: Partial<ColumnSchema>): string {
     return `// TODO: alter column '${column}' in '${table}': ${JSON.stringify(changes)}`;
+  }
+
+  private genAddIndex(table: string, fields: string[]): string {
+    const fieldsStr = fields.map((f) => `'${f}'`).join(', ');
+    return `await knex.schema.alterTable('${table}', (table) => {\n  table.index([${fieldsStr}]);\n});`;
+  }
+
+  private genDropIndex(table: string, fields: string[]): string {
+    const fieldsStr = fields.map((f) => `'${f}'`).join(', ');
+    return `await knex.schema.alterTable('${table}', (table) => {\n  table.dropIndex([${fieldsStr}]);\n});`;
   }
 }
