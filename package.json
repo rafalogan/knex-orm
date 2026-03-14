@@ -4,6 +4,7 @@
   "description": "ORM superset for Knex.js with decorators, NestJS and Bun support",
   "main": "./dist/index.js",
   "bin": {
+    "kor": "./dist/cli/migrate-generate.js",
     "knex-orm": "./dist/cli/migrate-generate.js"
   },
   "module": "./dist/index.js",
@@ -30,6 +31,9 @@
     "migrate:generate": "node dist/cli/migrate-generate.js migrate:generate",
     "migrate:run": "node dist/cli/migrate-generate.js migrate:run",
     "migrate:rollback": "node dist/cli/migrate-generate.js migrate:rollback",
+    "connection:init": "node dist/cli/migrate-generate.js connection:init",
+    "connection:test": "node dist/cli/migrate-generate.js connection:test",
+    "connection:list": "node dist/cli/migrate-generate.js connection:list",
     "test": "jest",
     "test:node": "jest",
     "test:bun": "bun test",
@@ -51,9 +55,18 @@
   "peerDependencies": {
     "knex": "^3.0.0",
     "reflect-metadata": "^0.2.0",
-    "typescript": ">=4.5.0"
+    "typescript": ">=4.5.0",
+    "@nestjs/common": ">=9.0.0",
+    "@nestjs/core": ">=9.0.0"
+  },
+  "peerDependenciesMeta": {
+    "@nestjs/common": { "optional": true },
+    "@nestjs/core": { "optional": true }
   },
   "devDependencies": {
+    "@nestjs/common": "^10.0.0",
+    "@nestjs/core": "^10.0.0",
+    "@nestjs/testing": "^10.0.0",
     "knex": "^3.0.0",
     "reflect-metadata": "^0.2.0",
     "typescript": "^5.0.0",

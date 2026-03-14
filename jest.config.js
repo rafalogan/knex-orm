@@ -5,9 +5,9 @@ module.exports = {
   roots: ['<rootDir>/test'],
   testMatch: ['**/*.test.ts', '**/*.spec.ts'],
   moduleNameMapper: {
+    '^knex-orm/nestjs$': '<rootDir>/src/nestjs/index.ts',
     '^@core/(.*)$': '<rootDir>/src/core/$1',
     '^@adapters/(.*)$': '<rootDir>/src/adapters/$1',
-    '^@nestjs/(.*)$': '<rootDir>/src/nestjs/$1',
     '^@cli/(.*)$': '<rootDir>/src/cli/$1',
     '^@test/(.*)$': '<rootDir>/test/$1',
   },
