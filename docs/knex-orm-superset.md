@@ -309,31 +309,47 @@ class GenericRepository<T> implements IRepository<T> {
 
 ### 5.1 Fluxo do CLI
 
-1. O CLI carrega entidades via `reflect-metadata` e `MetadataStorage`
-2. Lê o schema atual do banco (via `knex.schema` ou `information_schema`)
-3. Calcula o **diff** entre metadata das entidades e schema existente
+1. O CLI carrega entidades via `reflect-metadata` e `MetadataStorage` (a partir do módulo indicado em `--entities`)
+2. Lê o schema anterior do arquivo `.orm-schema.json` (estado rastreado)
+3. Calcula o **diff** entre metadata das entidades e o schema anterior
 4. Gera arquivo de migration no formato Knex (`exports.up`, `exports.down`)
+5. Atualiza `.orm-schema.json` com o novo estado
+
+> **Nota:** O diff é calculado entre entidades e `.orm-schema.json`, não entre entidades e o banco. Para migrar, use `knex-orm migrate:run`.
 
 ### 5.2 Comandos
 
-| Comando                                      | Descrição                           |
-| -------------------------------------------- | ----------------------------------- |
-| `knex-orm migration:generate <NomeEntidade>` | Cria migration a partir da entidade |
-| `knex-orm migration:run`                     | Executa `knex.migrate.latest()`     |
-| `knex-orm migration:rollback`                | Executa `knex.migrate.rollback()`   |
+| Comando | Descrição |
+| ------- | --------- |
+| `knex-orm migrate:generate --entities=<path>` | Gera migration a partir das entidades. Ex.: `--entities=./src/entities` |
+| `knex-orm migrate:run` | Executa `knex.migrate.latest()` (requer `knexfile.js` no projeto) |
+| `knex-orm migrate:rollback` | Executa `knex.migrate.rollback()` |
+
+**Exemplos:**
+
+```bash
+npx knex-orm migrate:generate --entities=./src/entities --migrations-dir=migrations
+npx knex-orm migrate:run
+npx knex-orm migrate:rollback
+npx knex-orm migrate:run --config=./knexfile.js
+```
 
 ### 5.3 Diff de Schema
 
 Operações suportadas:
 
-- `createTable` — tabela não existe
+- `createTable` — tabela não existe no schema anterior
 - `addColumn` — coluna nova na entidade
-- `alterColumn` — tipo/nullable/default alterado
+- `alterColumn` — tipo/nullable/default alterado (gera comentário TODO; alter real depende do banco)
 - `dropColumn` — coluna removida da entidade
 - `addIndex` — `@Index` ou `@Column({ index: true })`
 - `dropIndex` — índice removido
 
-### 5.4 Formato do Arquivo Gerado
+### 5.4 Schema Tracking (`.orm-schema.json`)
+
+O arquivo `.orm-schema.json` armazena o estado anterior do schema (tabelas, colunas, índices) para cálculo do diff. É atualizado automaticamente após cada `migrate:generate` bem-sucedido. **Não confundir com schema do banco** — o diff é entidades vs `.orm-schema.json`.
+
+### 5.5 Formato do Arquivo Gerado
 
 ```typescript
 // migrations/20250311120000_create_users.ts
@@ -547,15 +563,23 @@ A suite suporta **Jest** (Node) e **Bun test** com instruções claras:
 
 ## 10. Roadmap e Escalabilidade
 
-### 10.1 v1.0 (Escopo deste Documento)
+### 10.1 v1.0 — Estado Atual
+
+**Implementado:**
 
 - [x] Decorators básicos (`@Entity`, `@Column`, `@PrimaryKey`, `@CreatedAt`, `@UpdatedAt`, `@SoftDelete`, `@Index`)
-- [x] GenericRepository com CRUD completo
-- [x] Geração de migrations a partir de entidades
-- [x] Multi-connection (Connection Registry)
-- [x] Integração NestJS (DynamicModule, forRoot, forFeature)
-- [x] Integração Node vanilla
-- [x] Compatibilidade dual runtime (Node.js + Bun)
+- [x] `Repository` (equivalente a GenericRepository) com CRUD completo
+- [x] Geração de migrations a partir de entidades (`migrate:generate`)
+- [x] `migrate:run` e `migrate:rollback` (via knexfile)
+- [x] Schema tracking (`.orm-schema.json`)
+- [x] Diff: createTable, addColumn, dropColumn, dropTable, addIndex, dropIndex
+- [x] `KnexAdapter` (implementa `IConnection`)
+
+**Ainda não implementado (documentado como referência / roadmap):**
+
+- [ ] Integração NestJS (`KnexOrmModule`, `forRoot`, `forFeature`, `@InjectRepository`)
+- [ ] `KnexORM.initialize()` e `KnexORM.configure()` (Connection Registry)
+- [ ] `orm schema:sync` (auto-migrate) — previsto para v2.0
 
 ### 10.2 v1.x
 
