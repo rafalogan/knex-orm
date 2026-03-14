@@ -37,3 +37,17 @@ export type { GenerateOptions, GenerateResult, MigrationOp, OrmSchema } from '@a
 
 // Knex adapter
 export { KnexAdapter } from '@adapters/knex';
+
+// Connection management
+export {
+  KnexORM,
+  ConnectionManager,
+  ConnectionConfigLoader,
+  ConnectionFactory,
+  ConnectionRegistry,
+} from '@adapters/connection';
+export type {
+  OrmConfig,
+  OrmConfigModule,
+  ConnectionEntry,
+} from '@adapters/connection';
