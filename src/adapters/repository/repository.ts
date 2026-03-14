@@ -1,7 +1,13 @@
 import type { Knex } from 'knex';
 import type { EntityMetadata } from '@core/types/entity-metadata';
 import { getEntityMetadata } from '@core/decorators';
-import type { PaginateOptions, PaginateResult, FindManyOptions } from './types';
+import type {
+  PaginateOptions,
+  PaginateResult,
+  FindManyOptions,
+  FindOptions,
+  WhereClause,
+} from './types';
 
 /**
  * Repository genérico com CRUD, query builder e raw queries.
@@ -79,6 +85,39 @@ export class Repository<T extends Record<string, unknown>> {
     return instance;
   }
 
+  /** Resolves property name to column name. */
+  private propToColumn(prop: string): string {
+    const pk = this.metadata.primaryKey;
+    if (pk && pk.propertyName === prop) return pk.columnName;
+    const col = this.metadata.columns?.[prop];
+    return col?.columnName ?? prop;
+  }
+
+  /** Applies WhereClause (including $eq, $ne, $in, $like) to query builder. */
+  private applyWhereClause(
+    qb: Knex.QueryBuilder,
+    where: WhereClause<T>,
+  ): Knex.QueryBuilder {
+    const entries = Object.entries(where) as [keyof T & string, unknown][];
+    for (const [prop, val] of entries) {
+      if (val === undefined) continue;
+      const col = this.propToColumn(prop);
+      if (val !== null && typeof val === 'object' && !Array.isArray(val) && !(val instanceof Date)) {
+        const op = val as { $eq?: unknown; $ne?: unknown; $in?: unknown[]; $like?: string };
+        if ('$eq' in op && op.$eq !== undefined) qb = qb.where(col, op.$eq);
+        else if ('$ne' in op && op.$ne !== undefined)
+          qb = qb.whereNot(col, op.$ne);
+        else if ('$in' in op && Array.isArray(op.$in))
+          qb = qb.whereIn(col, op.$in as readonly (string | number)[]);
+        else if ('$like' in op && typeof op.$like === 'string')
+          qb = qb.where(col, 'like', op.$like);
+      } else {
+        qb = qb.where(col, val);
+      }
+    }
+    return qb;
+  }
+
   /** Converts entity to DB row (camelCase to snake_case). */
   private toRow(data: Partial<T>): Record<string, unknown> {
     const row: Record<string, unknown> = {};
@@ -115,12 +154,56 @@ export class Repository<T extends Record<string, unknown>> {
     );
   }
 
+  /** Sem where → INSERT; com where → UPDATE. */
+  async save(entity: Partial<T>, where?: WhereClause<T>): Promise<T> {
+    if (!where || Object.keys(where).length === 0) {
+      return this.create(entity);
+    }
+    const whereRow = this.toRow(where as Partial<T>);
+    return this.update(
+      whereRow as Partial<T> & { [key: string]: string | number },
+      entity,
+    );
+  }
+
   async findById(id: string | number): Promise<T | null> {
     const row = await this.query()
       .where(this.primaryKeyColumn, id)
       .first();
     if (!row) return null;
     return this.mapRowToEntity(row as Record<string, unknown>);
+  }
+
+  /** find() com FindOptions: select, where, orderBy (objeto), limit, offset, withDeleted. */
+  async find(options?: FindOptions<T>): Promise<T[]> {
+    let qb = this.query();
+    const cols = this.metadata.columns ?? {};
+    const selectCols =
+      options?.select?.map((p) => this.propToColumn(String(p))) ?? ['*'];
+    qb = qb.select(selectCols as [string, ...string[]]);
+    if (this.metadata.softDelete && !options?.withDeleted) {
+      qb = qb.whereNull(this.metadata.softDelete.columnName);
+    }
+    if (options?.where && Object.keys(options.where).length > 0) {
+      qb = this.applyWhereClause(qb, options.where);
+    }
+    if (options?.orderBy) {
+      for (const [prop, dir] of Object.entries(options.orderBy)) {
+        qb = qb.orderBy(this.propToColumn(prop), dir ?? 'asc');
+      }
+    }
+    if (options?.limit) qb = qb.limit(options.limit);
+    if (options?.offset) qb = qb.offset(options.offset);
+    const rows = await qb;
+    return (rows as Record<string, unknown>[]).map((r) =>
+      this.mapRowToEntity(r),
+    );
+  }
+
+  /** findOne(where): where obrigatório, retorna primeiro ou null. */
+  async findOne(where: WhereClause<T>): Promise<T | null> {
+    const rows = await this.find({ where, limit: 1 });
+    return rows[0] ?? null;
   }
 
   async findMany(options?: FindManyOptions<T>): Promise<T[]> {
@@ -172,6 +255,19 @@ export class Repository<T extends Record<string, unknown>> {
       .whereIn(this.primaryKeyColumn, where.ids)
       .update(updateRow);
     return typeof count === 'number' ? count : 0;
+  }
+
+  /** Soft delete: seta deleted_at. Requer @SoftDelete() na entidade. */
+  async disable(where: WhereClause<T>): Promise<void> {
+    if (!this.metadata.softDelete) {
+      throw new Error('Entity does not support soft delete');
+    }
+    const whereRow = this.toRow(where as Partial<T>);
+    await this.query()
+      .where(whereRow)
+      .update({
+        [this.metadata.softDelete.columnName]: new Date(),
+      });
   }
 
   async delete(

@@ -1,4 +1,24 @@
 /**
+ * Where clause com operadores opcionais ($eq, $ne, $in, $like).
+ * Valor direto = igualdade. Objeto com operador = condição específica.
+ */
+export type WhereClause<T> = {
+  [K in keyof T]?: T[K] | { $eq?: T[K]; $ne?: T[K]; $in?: Array<T[K]>; $like?: string };
+};
+
+/**
+ * Opções para find() conforme documentação IRepository.
+ */
+export interface FindOptions<T> {
+  select?: Array<keyof T>;
+  where?: WhereClause<T>;
+  orderBy?: Partial<Record<keyof T, 'asc' | 'desc'>>;
+  limit?: number;
+  offset?: number;
+  withDeleted?: boolean;
+}
+
+/**
  * Options for paginated queries.
  */
 export interface PaginateOptions {

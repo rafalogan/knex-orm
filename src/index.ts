@@ -18,5 +18,7 @@ export type {
   PaginateOptions,
   PaginateResult,
   FindManyOptions,
+  FindOptions,
+  WhereClause,
   IdsFilter,
 } from '@adapters/repository';

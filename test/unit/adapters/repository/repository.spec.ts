@@ -1,6 +1,6 @@
 import 'reflect-metadata';
 import type { Knex } from 'knex';
-import { Entity, PrimaryKey, Column, getEntityMetadata } from '@core/decorators';
+import { Entity, PrimaryKey, Column, SoftDelete, getEntityMetadata } from '@core/decorators';
 import { Repository } from '@adapters/repository';
 
 @Entity('users')
@@ -15,6 +15,18 @@ class User {
   name!: string;
 }
 
+@Entity('posts')
+class PostWithSoftDelete {
+  @PrimaryKey()
+  id!: number;
+
+  @Column({ type: 'string' })
+  title!: string;
+
+  @SoftDelete()
+  deletedAt?: Date;
+}
+
 function createThenableChain<T>(defaultValue: T) {
   let resolveValue: T = defaultValue;
   const chain = {
@@ -25,6 +37,8 @@ function createThenableChain<T>(defaultValue: T) {
     returning: jest.fn().mockImplementation((_cols?: string) => Promise.resolve(resolveValue)),
     select: jest.fn().mockImplementation(() => chain),
     where: jest.fn().mockImplementation(() => chain),
+    whereNull: jest.fn().mockImplementation(() => chain),
+    whereNotNull: jest.fn().mockImplementation(() => chain),
     whereIn: jest.fn().mockImplementation(() => chain),
     update: jest.fn().mockImplementation(() => chain),
     del: jest.fn().mockResolvedValue(0),
@@ -239,6 +253,117 @@ describe('Repository', () => {
       expect(chain.whereIn).toHaveBeenCalledWith('id', [1, 2, 3]);
       expect(chain.del).toHaveBeenCalled();
       expect(result).toBe(3);
+    });
+  });
+
+  describe('save', () => {
+    it('should insert when save() is called without where', async () => {
+      const chain = (mockKnex as jest.Mock)();
+      chain._setResolve([{ id: 1, email: 'a@b.com', name: 'Alice' }]);
+
+      const result = await repo.save({ email: 'a@b.com', name: 'Alice' });
+
+      expect(chain.insert).toHaveBeenCalledWith(
+        expect.objectContaining({ email: 'a@b.com', name: 'Alice' }),
+      );
+      expect(result).toMatchObject({ id: 1, email: 'a@b.com', name: 'Alice' });
+    });
+
+    it('should update when save() is called with where', async () => {
+      const meta = getEntityMetadata(User);
+      const pkColumn = meta?.primaryKey?.columnName ?? 'id';
+      const chain = (mockKnex as jest.Mock)();
+      chain.update.mockImplementation(() => chain);
+      chain._setResolve([{ id: 1, email: 'updated@b.com', name: 'Alice' }]);
+
+      const result = await repo.save(
+        { email: 'updated@b.com', name: 'Alice' },
+        { [pkColumn]: 1 } as { id: number },
+      );
+
+      expect(chain.update).toHaveBeenCalledWith(
+        expect.objectContaining({ email: 'updated@b.com', name: 'Alice' }),
+      );
+      expect(result).toMatchObject({ id: 1, email: 'updated@b.com' });
+    });
+  });
+
+  describe('find', () => {
+    it('should return entities when find() is called with options', async () => {
+      const chain = (mockKnex as jest.Mock)();
+      chain._setResolve([{ id: 1, email: 'a@b.com', name: 'Alice' }]);
+
+      const result = await repo.find({ where: { email: 'a@b.com' }, limit: 10 });
+
+      expect(chain.select).toHaveBeenCalled();
+      expect(chain.where).toHaveBeenCalled();
+      expect(chain.limit).toHaveBeenCalledWith(10);
+      expect(result).toHaveLength(1);
+      expect(result[0]).toMatchObject({ id: 1, email: 'a@b.com' });
+    });
+
+    it('should support select option when find() is called', async () => {
+      const chain = (mockKnex as jest.Mock)();
+      chain._setResolve([{ id: 1, email: 'a@b.com' }]);
+
+      await repo.find({ select: ['id', 'email'] });
+
+      expect(chain.select).toHaveBeenCalledWith(['id', 'email']);
+    });
+
+    it('should support orderBy as object when find() is called', async () => {
+      const chain = (mockKnex as jest.Mock)();
+      chain._setResolve([]);
+
+      await repo.find({ orderBy: { name: 'asc' as const } });
+
+      expect(chain.orderBy).toHaveBeenCalledWith('name', 'asc');
+    });
+  });
+
+  describe('findOne', () => {
+    it('should return entity when findOne() finds match', async () => {
+      const chain = (mockKnex as jest.Mock)();
+      chain._setResolve([{ id: 1, email: 'a@b.com', name: 'Alice' }]);
+
+      const result = await repo.findOne({ email: 'a@b.com' });
+
+      expect(chain.where).toHaveBeenCalled();
+      expect(chain.limit).toHaveBeenCalledWith(1);
+      expect(result).toMatchObject({ id: 1, email: 'a@b.com', name: 'Alice' });
+    });
+
+    it('should return null when findOne() finds no match', async () => {
+      const chain = (mockKnex as jest.Mock)();
+      chain._setResolve([]);
+
+      const result = await repo.findOne({ email: 'nonexistent@b.com' });
+
+      expect(result).toBeNull();
+    });
+  });
+
+  describe('disable', () => {
+    it('should throw when disable() is called on entity without SoftDelete', async () => {
+      await expect(repo.disable({ id: 1 } as { id: number })).rejects.toThrow(
+        'Entity does not support soft delete',
+      );
+    });
+
+    it('should set deleted_at when disable() is called on entity with SoftDelete', async () => {
+      const postRepo = new Repository(mockKnex, PostWithSoftDelete);
+      const chain = (mockKnex as jest.Mock)();
+      chain.update.mockResolvedValueOnce(1);
+
+      await postRepo.disable({ id: 1 } as { id: number });
+
+      expect(mockKnex).toHaveBeenCalledWith('posts');
+      expect(chain.where).toHaveBeenCalledWith(expect.objectContaining({ id: 1 }));
+      expect(chain.update).toHaveBeenCalledWith(
+        expect.objectContaining({
+          deleted_at: expect.any(Date),
+        }),
+      );
     });
   });
 
