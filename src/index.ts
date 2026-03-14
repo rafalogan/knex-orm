@@ -14,6 +14,8 @@ export type { ColumnMetadata, ColumnOptions } from '@core/types/column-metadata'
 
 // Repository
 export { Repository } from '@adapters/repository';
+import type { Repository } from '@adapters/repository';
+export type IRepository<T extends Record<string, unknown> = Record<string, unknown>> = Repository<T>;
 export type {
   PaginateOptions,
   PaginateResult,
