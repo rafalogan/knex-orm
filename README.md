@@ -14,6 +14,7 @@
 - [Stack](#stack)
 - [Pré-requisitos](#pré-requisitos)
 - [Instalação](#instalação)
+- [CLI](#cli)
 - [Configuração](#configuração)
 - [Executando o projeto](#executando-o-projeto)
   - [Node.js](#nodejs)
@@ -58,6 +59,16 @@ npm install knex-orm knex reflect-metadata
 
 # Com bun
 bun add knex-orm knex reflect-metadata
+```
+
+## CLI
+
+O pacote expõe dois binários: **`kor`** (atalho) e `knex-orm`.
+
+```bash
+npx kor migrate:generate --entities=./src/entities
+npx kor migrate:run
+npx kor connection:init
 ```
 
 ## Configuração
@@ -128,7 +139,7 @@ knex-orm/
 │   ├── core/           # Decorators, interfaces, metadata, types
 │   ├── adapters/       # Knex, migration, repository
 │   ├── nestjs/         # Integração NestJS
-│   ├── cli/            # CLI knex-orm
+│   ├── cli/            # kor / knex-orm
 │   └── index.ts
 ├── test/
 │   ├── unit/

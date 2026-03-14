@@ -74,7 +74,7 @@ knex-orm/
 │   │   └── utils/
 │   ├── adapters/       # Knex, migration, repository
 │   ├── nestjs/         # Integração NestJS
-│   ├── cli/            # CLI knex-orm
+│   ├── cli/            # kor / knex-orm
 │   └── index.ts
 ├── test/
 │   ├── unit/

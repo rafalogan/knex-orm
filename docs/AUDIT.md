@@ -30,9 +30,8 @@
 
 ### 2.2 Nome do binário
 
-- **Doc:** `knexorm` (sem hífen)
-- **Real:** `knex-orm` (package.json bin)
-- **Ação:** Doc deve usar `knex-orm` ou `npx knex-orm` para consistência com npm.
+- **Binários:** `kor` (atalho) e `knex-orm` (package.json bin)
+- **Doc:** Usa `kor` como primário nos exemplos; `knex-orm` mantido para compatibilidade.
 
 ### 2.3 Sintaxe de migration:generate
 

@@ -143,13 +143,14 @@ knex-orm/
 │   │   ├── types/           # ColumnType, EntityMetadata, QueryOptions
 │   │   └── utils/           # toSnakeCase, getPrototypeConstructor
 │   ├── adapters/
+│   │   ├── connection/      # ConnectionManager, ConnectionFactory, ConnectionConfig, ConnectionRegistry
 │   │   ├── knex/            # KnexAdapter implementa IConnection
 │   │   ├── migration/       # MigrationEngine, MigrationGenerator, SchemaBuilder, SchemaDiff, SchemaRegistry
 │   │   │   ├── schema/      # schema-types, schema-builder, schema-diff
 │   │   │   └── storage/     # schema-registry (.orm-schema.json)
 │   │   └── repository/      # Repository<T> (GenericRepository)
 │   ├── nestjs/              # DynamicModule, providers, decorators NestJS
-│   ├── cli/                 # knex-orm migrate:generate
+│   ├── cli/                 # kor / knex-orm
 │   └── index.ts             # exports públicos da lib
 ├── test/
 │   ├── unit/
@@ -315,23 +316,25 @@ class GenericRepository<T> implements IRepository<T> {
 4. Gera arquivo de migration no formato Knex (`exports.up`, `exports.down`)
 5. Atualiza `.orm-schema.json` com o novo estado
 
-> **Nota:** O diff é calculado entre entidades e `.orm-schema.json`, não entre entidades e o banco. Para migrar, use `knex-orm migrate:run`.
+> **Nota:** O diff é calculado entre entidades e `.orm-schema.json`, não entre entidades e o banco. Para migrar, use `kor migrate:run` ou `knex-orm migrate:run`.
 
 ### 5.2 Comandos
 
+**Binário CLI:** `kor` (atalho recomendado) ou `knex-orm`. Ambos disponíveis após `npm install knex-orm`.
+
 | Comando | Descrição |
 | ------- | --------- |
-| `knex-orm migrate:generate --entities=<path>` | Gera migration a partir das entidades. Ex.: `--entities=./src/entities` |
-| `knex-orm migrate:run` | Executa `knex.migrate.latest()` (requer `knexfile.js` no projeto) |
-| `knex-orm migrate:rollback` | Executa `knex.migrate.rollback()` |
+| `kor migrate:generate --entities=<path>` | Gera migration a partir das entidades |
+| `kor migrate:run` | Executa `knex.migrate.latest()` |
+| `kor migrate:rollback` | Executa `knex.migrate.rollback()` |
 
 **Exemplos:**
 
 ```bash
-npx knex-orm migrate:generate --entities=./src/entities --migrations-dir=migrations
-npx knex-orm migrate:run
-npx knex-orm migrate:rollback
-npx knex-orm migrate:run --config=./knexfile.js
+npx kor migrate:generate --entities=./src/entities --migrations-dir=migrations
+npx kor migrate:run
+npx kor migrate:rollback
+npx kor migrate:run --config=./knexfile.js
 ```
 
 ### 5.3 Diff de Schema
@@ -376,12 +379,13 @@ export async function down(knex: Knex): Promise<void> {
 
 ## 6. Configuração de Conexões (KnexFile Simplificado)
 
-### 6.1 knex-orm.config.ts
+### 6.1 orm.config.js / knex-orm.config.js
 
-```typescript
-import { KnexORM } from 'knex-orm';
+Crie `orm.config.js` na raiz do projeto (ou use `kor connection:init` para gerar template):
 
-export default KnexORM.configure({
+```javascript
+/** @type {import('knex-orm').OrmConfig} */
+module.exports = {
   default: 'primary',
   connections: {
     primary: {
@@ -393,6 +397,7 @@ export default KnexORM.configure({
         password: process.env.DB_PASSWORD,
         database: process.env.DB_NAME,
       },
+      pool: { min: 0, max: 10 },
     },
     secondary: {
       client: 'mysql2',
@@ -408,31 +413,81 @@ export default KnexORM.configure({
       connection: { filename: './analytics.db' },
     },
   },
-});
+};
 ```
+
+**Múltiplos ambientes** — use chaves `development`, `test`, `production`:
+
+```javascript
+module.exports = {
+  development: {
+    default: 'primary',
+    connections: { primary: { client: 'sqlite3', connection: { filename: ':memory:' } } },
+  },
+  test: { default: 'primary', connections: { primary: { client: 'sqlite3', connection: { filename: ':memory:' } } } },
+  production: {
+    default: 'primary',
+    connections: {
+      primary: {
+        client: 'postgresql',
+        connection: { host: process.env.DB_HOST, /* ... */ },
+      },
+    },
+  },
+};
+```
+
+O ambiente é selecionado por `NODE_ENV` (padrão: `development`).
 
 ### 6.2 Bancos Suportados (via Knex)
 
-- PostgreSQL (`pg`)
+- PostgreSQL (`pg` / `postgresql`)
 - MySQL / MySQL2 (`mysql2`)
 - SQLite3 (`sqlite3`)
 - MSSQL (`mssql`)
 - Oracle (`oracledb`)
 
-### 6.3 Connection Registry
+### 6.3 Connection Registry e KnexORM
 
-- **Node vanilla**: `getConnection('secondary')` para obter conexão nomeada
-- **NestJS**: `@InjectConnection('secondary')` para injetar conexão específica
+```typescript
+import { KnexORM } from 'knex-orm';
+
+const orm = await KnexORM.initializeFromPath();
+const knex = orm.getConnection('primary');
+const defaultKnex = orm.getDefaultConnection();
+
+await orm.close();
+```
+
+Ou com config programático:
+
+```typescript
+const orm = await KnexORM.initialize({
+  default: 'primary',
+  connections: { primary: { client: 'sqlite3', connection: { filename: ':memory:' } } },
+});
+const knex = KnexORM.getConnection('secondary');
+```
+
+### 6.4 CLI de Conexões
+
+| Comando | Descrição |
+| ------- | --------- |
+| `kor connection:init` | Cria `orm.config.js` com template |
+| `kor connection:test` | Valida todas as conexões configuradas |
+| `kor connection:list` | Lista nomes das conexões |
 
 ---
 
 ## 7. Integração NestJS
 
+> **Status**: Implementado. Use o subpath `knex-orm/nestjs` para importar o módulo e decorators.
+
 ### 7.1 Configuração do Módulo
 
 ```typescript
 import { Module } from '@nestjs/common';
-import { KnexOrmModule } from 'knex-orm';
+import { KnexOrmModule } from 'knex-orm/nestjs';
 
 @Module({
   imports: [
@@ -575,11 +630,19 @@ A suite suporta **Jest** (Node) e **Bun test** com instruções claras:
 - [x] Diff: createTable, addColumn, dropColumn, dropTable, addIndex, dropIndex
 - [x] `KnexAdapter` (implementa `IConnection`)
 
+**Implementado (Módulo 7):**
+
+- [x] Integração NestJS (`KnexOrmModule`, `forRoot`, `forFeature`, `@InjectRepository`, `@InjectConnection`)
+
 **Ainda não implementado (documentado como referência / roadmap):**
 
-- [ ] Integração NestJS (`KnexOrmModule`, `forRoot`, `forFeature`, `@InjectRepository`)
-- [ ] `KnexORM.initialize()` e `KnexORM.configure()` (Connection Registry)
 - [ ] `orm schema:sync` (auto-migrate) — previsto para v2.0
+
+**Implementado (Módulo 6):**
+
+- [x] `KnexORM.initialize()` / `KnexORM.initializeFromPath()` e Connection Registry
+- [x] Config `orm.config.js` com múltiplos ambientes e conexões
+- [x] CLI `connection:init`, `connection:test`, `connection:list`
 
 ### 10.2 v1.x
 
