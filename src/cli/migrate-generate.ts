@@ -3,45 +3,59 @@
  * knex-orm CLI
  *
  * Comandos:
- *   migrate:generate  Gera migration a partir das entidades
- *   migrate:run       Executa knex.migrate.latest()
- *   migrate:rollback  Executa knex.migrate.rollback()
- *
- * Uso:
- *   knex-orm migrate:generate --entities=./src/entities
- *   knex-orm migrate:run [--config=./knexfile.js]
- *   knex-orm migrate:rollback [--config=./knexfile.js]
+ *   migrate:generate   Gera migration a partir das entidades
+ *   migrate:run        Executa knex.migrate.latest()
+ *   migrate:rollback   Executa knex.migrate.rollback()
+ *   connection:init    Cria arquivo orm.config.js
+ *   connection:test    Testa conexões configuradas
+ *   connection:list    Lista conexões configuradas
  */
 import 'reflect-metadata';
 
-type Command = 'migrate:generate' | 'migrate:run' | 'migrate:rollback';
+type Command =
+  | 'migrate:generate'
+  | 'migrate:run'
+  | 'migrate:rollback'
+  | 'connection:init'
+  | 'connection:test'
+  | 'connection:list';
+
+const ALL_COMMANDS: Command[] = [
+  'migrate:generate',
+  'migrate:run',
+  'migrate:rollback',
+  'connection:init',
+  'connection:test',
+  'connection:list',
+];
 
 async function main(): Promise<void> {
   const args = process.argv.slice(2);
   const cmd = args[0] as Command | undefined;
 
-  const known: Command[] = ['migrate:generate', 'migrate:run', 'migrate:rollback'];
-  if (!cmd || !known.includes(cmd)) {
+  if (!cmd || !ALL_COMMANDS.includes(cmd)) {
     console.error(
-      'Usage: knex-orm <command>\n' +
-        '  migrate:generate  Generate migration from entities\n' +
-        '  migrate:run       Run pending migrations (knex.migrate.latest)\n' +
-        '  migrate:rollback  Rollback last migration (knex.migrate.rollback)\n\n' +
+      'Usage: kor <command>  (or: knex-orm <command>)\n' +
+        '  migrate:generate   Generate migration from entities\n' +
+        '  migrate:run        Run pending migrations\n' +
+        '  migrate:rollback   Rollback last migration\n' +
+        '  connection:init    Create orm.config.js template\n' +
+        '  connection:test    Test database connections\n' +
+        '  connection:list    List configured connections\n\n' +
         'Examples:\n' +
-        '  knex-orm migrate:generate --entities=./src/entities\n' +
-        '  knex-orm migrate:run\n' +
-        '  knex-orm migrate:rollback',
+        '  kor migrate:generate --entities=./src/entities\n' +
+        '  kor migrate:run\n' +
+        '  kor connection:init',
     );
     process.exit(1);
   }
 
-  if (cmd === 'migrate:generate') {
-    await runMigrateGenerate(args);
-  } else if (cmd === 'migrate:run') {
-    await runMigrateRun(args);
-  } else if (cmd === 'migrate:rollback') {
-    await runMigrateRollback(args);
-  }
+  if (cmd === 'migrate:generate') await runMigrateGenerate(args);
+  else if (cmd === 'migrate:run') await runMigrateRun(args);
+  else if (cmd === 'migrate:rollback') await runMigrateRollback(args);
+  else if (cmd === 'connection:init') await runConnectionInit(args);
+  else if (cmd === 'connection:test') await runConnectionTest(args);
+  else if (cmd === 'connection:list') await runConnectionList(args);
 }
 
 async function runMigrateGenerate(args: string[]): Promise<void> {
@@ -89,57 +103,59 @@ async function runMigrateGenerate(args: string[]): Promise<void> {
   }
 }
 
-async function loadKnexFromConfig(configPath?: string): Promise<import('knex').Knex> {
+async function loadKnexForMigrate(configPath?: string): Promise<import('knex').Knex> {
   const { resolve, join } = await import('node:path');
   const { existsSync } = await import('node:fs');
-  const { pathToFileURL } = await import('node:url');
+  const { createRequire } = await import('node:module');
 
   const cwd = process.cwd();
-  const candidates = configPath
-    ? [resolve(cwd, configPath)]
-    : [
-        join(cwd, 'knexfile.js'),
-        join(cwd, 'knexfile.cjs'),
-        join(cwd, 'knexfile.mjs'),
-      ];
+  const { ConnectionConfigLoader } = await import(
+    '../adapters/connection/connection-config.js'
+  );
+  const { ConnectionFactory } = await import(
+    '../adapters/connection/connection-factory.js'
+  );
+  const loader = new ConnectionConfigLoader();
 
-  let configModule: Record<string, unknown> | ((env: string) => Record<string, unknown>) | null =
-    null;
+  const path = configPath ? resolve(cwd, configPath) : loader.findConfigPath();
+  const toTry = path ? [path] : [join(cwd, 'knexfile.js'), join(cwd, 'knexfile.cjs')];
 
-  for (const p of candidates) {
-    if (existsSync(p)) {
-      try {
-        const mod = await import(pathToFileURL(p).href);
-        configModule = (mod.default ?? mod) as
-          | Record<string, unknown>
-          | ((env: string) => Record<string, unknown>);
-        break;
-      } catch {
-        continue;
-      }
+  for (const p of toTry) {
+    if (!existsSync(p)) continue;
+
+    const raw = await loader.loadFromPath(p);
+    if (!raw) continue;
+
+    const env = process.env.NODE_ENV ?? 'development';
+    const ormConfig = loader.resolveForEnv(raw, env);
+    const defaultName = ormConfig?.default;
+    const defaultConn =
+      defaultName && ormConfig?.connections
+        ? ormConfig.connections[defaultName]
+        : undefined;
+    if (defaultConn) {
+      const factory = new ConnectionFactory();
+      return factory.create(defaultConn);
+    }
+
+    const req = createRequire(resolve(cwd, 'package.json'));
+    const mod = req(p) as Record<string, unknown>;
+    const cfg = (mod[env] ?? mod.development ?? mod) as Record<string, unknown>;
+    if (cfg?.client && cfg?.connection) {
+      const knex = req('knex');
+      return knex(cfg);
     }
   }
 
-  if (!configModule) {
-    throw new Error(
-      'Knex config not found. Create knexfile.js in project root or pass --config=./path/to/knexfile.js',
-    );
-  }
-
-  const env = process.env.NODE_ENV ?? 'development';
-  const config =
-    typeof configModule === 'function'
-      ? configModule(env)
-      : (configModule[env] as Record<string, unknown>) ?? configModule;
-
-  const knex = (await import('knex')).default;
-  return knex(config as import('knex').Knex.Config);
+  throw new Error(
+    'Config not found. Run: kor connection:init or create knexfile.js',
+  );
 }
 
 async function runMigrateRun(args: string[]): Promise<void> {
   const configPath = args.find((a) => a.startsWith('--config='))?.split('=')[1];
 
-  const k = await loadKnexFromConfig(configPath);
+  const k = await loadKnexForMigrate(configPath);
   try {
     const [batch, migrations] = await k.migrate.latest();
     if (migrations.length === 0) {
@@ -156,7 +172,7 @@ async function runMigrateRun(args: string[]): Promise<void> {
 async function runMigrateRollback(args: string[]): Promise<void> {
   const configPath = args.find((a) => a.startsWith('--config='))?.split('=')[1];
 
-  const k = await loadKnexFromConfig(configPath);
+  const k = await loadKnexForMigrate(configPath);
   try {
     const [batch, migrations] = await k.migrate.rollback();
     if (migrations.length === 0) {
@@ -167,6 +183,81 @@ async function runMigrateRollback(args: string[]): Promise<void> {
     }
   } finally {
     await k.destroy();
+  }
+}
+
+async function runConnectionInit(_args: string[]): Promise<void> {
+  const { writeFile } = await import('node:fs/promises');
+  const { join } = await import('node:path');
+
+  const content = `/** @type {import('knex-orm').OrmConfig} */
+module.exports = {
+  default: 'primary',
+  connections: {
+    primary: {
+      client: 'sqlite3',
+      connection: {
+        filename: process.env.DB_PATH || ':memory:',
+      },
+      pool: { min: 0, max: 5 },
+    },
+  },
+};
+`;
+
+  const path = join(process.cwd(), 'orm.config.js');
+  await writeFile(path, content, 'utf-8');
+  console.log(`Created ${path}`);
+}
+
+async function runConnectionTest(args: string[]): Promise<void> {
+  const configPath = args.find((a) => a.startsWith('--config='))?.split('=')[1];
+  const { ConnectionConfigLoader } = await import('../adapters/connection/connection-config.js');
+  const { ConnectionManager } = await import('../adapters/connection/connection-manager.js');
+
+  const loader = new ConnectionConfigLoader();
+  const path = configPath ?? loader.findConfigPath();
+  if (!path) {
+    console.error('No config file found. Run: kor connection:init');
+    process.exit(1);
+  }
+
+  const manager = new ConnectionManager();
+  try {
+    await manager.initializeFromPath(path);
+    for (const name of manager.getRegistry().list()) {
+      const knex = manager.getConnection(name);
+      await knex.raw('SELECT 1');
+      console.log(`  ✓ ${name}`);
+    }
+    console.log('All connections OK.');
+  } catch (err) {
+    console.error('Connection test failed:', (err as Error).message);
+    process.exit(1);
+  } finally {
+    await manager.closeAll();
+  }
+}
+
+async function runConnectionList(args: string[]): Promise<void> {
+  const configPath = args.find((a) => a.startsWith('--config='))?.split('=')[1];
+  const { ConnectionConfigLoader } = await import('../adapters/connection/connection-config.js');
+  const { ConnectionManager } = await import('../adapters/connection/connection-manager.js');
+
+  const loader = new ConnectionConfigLoader();
+  const path = configPath ?? loader.findConfigPath();
+  if (!path) {
+    console.error('No config file found. Run: kor connection:init');
+    process.exit(1);
+  }
+
+  const manager = new ConnectionManager();
+  try {
+    await manager.initializeFromPath(path);
+    const names = manager.getRegistry().list();
+    console.log('Configured connections:', names.join(', '));
+  } finally {
+    await manager.closeAll();
   }
 }
 
