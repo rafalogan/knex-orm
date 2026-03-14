@@ -28,6 +28,8 @@
   "scripts": {
     "build": "tsc",
     "migrate:generate": "node dist/cli/migrate-generate.js migrate:generate",
+    "migrate:run": "node dist/cli/migrate-generate.js migrate:run",
+    "migrate:rollback": "node dist/cli/migrate-generate.js migrate:rollback",
     "test": "jest",
     "test:node": "jest",
     "test:bun": "bun test",
