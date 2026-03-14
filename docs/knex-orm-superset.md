@@ -140,6 +140,7 @@ knex-orm/
 │   │   ├── decorators/      # @Entity, @Column, @PrimaryKey, @Index, @Relation
 │   │   ├── interfaces/      # IConnection, IRepository (ports)
 │   │   ├── metadata/        # MetadataStorage, EntityScanner
+│   │   ├── security/        # isValidSqlIdentifier, redactConnectionConfig
 │   │   ├── types/           # ColumnType, EntityMetadata, QueryOptions
 │   │   └── utils/           # toSnakeCase, getPrototypeConstructor
 │   ├── adapters/
@@ -541,6 +542,8 @@ export class UserService {
 
 ## 8. Integração Node Vanilla
 
+> **Status**: Implementado. Use `KnexORM.initialize()` e `orm.getRepository(Entity)` para Node sem framework.
+
 ```typescript
 import 'reflect-metadata';
 import { KnexORM } from 'knex-orm';
@@ -563,6 +566,22 @@ async function main() {
   await orm.close();
 }
 ```
+
+### 8.1 API Node Vanilla
+
+| Método | Descrição |
+|--------|-----------|
+| `KnexORM.initialize(config)` | Inicializa conexões e retorna instância |
+| `KnexORM.initializeFromPath(path?)` | Carrega config de `orm.config.js` ou `knexfile.js` |
+| `orm.getRepository(Entity)` | Retorna `Repository<Entity>` para a conexão default |
+| `orm.getConnection(name?)` | Retorna instância Knex (conexão nomeada) |
+| `orm.close()` | Fecha todas as conexões |
+
+### 8.2 Compatibilidade
+
+- **Node.js** ≥18 (ESM e CJS)
+- **Bun** ≥1.0
+- Sem dependências de framework
 
 ---
 
@@ -612,7 +631,19 @@ A suite suporta **Jest** (Node) e **Bun test** com instruções claras:
 - **Bun test** para execução em Bun (opcional)
 - **SQLite3** para integração em Node
 - **PostgreSQL/MySQL** para integração em Bun
-- **jest-mock-extended** para mocks tipados
+- **jest-mock-extended** para mocks tipados (opcional; `jest.fn()` suficiente)
+
+### 9.6 Implementação (Módulo 9)
+
+| Recurso | Status |
+|---------|--------|
+| Jest + ts-jest | ✅ `npm test` |
+| Coverage thresholds | ✅ statements 85%, branches 63%, functions 85%, lines 85% |
+| Bun test | ✅ `bun test --tsconfig-override=tsconfig.test.json` |
+| Repository CRUD integration | ✅ `test/integration/repository/repository-crud.spec.ts` |
+| MigrationGenerator integration | ✅ `test/integration/migration/migration-generate-run.spec.ts` |
+| Node Vanilla integration | ✅ `test/integration/node-vanilla/` |
+| Isolamento por suite | ✅ `beforeEach` / `beforeAll` / `afterAll` |
 
 ---
 
@@ -644,6 +675,14 @@ A suite suporta **Jest** (Node) e **Bun test** com instruções claras:
 - [x] Config `orm.config.js` com múltiplos ambientes e conexões
 - [x] CLI `connection:init`, `connection:test`, `connection:list`
 
+**Implementado (Módulo 8):**
+
+- [x] Integração Node Vanilla (`KnexORM.initialize`, `getRepository`, `find`, `close`)
+
+**Implementado (Módulo 9):**
+
+- [x] Estratégia TDD: Jest, coverage thresholds, integração SQLite, Bun test
+
 ### 10.2 v1.x
 
 - **Relations**: `@OneToMany`, `@ManyToOne`, `@ManyToMany`
@@ -655,6 +694,16 @@ A suite suporta **Jest** (Node) e **Bun test** com instruções claras:
 - **Schema validation em runtime**: validação de dados antes de persistir
 - **Migrations automáticas**: auto-migrate em ambiente de desenvolvimento
 - **Plugin system**: extensões para auditoria, multi-tenancy, etc.
+
+### 10.4 Implementação Módulo 10 (Roadmap e Escalabilidade)
+
+| Item | Status |
+|------|--------|
+| Runtime detection (`isBun`, `isNode`, `getRuntime`) | ✅ `src/core/runtime.ts` |
+| package.json: prepublishOnly, engines.bun, repository | ✅ |
+| CI/CD: Node + Bun + build | ✅ `.github/workflows/ci.yml` |
+| SemVer + Conventional Commits | ✅ `docs/COMMITS_RULES.md` |
+| Estrutura extensível para v1.x/v2.0 | ✅ Clean Architecture, ports/adapters |
 
 ---
 
@@ -691,6 +740,18 @@ Configuração recomendada por banco (via Knex `pool`):
 
 - **Nunca** logar connection strings ou credenciais
 - Usar variáveis de ambiente e serviços como Vault em produção
+- Usar `redactConnectionConfig(config)` antes de logar config
+
+### 11.6 Implementação Módulo 11
+
+| Item | Status |
+|------|--------|
+| Validação de identificadores SQL | ✅ `assertValidSqlIdentifier` em @Entity, @Column, @PrimaryKey, @Index |
+| Repository.raw() JSDoc (parameterized queries) | ✅ |
+| Connection pooling (pool min/max) | ✅ ConnectionEntry.pool documentado |
+| Redact config para log seguro | ✅ `redactConnectionConfig()` exportado |
+| Índices (PK, unique, @Index) | ✅ Já implementado |
+| Soft delete | ✅ Já implementado |
 
 ---
 
