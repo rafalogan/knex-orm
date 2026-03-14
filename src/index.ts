@@ -40,6 +40,12 @@ export type { GenerateOptions, GenerateResult, MigrationOp, OrmSchema } from '@a
 // Knex adapter
 export { KnexAdapter } from '@adapters/knex';
 
+// Runtime detection (Node/Bun)
+export { isBun, isNode, getRuntime, type Runtime } from '@core/runtime';
+
+// Security utilities
+export { redactConnectionConfig, isValidSqlIdentifier } from '@core/security';
+
 // Connection management
 export {
   KnexORM,
