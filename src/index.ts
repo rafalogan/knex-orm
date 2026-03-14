@@ -22,3 +22,18 @@ export type {
   WhereClause,
   IdsFilter,
 } from '@adapters/repository';
+
+// Migration engine
+export {
+  MigrationEngine,
+  SchemaBuilder,
+  SchemaDiff,
+  SchemaRegistry,
+  MigrationGenerator,
+  MigrationWriter,
+} from '@adapters/migration';
+export { EntityScanner } from '@core/metadata/entity-scanner';
+export type { GenerateOptions, GenerateResult, MigrationOp, OrmSchema } from '@adapters/migration';
+
+// Knex adapter
+export { KnexAdapter } from '@adapters/knex';

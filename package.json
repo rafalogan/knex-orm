@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "description": "ORM superset for Knex.js with decorators, NestJS and Bun support",
   "main": "./dist/index.js",
+  "bin": {
+    "knex-orm": "./dist/cli/migrate-generate.js"
+  },
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {
@@ -15,10 +18,16 @@
       "types": "./dist/nestjs/index.d.ts",
       "import": "./dist/nestjs/index.js",
       "require": "./dist/nestjs/index.js"
+    },
+    "./migration": {
+      "types": "./dist/adapters/migration/index.d.ts",
+      "import": "./dist/adapters/migration/index.js",
+      "require": "./dist/adapters/migration/index.js"
     }
   },
   "scripts": {
     "build": "tsc",
+    "migrate:generate": "node dist/cli/migrate-generate.js migrate:generate",
     "test": "jest",
     "test:node": "jest",
     "test:bun": "bun test",
