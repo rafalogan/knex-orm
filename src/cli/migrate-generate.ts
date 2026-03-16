@@ -11,6 +11,11 @@
  *   connection:list    Lista conexões configuradas
  */
 import 'reflect-metadata';
+import {
+  EntitiesPathNotFoundError,
+  MigrationsDirNotFoundError,
+  resolveProjectContextForMigrateGenerate,
+} from './project-introspection';
 
 type Command =
   | 'migrate:generate'
@@ -59,21 +64,39 @@ async function main(): Promise<void> {
 }
 
 async function runMigrateGenerate(args: string[]): Promise<void> {
-  const entitiesPath = args.find((a) => a.startsWith('--entities='))?.split('=')[1];
-  const migrationsDir = args.find((a) => a.startsWith('--migrations-dir='))?.split('=')[1] ?? 'migrations';
+  const entitiesFlag = args.find((a) => a.startsWith('--entities='))?.split('=')[1];
+  const migrationsFlag = args.find((a) => a.startsWith('--migrations-dir='))?.split('=')[1];
 
-  if (!entitiesPath) {
-    console.error(
-      'Usage: knex-orm migrate:generate --entities=<path>\n' +
-        '  --entities=./src/entities  Path to module exporting { entities: [...] }\n' +
-        '  --migrations-dir=migrations  Output directory (default: migrations)',
+  let entitiesPath: string;
+  let migrationsDir: string;
+
+  try {
+    const ctx = await resolveProjectContextForMigrateGenerate(
+      { entities: entitiesFlag, migrationsDir: migrationsFlag },
+      process.cwd(),
     );
+    entitiesPath = ctx.entitiesPath;
+    migrationsDir = ctx.migrationsDir;
+  } catch (err) {
+    if (err instanceof EntitiesPathNotFoundError) {
+      console.error(
+        'Entities directory not found.\n' +
+          'Tried config (knexfile*/knex.config*) and default paths: ./dist/entities, ./src/entities, ./entities.\n' +
+          'Provide --entities=<path> or configure entitiesDir in your knexfile.',
+      );
+    } else if (err instanceof MigrationsDirNotFoundError) {
+      console.error(
+        'Migrations directory not found.\n' +
+          'Tried config (knexfile*/knex.config*) and default paths: ./migrations, ./dist/migrations, ./src/migrations.\n' +
+          'Provide --migrations-dir=<path> or configure migrationsDir in your knexfile.',
+      );
+    } else {
+      console.error('Failed to resolve paths for migrate:generate:', (err as Error).message);
+    }
     process.exit(1);
   }
 
-  const { resolve } = await import('node:path');
-  const absPath = resolve(process.cwd(), entitiesPath);
-  const resolved = await import(absPath).catch((err: Error) => {
+  const resolved = await import(entitiesPath).catch((err: Error) => {
     console.error(`Failed to load entities from ${entitiesPath}:`, err.message);
     process.exit(1);
   });
@@ -103,16 +126,26 @@ async function runMigrateGenerate(args: string[]): Promise<void> {
 }
 
 async function loadKnexForMigrate(configPath?: string): Promise<import('knex').Knex> {
-  const { resolve, join } = await import('node:path');
   const { existsSync } = await import('node:fs');
   const { createRequire } = await import('node:module');
+  const { resolve, join } = await import('node:path');
+  const { detectProjectStructure } = await import('./project-introspection');
 
-  const cwd = process.cwd();
+  const ctx = await detectProjectStructure(process.cwd());
+  const cwd = ctx.paths.rootDir;
   const { ConnectionConfigLoader } = await import('../adapters/connection/connection-config.js');
   const { ConnectionFactory } = await import('../adapters/connection/connection-factory.js');
   const loader = new ConnectionConfigLoader();
 
-  const path = configPath ? resolve(cwd, configPath) : loader.findConfigPath();
+  const pathFromFlags = configPath ? resolve(cwd, configPath) : undefined;
+  const pathFromIntrospection =
+    ctx.paths.configFiles.ormConfig ?? ctx.paths.configFiles.knexfile ?? ctx.paths.configFiles.knexConfig;
+  const path =
+    pathFromFlags ??
+    pathFromIntrospection ??
+    loader.findConfigPath() ??
+    undefined;
+
   const toTry = path ? [path] : [join(cwd, 'knexfile.js'), join(cwd, 'knexfile.cjs')];
 
   for (const p of toTry) {
@@ -179,6 +212,10 @@ async function runMigrateRollback(args: string[]): Promise<void> {
 async function runConnectionInit(_args: string[]): Promise<void> {
   const { writeFile } = await import('node:fs/promises');
   const { join } = await import('node:path');
+  const { detectProjectStructure } = await import('./project-introspection');
+
+  const ctx = await detectProjectStructure(process.cwd());
+  const rootDir = ctx.paths.rootDir;
 
   const content = `/** @type {import('knex-orm').OrmConfig} */
 module.exports = {
@@ -195,7 +232,7 @@ module.exports = {
 };
 `;
 
-  const path = join(process.cwd(), 'orm.config.js');
+  const path = join(rootDir, 'orm.config.js');
   await writeFile(path, content, 'utf-8');
   console.log(`Created ${path}`);
 }
@@ -204,9 +241,15 @@ async function runConnectionTest(args: string[]): Promise<void> {
   const configPath = args.find((a) => a.startsWith('--config='))?.split('=')[1];
   const { ConnectionConfigLoader } = await import('../adapters/connection/connection-config.js');
   const { ConnectionManager } = await import('../adapters/connection/connection-manager.js');
+  const { detectProjectStructure } = await import('./project-introspection');
 
   const loader = new ConnectionConfigLoader();
-  const path = configPath ?? loader.findConfigPath();
+  const ctx = await detectProjectStructure(process.cwd());
+  const rootDir = ctx.paths.rootDir;
+  const pathFromFlags = configPath ? require('node:path').resolve(rootDir, configPath) : undefined;
+  const pathFromIntrospection =
+    ctx.paths.configFiles.ormConfig ?? ctx.paths.configFiles.knexfile ?? ctx.paths.configFiles.knexConfig;
+  const path = pathFromFlags ?? pathFromIntrospection ?? loader.findConfigPath();
   if (!path) {
     console.error('No config file found. Run: kor connection:init');
     process.exit(1);
@@ -233,9 +276,15 @@ async function runConnectionList(args: string[]): Promise<void> {
   const configPath = args.find((a) => a.startsWith('--config='))?.split('=')[1];
   const { ConnectionConfigLoader } = await import('../adapters/connection/connection-config.js');
   const { ConnectionManager } = await import('../adapters/connection/connection-manager.js');
+  const { detectProjectStructure } = await import('./project-introspection');
 
   const loader = new ConnectionConfigLoader();
-  const path = configPath ?? loader.findConfigPath();
+  const ctx = await detectProjectStructure(process.cwd());
+  const rootDir = ctx.paths.rootDir;
+  const pathFromFlags = configPath ? require('node:path').resolve(rootDir, configPath) : undefined;
+  const pathFromIntrospection =
+    ctx.paths.configFiles.ormConfig ?? ctx.paths.configFiles.knexfile ?? ctx.paths.configFiles.knexConfig;
+  const path = pathFromFlags ?? pathFromIntrospection ?? loader.findConfigPath();
   if (!path) {
     console.error('No config file found. Run: kor connection:init');
     process.exit(1);
