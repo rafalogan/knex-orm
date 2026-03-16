@@ -1,170 +1,167 @@
-# knex-orm
+## knex-orm
 
 > Biblioteca NPM que estende Knex.js com padrão ORM baseado em decorators, mantendo compatibilidade total com a API nativa do Knex.
 
-[![Build](https://img.shields.io/badge/build-tsc-blue)](./package.json)
+[![Build](https://img.shields.io/badge/build-tsup-blue)](./package.json)
 [![Tests](https://img.shields.io/badge/tests-jest%20%7C%20bun-green)](./package.json)
-[![License](https://img.shields.io/badge/license-ISC-yellow)](./package.json)
+[![License](https://img.shields.io/badge/license-MIT-yellow)](./LICENSE)
 
-[English](./docs/README.en.md)
-
-## Índice
-
-- [Sobre](#sobre)
-- [Stack](#stack)
-- [Pré-requisitos](#pré-requisitos)
-- [Instalação](#instalação)
-- [CLI](#cli)
-- [Configuração](#configuração)
-- [Executando o projeto](#executando-o-projeto)
-  - [Node.js](#nodejs)
-  - [Bun](#bun)
-- [Testes](#testes)
-- [Build](#build)
-- [Lint & Format](#lint--format)
-- [Estrutura de Pastas](#estrutura-de-pastas)
-- [Paths / Aliases TypeScript](#paths--aliases-typescript)
-- [Documentação](#documentação)
-- [Regras de Commit](#regras-de-commit)
-- [Contribuindo](#contribuindo)
-- [Licença](#licença)
+🇧🇷 Português &nbsp;|&nbsp; 🇺🇸 [English](./docs/README.en.md)
 
 ---
 
-## Sobre
+## Visão rápida
 
-KnexORM Superset adiciona uma camada ORM sobre o Knex.js sem substituí-lo: decorators para entidades, repositórios genéricos, geração de migrations a partir de entidades, multi-connection e integração com NestJS. Funciona em Node.js e Bun.
+- **O que é**: camada ORM leve sobre o Knex.js com decorators, repositório genérico, migrations geradas a partir de entidades e integração com NestJS.
+- **Por que usar**: mantém todo o poder do Knex, adicionando organização, tipagem e convenções típicas de ORMs modernos.
+- **Compatibilidade**:
+  - Runtimes: **Node.js ≥ 18**, **Bun ≥ 1.0**
+  - Framework opcional: **NestJS 9–11**
+  - Bancos (via Knex): PostgreSQL, MySQL/MySQL2, SQLite3 (Node), MSSQL, Oracle
 
-## Stack
+---
 
-| Camada     | Tecnologia                                       |
-| ---------- | ------------------------------------------------ |
-| Runtimes   | Node.js ≥18, Bun ≥1.0                            |
-| Linguagem  | TypeScript 4.5+                                  |
-| Base       | Knex.js                                          |
-| Frameworks | NestJS 9–11 (opcional)                           |
-| Bancos     | PostgreSQL, MySQL/MySQL2, SQLite3, MSSQL, Oracle |
-| Testes     | Jest, Bun test                                   |
-
-## Pré-requisitos
-
-- Node.js ≥18 ou Bun ≥1.0
-- npm, yarn, pnpm ou bun
-
-## Instalação
+## Instalação em 1 comando
 
 ```bash
-# Com npm
 npm install knex-orm knex reflect-metadata
+```
 
-# Com bun
+Ou com Bun:
+
+```bash
 bun add knex-orm knex reflect-metadata
 ```
 
-## CLI
+> Observação: para SQLite, adicione também o driver (`sqlite3`) no projeto consumidor.
 
-O pacote expõe dois binários: **`kor`** (atalho) e `knex-orm`.
+---
 
-```bash
-npx kor migrate:generate --entities=./src/entities
-npx kor migrate:run
-npx kor connection:init
-```
+## Exemplo mínimo (≤ 15 linhas)
 
-## Configuração
-
-Variáveis de ambiente típicas (para projetos consumidores):
-
-| Variável       | Descrição                       |
-| -------------- | ------------------------------- |
-| `DB_HOST`      | Host do banco                   |
-| `DB_PORT`      | Porta                           |
-| `DB_USER`      | Usuário                         |
-| `DB_PASSWORD`  | Senha                           |
-| `DB_NAME`      | Nome do banco                   |
-| `DATABASE_URL` | Connection string (alternativa) |
-
-## Executando o projeto
-
-### Node.js
-
-```bash
-npm run build
-node dist/index.js
-```
-
-### Bun
-
-```bash
-bun run build
-bun run dist/index.js
-```
-
-## Testes
-
-```bash
-# Jest (Node)
-npm test
-# ou
-npm run test:node
-
-# Bun test
-bun test
-# ou
-npm run test:bun
-```
-
-## Build
-
-```bash
-npm run build
-```
-
-Saída em `dist/` com `.js` e `.d.ts`.
-
-## Lint & Format
-
-```bash
-npm run lint        # Verifica código com ESLint
-npm run lint:fix    # Corrige automaticamente
-npm run format      # Formata com Prettier
-npm run format:check # Verifica formatação (CI)
-```
-
-## Estrutura de Pastas
-
-```
-knex-orm/
-├── src/
-│   ├── core/           # Decorators, interfaces, metadata, types
-│   ├── adapters/       # Knex, migration, repository
-│   ├── nestjs/         # Integração NestJS
-│   ├── cli/            # kor / knex-orm
-│   └── index.ts
-├── test/
-│   ├── unit/
-│   └── integration/
-├── docs/
-└── package.json
-```
-
-## Paths / Aliases TypeScript
-
-| Alias         | Destino            |
-| ------------- | ------------------ |
-| `@core/*`     | `./src/core/*`     |
-| `@adapters/*` | `./src/adapters/*` |
-| `@nestjs/*`   | `./src/nestjs/*`   |
-| `@cli/*`      | `./src/cli/*`      |
-| `@test/*`     | `./test/*`         |
-
-Exemplo de entidade com decorators:
+Exemplo Node.js “vanilla” usando SQLite in‑memory (inspirado nos testes de integração do repositório):
 
 ```typescript
-import { Entity, PrimaryKey, Column, CreatedAt, UpdatedAt, SoftDelete, Index } from '@core/decorators';
+import 'reflect-metadata';
+import { KnexORM, Entity, PrimaryKey, Column } from 'knex-orm';
 
 @Entity('users')
-@Index(['email', 'tenant_id'])
+class User {
+  @PrimaryKey() id!: number;
+  @Column({ type: 'string' }) name!: string;
+}
+
+async function main() {
+  const orm = await KnexORM.initialize({
+    default: 'primary',
+    connections: { primary: { client: 'sqlite3', connection: { filename: ':memory:' } } },
+  });
+  const repo = orm.getRepository(User);
+  await repo.create({ name: 'Alice' });
+  console.log(await repo.find({}));
+  await orm.close();
+}
+main().catch(console.error);
+```
+
+---
+
+## Documentação completa
+
+### 🇧🇷 Português
+
+| # | Documento | Descrição |
+|---|-----------|-----------|
+| 01 | [Introdução](./docs/pt/01-introducao.md) | O que é, motivação, posicionamento |
+| 02 | [Arquitetura](./docs/pt/02-arquitetura.md) | Design, camadas, padrões |
+| 03 | [Instalação & Get Started](./docs/pt/03-instalacao-e-getstarted.md) | Setup passo a passo |
+| 04 | [Guia de uso](./docs/pt/04-guia-de-uso.md) | Decorators, repositório, exemplos |
+| 05 | [API Reference](./docs/pt/05-api-reference.md) | Referência completa das APIs públicas |
+| 06 | [Configuração](./docs/pt/06-configuracao.md) | Opções de conexão, multi-banco |
+| 07 | [Testes](./docs/pt/07-testes.md) | Como rodar e escrever testes |
+| 08 | [Migrações](./docs/pt/08-migracoes.md) | CLI, geração e execução de migrations |
+| 09 | [Contribuindo](./docs/pt/09-contribuindo.md) | Fluxo de contribuição, TDD, regras |
+| 10 | [Changelog](./docs/pt/10-changelog.md) | Histórico de versões |
+
+### 🇺🇸 English
+
+| # | Document | Description |
+|---|----------|-------------|
+| 01 | [Introduction](./docs/en/01-introduction.md) | What it is, motivation, positioning |
+| 02 | [Architecture](./docs/en/02-architecture.md) | Design, layers, patterns |
+| 03 | [Installation & Get Started](./docs/en/03-installation-and-getstarted.md) | Step-by-step setup |
+| 04 | [Usage Guide](./docs/en/04-usage-guide.md) | Decorators, repository, examples |
+| 05 | [API Reference](./docs/en/05-api-reference.md) | Full public API reference |
+| 06 | [Configuration](./docs/en/06-configuration.md) | Connection options, multi-database |
+| 07 | [Testing](./docs/en/07-testing.md) | How to run and write tests |
+| 08 | [Migrations](./docs/en/08-migrations.md) | CLI, generating and running migrations |
+| 09 | [Contributing](./docs/en/09-contributing.md) | Contribution flow, TDD, rules |
+| 10 | [Changelog](./docs/en/10-changelog.md) | Version history |
+
+### Referência interna
+
+| Documento | Descrição |
+|-----------|-----------|
+| [knex-orm-superset.md](./docs/knex-orm-superset.md) | Documento mestre de arquitetura: visão geral, decorators, repositório, migrations, multi-conexão, NestJS, Bun, testes, publicação NPM |
+| [DEVELOPMENT.md](./docs/DEVELOPMENT.md) | Guia de desenvolvimento: TDD, regras (.rules), boas práticas |
+| [COMMITS_RULES.md](./docs/COMMITS_RULES.md) | Regras de commit convencional para agentes e humanos |
+
+---
+
+## CLI (visão rápida)
+
+O pacote exporta dois binários, definidos em `package.json`:
+
+- `kor` (atalho recomendado)
+- `knex-orm`
+
+Comandos principais (com detecção automática de estrutura via Project Introspection Layer):
+
+```bash
+npx kor migrate:generate              # detecta entities/migrations (CONFIG → CONVENTION → FLAGS)
+npx kor migrate:generate --entities=./dist/entities --migrations-dir=./migrations
+npx kor migrate:run
+npx kor migrate:rollback
+npx kor connection:init
+npx kor connection:test
+npx kor connection:list
+```
+
+Detalhes completos em `docs/pt/08-migracoes.md`.
+
+---
+
+## Compatibilidade
+
+- **Node.js**: ≥ 18
+- **Bun**: ≥ 1.0
+- **NestJS**: 9, 10, 11 (submódulo `knex-orm/nestjs`)
+- **Bancos**: PostgreSQL, MySQL/MySQL2, SQLite3 (Node), MSSQL, Oracle
+
+Para Bun, evite SQLite (drivers nativos); use PostgreSQL ou MySQL.
+
+---
+
+## Integração com NestJS (CRUD completo)
+
+O knex-orm expõe um módulo NestJS pronto para uso via `knex-orm/nestjs`. Ele segue o padrão `forRoot()` / `forFeature()` familiar do TypeORM/MikroORM.
+
+### Instalação
+
+```bash
+npm install knex-orm knex reflect-metadata pg   # ou mysql2, sqlite3 etc.
+```
+
+> `@nestjs/common` e `@nestjs/core` já são peer dependencies do seu projeto NestJS — não precisam ser instalados novamente.
+
+### 1. Definir a entidade
+
+```typescript
+// src/users/user.entity.ts
+import 'reflect-metadata';
+import { Entity, PrimaryKey, Column, CreatedAt, UpdatedAt, SoftDelete } from 'knex-orm';
+
+@Entity('users')
 export class User {
   @PrimaryKey()
   id!: number;
@@ -172,7 +169,7 @@ export class User {
   @Column({ type: 'string', nullable: false, unique: true })
   email!: string;
 
-  @Column({ type: 'string' })
+  @Column({ type: 'string', nullable: false })
   name!: string;
 
   @CreatedAt()
@@ -186,40 +183,224 @@ export class User {
 }
 ```
 
-## Documentação
+### 2. Registrar o módulo global (`AppModule`)
 
-| Arquivo                                             | Descrição                                                                                                                                        |
-| --------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
-| [knex-orm-superset.md](./docs/knex-orm-superset.md) | Documento de arquitetura completo: visão geral, decorators, GenericRepository, migrations, multi-connection, NestJS, Bun, testes, publicação NPM |
-| [DEVELOPMENT.md](./docs/DEVELOPMENT.md)             | Guia de desenvolvimento: TDD, regras (.rules), boas práticas                                                                                     |
-| [README.en.md](./docs/README.en.md)                 | README em inglês                                                                                                                                 |
-| [COMMITS_RULES.md](./docs/COMMITS_RULES.md)         | Regras de commits convencionais para agentes e humanos                                                                                           |
+```typescript
+// src/app.module.ts
+import { Module } from '@nestjs/common';
+import { KnexOrmModule } from 'knex-orm/nestjs';
+import { UsersModule } from './users/users.module';
 
-## Regras de Commit
+@Module({
+  imports: [
+    KnexOrmModule.forRoot({
+      default: 'primary',
+      connections: {
+        primary: {
+          client: 'pg',
+          connection: {
+            host: process.env.DB_HOST,
+            port: Number(process.env.DB_PORT ?? 5432),
+            user: process.env.DB_USER,
+            password: process.env.DB_PASSWORD,
+            database: process.env.DB_NAME,
+          },
+        },
+      },
+    }),
+    UsersModule,
+  ],
+})
+export class AppModule {}
+```
 
-O projeto usa **Conventional Commits** para mensagens de commit. Todas as mensagens devem ser em **inglês** e **atômicas** (uma intenção lógica por commit).
+### 3. Registrar repositórios no módulo de feature
 
-- Formato: `type(scope): subject` (ex.: `feat(repository): add soft delete`)
-- Tipos: `feat`, `fix`, `docs`, `refactor`, `perf`, `test`, `build`, `ci`, `chore`, `revert`, `security`
-- Subject: imperativo, ≤72 caracteres, sem ponto final
+```typescript
+// src/users/users.module.ts
+import { Module } from '@nestjs/common';
+import { KnexOrmModule } from 'knex-orm/nestjs';
+import { User } from './user.entity';
+import { UsersService } from './users.service';
+import { UsersController } from './users.controller';
 
-Consulte [COMMITS_RULES.md](./docs/COMMITS_RULES.md) para regras completas.
+@Module({
+  imports: [KnexOrmModule.forFeature([User])],
+  providers: [UsersService],
+  controllers: [UsersController],
+})
+export class UsersModule {}
+```
 
-### References
+### 4. Service com CRUD completo
 
-- [Conventional Commits v1.0.0](https://www.conventionalcommits.org/en/v1.0.0/)
-- [SemVer](https://semver.org/)
-- [7 rules of a great commit message](https://cbea.ms/git-commit/)
-- [GitHub Docs best practices](https://docs.github.com/en/contributing/writing-for-github-docs/best-practices-for-github-docs)
+```typescript
+// src/users/users.service.ts
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { InjectRepository } from 'knex-orm/nestjs';
+import { IRepository } from 'knex-orm';
+import { User } from './user.entity';
+
+@Injectable()
+export class UsersService {
+  constructor(
+    @InjectRepository(User)
+    private readonly userRepo: IRepository<User>,
+  ) {}
+
+  // CREATE
+  async create(data: Pick<User, 'name' | 'email'>): Promise<User> {
+    return this.userRepo.create(data);
+  }
+
+  // READ — lista com paginação
+  async findAll(page = 1, limit = 20) {
+    return this.userRepo.paginate({ page, limit });
+    // Retorna: { data: User[], total: number, page: number, lastPage: number }
+  }
+
+  // READ — por ID
+  async findOne(id: number): Promise<User> {
+    const user = await this.userRepo.findById(id);
+    if (!user) throw new NotFoundException(`User #${id} not found`);
+    return user;
+  }
+
+  // READ — busca por campo
+  async findByEmail(email: string): Promise<User | null> {
+    return this.userRepo.findOne({ email });
+  }
+
+  // UPDATE
+  async update(id: number, data: Partial<Pick<User, 'name' | 'email'>>): Promise<User> {
+    const user = await this.findOne(id);  // garante que existe
+    return this.userRepo.update({ id: user.id }, data);
+  }
+
+  // DELETE (soft delete — usa @SoftDelete na entidade)
+  async softRemove(id: number): Promise<void> {
+    const user = await this.findOne(id);
+    await this.userRepo.disable({ id: user.id });
+  }
+
+  // DELETE físico
+  async remove(id: number): Promise<void> {
+    await this.findOne(id);
+    await this.userRepo.delete({ id });
+  }
+}
+```
+
+### 5. Controller REST
+
+```typescript
+// src/users/users.controller.ts
+import { Controller, Get, Post, Patch, Delete, Param, Body, Query, ParseIntPipe } from '@nestjs/common';
+import { UsersService } from './users.service';
+import { User } from './user.entity';
+
+@Controller('users')
+export class UsersController {
+  constructor(private readonly usersService: UsersService) {}
+
+  @Post()
+  create(@Body() body: Pick<User, 'name' | 'email'>) {
+    return this.usersService.create(body);
+  }
+
+  @Get()
+  findAll(
+    @Query('page', ParseIntPipe) page = 1,
+    @Query('limit', ParseIntPipe) limit = 20,
+  ) {
+    return this.usersService.findAll(page, limit);
+  }
+
+  @Get(':id')
+  findOne(@Param('id', ParseIntPipe) id: number) {
+    return this.usersService.findOne(id);
+  }
+
+  @Patch(':id')
+  update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() body: Partial<Pick<User, 'name' | 'email'>>,
+  ) {
+    return this.usersService.update(id, body);
+  }
+
+  @Delete(':id')
+  remove(@Param('id', ParseIntPipe) id: number) {
+    return this.usersService.softRemove(id);
+  }
+}
+```
+
+### 6. Injetar a conexão bruta (avançado)
+
+```typescript
+import { InjectConnection } from 'knex-orm/nestjs';
+import { Knex } from 'knex';
+
+@Injectable()
+export class ReportsService {
+  constructor(
+    @InjectConnection()           // conexão padrão
+    private readonly knex: Knex,
+  ) {}
+
+  async rawReport() {
+    return this.knex('users')
+      .select('name')
+      .count('id as total')
+      .groupBy('name');
+  }
+}
+```
+
+### Resumo das APIs NestJS
+
+| Símbolo | Importado de | Descrição |
+|---|---|---|
+| `KnexOrmModule` | `knex-orm/nestjs` | Módulo principal (`forRoot` / `forFeature`) |
+| `@InjectRepository(Entity)` | `knex-orm/nestjs` | Injeta `IRepository<Entity>` |
+| `@InjectConnection(name?)` | `knex-orm/nestjs` | Injeta a instância `Knex` |
+| `IRepository<T>` | `knex-orm` | Interface do repositório genérico |
+
+---
+
+## Scripts principais
+
+Do `package.json`:
+
+- **Build**: `npm run build` (usa `tsup`, saída em `dist/` com ESM + CJS + `.d.ts`)
+- **Testes**:
+  - `npm test` / `npm run test:node` — Jest (Node)
+  - `npm run test:coverage` — Jest com coverage
+  - `npm run test:bun` — Bun test (unitários)
+- **Qualidade**:
+  - `npm run lint`, `npm run lint:fix`
+  - `npm run format`, `npm run format:check`
+
+---
 
 ## Contribuindo
 
-1. Fork o repositório
-2. Crie uma branch (`git checkout -b feat/minha-feature`)
-3. Commit suas alterações (`git commit -m 'feat: adiciona X'`)
-4. Push para a branch (`git push origin feat/minha-feature`)
-5. Abra um Pull Request
+- Leia primeiro:
+  - `.rules`
+  - `docs/DEVELOPMENT.md`
+  - `docs/COMMITS_RULES.md`
+  - `docs/pt/09-contribuindo.md`
+- Resumo do fluxo:
+  1. Fork → branch (`feat/...`)  
+  2. TDD (teste primeiro)  
+  3. `npm test` + `npm run test:bun` + `npm run lint`  
+  4. Commits em formato **Conventional Commits** (em inglês)  
+  5. Abra um Pull Request
+
+---
 
 ## Licença
 
-ISC
+Este projeto é licenciado sob **MIT**. Consulte `LICENSE` para o texto completo.
+

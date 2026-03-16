@@ -2,11 +2,11 @@
 
 > NPM library that extends Knex.js with an ORM pattern based on decorators, maintaining full compatibility with Knex's native API.
 
-[![Build](https://img.shields.io/badge/build-tsc-blue)](../package.json)
+[![Build](https://img.shields.io/badge/build-tsup-blue)](../package.json)
 [![Tests](https://img.shields.io/badge/tests-jest%20%7C%20bun-green)](../package.json)
-[![License](https://img.shields.io/badge/license-ISC-yellow)](../package.json)
+[![License](https://img.shields.io/badge/license-MIT-yellow)](../package.json)
 
-[Português](../README.md)
+🇧🇷 [Português](../README.md) &nbsp;|&nbsp; 🇺🇸 English
 
 ## Table of Contents
 
@@ -16,6 +16,7 @@
 - [Installation](#installation)
 - [CLI](#cli)
 - [Configuration](#configuration)
+- [NestJS Integration (Full CRUD)](#nestjs-integration-full-crud)
 - [Running the Project](#running-the-project)
   - [Node.js](#nodejs)
   - [Bun](#bun)
@@ -83,6 +84,233 @@ Typical environment variables (for consumer projects):
 | `DB_PASSWORD`  | Password                        |
 | `DB_NAME`      | Database name                   |
 | `DATABASE_URL` | Connection string (alternative) |
+
+## NestJS Integration (Full CRUD)
+
+knex-orm ships a ready-to-use NestJS module via the `knex-orm/nestjs` sub-path. It follows the `forRoot()` / `forFeature()` pattern familiar from TypeORM/MikroORM.
+
+### Installation
+
+```bash
+npm install knex-orm knex reflect-metadata pg   # or mysql2, sqlite3, etc.
+```
+
+> `@nestjs/common` and `@nestjs/core` are already peer dependencies of your NestJS project — no need to reinstall them.
+
+### 1. Define the entity
+
+```typescript
+// src/users/user.entity.ts
+import 'reflect-metadata';
+import { Entity, PrimaryKey, Column, CreatedAt, UpdatedAt, SoftDelete } from 'knex-orm';
+
+@Entity('users')
+export class User {
+  @PrimaryKey()
+  id!: number;
+
+  @Column({ type: 'string', nullable: false, unique: true })
+  email!: string;
+
+  @Column({ type: 'string', nullable: false })
+  name!: string;
+
+  @CreatedAt()
+  createdAt!: Date;
+
+  @UpdatedAt()
+  updatedAt!: Date;
+
+  @SoftDelete()
+  deletedAt?: Date;
+}
+```
+
+### 2. Register the global module (`AppModule`)
+
+```typescript
+// src/app.module.ts
+import { Module } from '@nestjs/common';
+import { KnexOrmModule } from 'knex-orm/nestjs';
+import { UsersModule } from './users/users.module';
+
+@Module({
+  imports: [
+    KnexOrmModule.forRoot({
+      default: 'primary',
+      connections: {
+        primary: {
+          client: 'pg',
+          connection: {
+            host: process.env.DB_HOST,
+            port: Number(process.env.DB_PORT ?? 5432),
+            user: process.env.DB_USER,
+            password: process.env.DB_PASSWORD,
+            database: process.env.DB_NAME,
+          },
+        },
+      },
+    }),
+    UsersModule,
+  ],
+})
+export class AppModule {}
+```
+
+### 3. Register repositories in the feature module
+
+```typescript
+// src/users/users.module.ts
+import { Module } from '@nestjs/common';
+import { KnexOrmModule } from 'knex-orm/nestjs';
+import { User } from './user.entity';
+import { UsersService } from './users.service';
+import { UsersController } from './users.controller';
+
+@Module({
+  imports: [KnexOrmModule.forFeature([User])],
+  providers: [UsersService],
+  controllers: [UsersController],
+})
+export class UsersModule {}
+```
+
+### 4. Service with full CRUD
+
+```typescript
+// src/users/users.service.ts
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { InjectRepository } from 'knex-orm/nestjs';
+import { IRepository } from 'knex-orm';
+import { User } from './user.entity';
+
+@Injectable()
+export class UsersService {
+  constructor(
+    @InjectRepository(User)
+    private readonly userRepo: IRepository<User>,
+  ) {}
+
+  // CREATE
+  async create(data: Pick<User, 'name' | 'email'>): Promise<User> {
+    return this.userRepo.create(data);
+  }
+
+  // READ — paginated list
+  async findAll(page = 1, limit = 20) {
+    return this.userRepo.paginate({ page, limit });
+    // Returns: { data: User[], total: number, page: number, lastPage: number }
+  }
+
+  // READ — by ID
+  async findOne(id: number): Promise<User> {
+    const user = await this.userRepo.findById(id);
+    if (!user) throw new NotFoundException(`User #${id} not found`);
+    return user;
+  }
+
+  // READ — by field
+  async findByEmail(email: string): Promise<User | null> {
+    return this.userRepo.findOne({ email });
+  }
+
+  // UPDATE
+  async update(id: number, data: Partial<Pick<User, 'name' | 'email'>>): Promise<User> {
+    const user = await this.findOne(id);  // ensures it exists
+    return this.userRepo.update({ id: user.id }, data);
+  }
+
+  // SOFT DELETE — uses @SoftDelete on the entity
+  async softRemove(id: number): Promise<void> {
+    const user = await this.findOne(id);
+    await this.userRepo.disable({ id: user.id });
+  }
+
+  // HARD DELETE
+  async remove(id: number): Promise<void> {
+    await this.findOne(id);
+    await this.userRepo.delete({ id });
+  }
+}
+```
+
+### 5. REST Controller
+
+```typescript
+// src/users/users.controller.ts
+import { Controller, Get, Post, Patch, Delete, Param, Body, Query, ParseIntPipe } from '@nestjs/common';
+import { UsersService } from './users.service';
+import { User } from './user.entity';
+
+@Controller('users')
+export class UsersController {
+  constructor(private readonly usersService: UsersService) {}
+
+  @Post()
+  create(@Body() body: Pick<User, 'name' | 'email'>) {
+    return this.usersService.create(body);
+  }
+
+  @Get()
+  findAll(
+    @Query('page', ParseIntPipe) page = 1,
+    @Query('limit', ParseIntPipe) limit = 20,
+  ) {
+    return this.usersService.findAll(page, limit);
+  }
+
+  @Get(':id')
+  findOne(@Param('id', ParseIntPipe) id: number) {
+    return this.usersService.findOne(id);
+  }
+
+  @Patch(':id')
+  update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() body: Partial<Pick<User, 'name' | 'email'>>,
+  ) {
+    return this.usersService.update(id, body);
+  }
+
+  @Delete(':id')
+  remove(@Param('id', ParseIntPipe) id: number) {
+    return this.usersService.softRemove(id);
+  }
+}
+```
+
+### 6. Inject raw connection (advanced)
+
+```typescript
+import { InjectConnection } from 'knex-orm/nestjs';
+import { Knex } from 'knex';
+
+@Injectable()
+export class ReportsService {
+  constructor(
+    @InjectConnection()           // default connection
+    private readonly knex: Knex,
+  ) {}
+
+  async rawReport() {
+    return this.knex('users')
+      .select('name')
+      .count('id as total')
+      .groupBy('name');
+  }
+}
+```
+
+### NestJS API summary
+
+| Symbol | Imported from | Description |
+|---|---|---|
+| `KnexOrmModule` | `knex-orm/nestjs` | Root module (`forRoot` / `forFeature`) |
+| `@InjectRepository(Entity)` | `knex-orm/nestjs` | Injects `IRepository<Entity>` |
+| `@InjectConnection(name?)` | `knex-orm/nestjs` | Injects the `Knex` instance |
+| `IRepository<T>` | `knex-orm` | Generic repository interface |
+
+---
 
 ## Running the Project
 
@@ -188,12 +416,43 @@ export class User {
 
 ## Documentation
 
-| File                                           | Description                                                                                                                             |
-| ---------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
+### 🇺🇸 English
+
+| # | Document | Description |
+|---|----------|-------------|
+| 01 | [Introduction](./en/01-introduction.md) | What it is, motivation, positioning |
+| 02 | [Architecture](./en/02-architecture.md) | Design, layers, patterns |
+| 03 | [Installation & Get Started](./en/03-installation-and-getstarted.md) | Step-by-step setup |
+| 04 | [Usage Guide](./en/04-usage-guide.md) | Decorators, repository, examples |
+| 05 | [API Reference](./en/05-api-reference.md) | Full public API reference |
+| 06 | [Configuration](./en/06-configuration.md) | Connection options, multi-database |
+| 07 | [Testing](./en/07-testing.md) | How to run and write tests |
+| 08 | [Migrations](./en/08-migrations.md) | CLI, generating and running migrations |
+| 09 | [Contributing](./en/09-contributing.md) | Contribution flow, TDD, rules |
+| 10 | [Changelog](./en/10-changelog.md) | Version history |
+
+### 🇧🇷 Português
+
+| # | Documento | Descrição |
+|---|-----------|-----------|
+| 01 | [Introdução](./pt/01-introducao.md) | O que é, motivação, posicionamento |
+| 02 | [Arquitetura](./pt/02-arquitetura.md) | Design, camadas, padrões |
+| 03 | [Instalação & Get Started](./pt/03-instalacao-e-getstarted.md) | Setup passo a passo |
+| 04 | [Guia de uso](./pt/04-guia-de-uso.md) | Decorators, repositório, exemplos |
+| 05 | [API Reference](./pt/05-api-reference.md) | Referência completa das APIs públicas |
+| 06 | [Configuração](./pt/06-configuracao.md) | Opções de conexão, multi-banco |
+| 07 | [Testes](./pt/07-testes.md) | Como rodar e escrever testes |
+| 08 | [Migrações](./pt/08-migracoes.md) | CLI, geração e execução de migrations |
+| 09 | [Contribuindo](./pt/09-contribuindo.md) | Fluxo de contribuição, TDD, regras |
+| 10 | [Changelog](./pt/10-changelog.md) | Histórico de versões |
+
+### Internal reference
+
+| File | Description |
+|------|-------------|
 | [knex-orm-superset.md](./knex-orm-superset.md) | Full architecture document: overview, decorators, GenericRepository, migrations, multi-connection, NestJS, Bun, testing, NPM publishing |
-| [DEVELOPMENT.md](./DEVELOPMENT.md)             | Development guide: TDD, rules (.rules), best practices                                                                                  |
-| [README.md](../README.md)                      | README in Portuguese                                                                                                                    |
-| [COMMITS_RULES.md](./COMMITS_RULES.md)         | Conventional commit rules for agents and humans                                                                                         |
+| [DEVELOPMENT.md](./DEVELOPMENT.md) | Development guide: TDD, rules (.rules), best practices |
+| [COMMITS_RULES.md](./COMMITS_RULES.md) | Conventional commit rules for agents and humans |
 
 ## Commit Rules
 
@@ -222,4 +481,4 @@ See [COMMITS_RULES.md](./COMMITS_RULES.md) for full rules.
 
 ## License
 
-ISC
+MIT — see [LICENSE](../LICENSE) for the full text.
