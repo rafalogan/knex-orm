@@ -4,6 +4,7 @@ test/
 examples/
 docs/
 *.ts
+*.spec.*
 !*.d.ts
 
 # Config (not needed by consumers)

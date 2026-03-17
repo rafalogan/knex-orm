@@ -70,9 +70,13 @@ async function runMigrateGenerate(args: string[]): Promise<void> {
   let entitiesPath: string;
   let migrationsDir: string;
 
+  const flags: { entities?: string; migrationsDir?: string } = {};
+  if (entitiesFlag !== undefined) flags.entities = entitiesFlag;
+  if (migrationsFlag !== undefined) flags.migrationsDir = migrationsFlag;
+
   try {
     const ctx = await resolveProjectContextForMigrateGenerate(
-      { entities: entitiesFlag, migrationsDir: migrationsFlag },
+      flags,
       process.cwd(),
     );
     entitiesPath = ctx.entitiesPath;
@@ -129,7 +133,7 @@ async function loadKnexForMigrate(configPath?: string): Promise<import('knex').K
   const { existsSync } = await import('node:fs');
   const { createRequire } = await import('node:module');
   const { resolve, join } = await import('node:path');
-  const { detectProjectStructure } = await import('./project-introspection');
+  const { detectProjectStructure } = await import('./project-introspection.js');
 
   const ctx = await detectProjectStructure(process.cwd());
   const cwd = ctx.paths.rootDir;
@@ -212,7 +216,7 @@ async function runMigrateRollback(args: string[]): Promise<void> {
 async function runConnectionInit(_args: string[]): Promise<void> {
   const { writeFile } = await import('node:fs/promises');
   const { join } = await import('node:path');
-  const { detectProjectStructure } = await import('./project-introspection');
+  const { detectProjectStructure } = await import('./project-introspection.js');
 
   const ctx = await detectProjectStructure(process.cwd());
   const rootDir = ctx.paths.rootDir;
@@ -241,7 +245,7 @@ async function runConnectionTest(args: string[]): Promise<void> {
   const configPath = args.find((a) => a.startsWith('--config='))?.split('=')[1];
   const { ConnectionConfigLoader } = await import('../adapters/connection/connection-config.js');
   const { ConnectionManager } = await import('../adapters/connection/connection-manager.js');
-  const { detectProjectStructure } = await import('./project-introspection');
+  const { detectProjectStructure } = await import('./project-introspection.js');
 
   const loader = new ConnectionConfigLoader();
   const ctx = await detectProjectStructure(process.cwd());
@@ -276,7 +280,7 @@ async function runConnectionList(args: string[]): Promise<void> {
   const configPath = args.find((a) => a.startsWith('--config='))?.split('=')[1];
   const { ConnectionConfigLoader } = await import('../adapters/connection/connection-config.js');
   const { ConnectionManager } = await import('../adapters/connection/connection-manager.js');
-  const { detectProjectStructure } = await import('./project-introspection');
+  const { detectProjectStructure } = await import('./project-introspection.js');
 
   const loader = new ConnectionConfigLoader();
   const ctx = await detectProjectStructure(process.cwd());
