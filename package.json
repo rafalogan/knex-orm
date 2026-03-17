@@ -1,5 +1,5 @@
 {
-  "name": "@knex/superset-orm",
+  "name": "@knex/kor-orm",
   "version": "1.2.3",
   "description": "ORM superset for Knex.js with decorators, NestJS and Bun support",
   "main": "./dist/index.js",
