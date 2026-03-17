@@ -4,8 +4,8 @@
   "description": "ORM superset for Knex.js with decorators, NestJS and Bun support",
   "main": "./dist/index.js",
   "bin": {
-    "kor": "dist/cli/migrate-generate.js",
-    "knex-orm": "dist/cli/migrate-generate.js"
+    "knx": "dist/cli/migrate-generate.js",
+    "knx-orm": "dist/cli/migrate-generate.js"
   },
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",

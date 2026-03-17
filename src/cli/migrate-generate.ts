@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * knex-orm CLI
+ * knx-orm CLI
  *
  * Comandos:
  *   migrate:generate   Gera migration a partir das entidades
@@ -40,7 +40,7 @@ async function main(): Promise<void> {
 
   if (!cmd || !ALL_COMMANDS.includes(cmd)) {
     console.error(
-      'Usage: kor <command>  (or: knex-orm <command>)\n' +
+      'Usage: knx <command>  (or: knx-orm <command>)\n' +
         '  migrate:generate   Generate migration from entities\n' +
         '  migrate:run        Run pending migrations\n' +
         '  migrate:rollback   Rollback last migration\n' +
@@ -48,9 +48,9 @@ async function main(): Promise<void> {
         '  connection:test    Test database connections\n' +
         '  connection:list    List configured connections\n\n' +
         'Examples:\n' +
-        '  kor migrate:generate --entities=./src/entities\n' +
-        '  kor migrate:run\n' +
-        '  kor connection:init',
+        '  knx migrate:generate --entities=./src/entities\n' +
+        '  knx migrate:run\n' +
+        '  knx connection:init',
     );
     process.exit(1);
   }
@@ -176,7 +176,7 @@ async function loadKnexForMigrate(configPath?: string): Promise<import('knex').K
     }
   }
 
-  throw new Error('Config not found. Run: kor connection:init or create knexfile.js');
+  throw new Error('Config not found. Run: knx connection:init or create knexfile.js');
 }
 
 async function runMigrateRun(args: string[]): Promise<void> {
@@ -255,7 +255,7 @@ async function runConnectionTest(args: string[]): Promise<void> {
     ctx.paths.configFiles.ormConfig ?? ctx.paths.configFiles.knexfile ?? ctx.paths.configFiles.knexConfig;
   const path = pathFromFlags ?? pathFromIntrospection ?? loader.findConfigPath();
   if (!path) {
-    console.error('No config file found. Run: kor connection:init');
+    console.error('No config file found. Run: knx connection:init');
     process.exit(1);
   }
 
@@ -290,7 +290,7 @@ async function runConnectionList(args: string[]): Promise<void> {
     ctx.paths.configFiles.ormConfig ?? ctx.paths.configFiles.knexfile ?? ctx.paths.configFiles.knexConfig;
   const path = pathFromFlags ?? pathFromIntrospection ?? loader.findConfigPath();
   if (!path) {
-    console.error('No config file found. Run: kor connection:init');
+    console.error('No config file found. Run: knx connection:init');
     process.exit(1);
   }
 
