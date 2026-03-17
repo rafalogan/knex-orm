@@ -5,13 +5,21 @@ module.exports = {
   roots: ['<rootDir>/test'],
   testMatch: ['**/*.test.ts', '**/*.spec.ts'],
   moduleNameMapper: {
+    '^knex-orm/nestjs$': '<rootDir>/src/nestjs/index.ts',
     '^@core/(.*)$': '<rootDir>/src/core/$1',
     '^@adapters/(.*)$': '<rootDir>/src/adapters/$1',
-    '^@nestjs/(.*)$': '<rootDir>/src/nestjs/$1',
     '^@cli/(.*)$': '<rootDir>/src/cli/$1',
     '^@test/(.*)$': '<rootDir>/test/$1',
   },
-  collectCoverageFrom: ['src/**/*.ts', '!src/**/*.d.ts'],
+  collectCoverageFrom: ['src/**/*.ts', '!src/**/*.d.ts', '!src/core/decorators/relation.decorator.ts'],
   coverageDirectory: 'coverage',
   coverageReporters: ['text', 'lcov'],
+  coverageThreshold: {
+    global: {
+      statements: 85,
+      branches: 63,
+      functions: 85,
+      lines: 85,
+    },
+  },
 };

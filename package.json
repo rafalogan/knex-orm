@@ -3,29 +3,65 @@
   "version": "1.0.0",
   "description": "ORM superset for Knex.js with decorators, NestJS and Bun support",
   "main": "./dist/index.js",
-  "module": "./dist/index.js",
+  "bin": {
+    "kor": "./dist/cli/migrate-generate.js",
+    "knex-orm": "./dist/cli/migrate-generate.js"
+  },
+  "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js",
-      "require": "./dist/index.js"
+      "import": {
+        "types": "./dist/index.d.mts",
+        "default": "./dist/index.mjs"
+      },
+      "require": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      }
     },
     "./nestjs": {
-      "types": "./dist/nestjs/index.d.ts",
-      "import": "./dist/nestjs/index.js",
-      "require": "./dist/nestjs/index.js"
+      "import": {
+        "types": "./dist/nestjs/index.d.mts",
+        "default": "./dist/nestjs/index.mjs"
+      },
+      "require": {
+        "types": "./dist/nestjs/index.d.ts",
+        "default": "./dist/nestjs/index.js"
+      }
+    },
+    "./migration": {
+      "import": {
+        "types": "./dist/adapters/migration/index.d.mts",
+        "default": "./dist/adapters/migration/index.mjs"
+      },
+      "require": {
+        "types": "./dist/adapters/migration/index.d.ts",
+        "default": "./dist/adapters/migration/index.js"
+      }
     }
   },
   "scripts": {
-    "build": "tsc",
+    "prepublishOnly": "npm run build && npm test",
+    "build": "tsup",
+    "migrate:generate": "node dist/cli/migrate-generate.js migrate:generate",
+    "migrate:run": "node dist/cli/migrate-generate.js migrate:run",
+    "migrate:rollback": "node dist/cli/migrate-generate.js migrate:rollback",
+    "connection:init": "node dist/cli/migrate-generate.js connection:init",
+    "connection:test": "node dist/cli/migrate-generate.js connection:test",
+    "connection:list": "node dist/cli/migrate-generate.js connection:list",
     "test": "jest",
+    "test:coverage": "jest --coverage",
     "test:node": "jest",
-    "test:bun": "bun test",
+    "test:bun": "bun test test/unit --tsconfig-override=tsconfig.test.json",
+    "dev": "tsup --watch",
+    "start": "node dist/cli/migrate-generate.js",
+    "start:bun": "bun run dist/cli/migrate-generate.mjs",
     "lint": "npx eslint .",
     "lint:fix": "npx eslint . --fix",
     "format": "npx prettier --write .",
-    "format:check": "npx prettier --check ."
+    "format:check": "npx prettier --check .",
+    "pack:dry-run": "npm run build && npm pack --dry-run"
   },
   "keywords": [
     "knex",
@@ -36,29 +72,57 @@
     "bun"
   ],
   "author": "",
-  "license": "ISC",
+  "license": "MIT",
   "peerDependencies": {
+    "@nestjs/common": ">=9.0.0",
+    "@nestjs/core": ">=9.0.0",
     "knex": "^3.0.0",
     "reflect-metadata": "^0.2.0",
     "typescript": ">=4.5.0"
   },
+  "peerDependenciesMeta": {
+    "@nestjs/common": {
+      "optional": true
+    },
+    "@nestjs/core": {
+      "optional": true
+    }
+  },
   "devDependencies": {
-    "knex": "^3.0.0",
-    "reflect-metadata": "^0.2.0",
-    "typescript": "^5.0.0",
     "@eslint/js": "^9.0.0",
+    "@nestjs/common": "^10.0.0",
+    "@nestjs/core": "^10.0.0",
+    "@nestjs/testing": "^10.0.0",
     "@types/jest": "^29.0.0",
     "eslint": "^10.0.0",
-    "jest": "^29.0.0",
-    "ts-jest": "^29.0.0",
     "globals": "^15.0.0",
-    "typescript-eslint": "^8.0.0",
-    "sqlite3": "^5.0.0"
+    "jest": "^29.0.0",
+    "knex": "^3.0.0",
+    "reflect-metadata": "^0.2.0",
+    "sqlite3": "^5.0.0",
+    "ts-jest": "^29.0.0",
+    "tsup": "^8.5.1",
+    "typescript": "^5.0.0",
+    "typescript-eslint": "^8.0.0"
   },
   "files": [
-    "dist"
+    "dist",
+    "LICENSE",
+    "README.md"
   ],
   "engines": {
-    "node": ">=18.0.0"
+    "node": ">=18.0.0",
+    "bun": ">=1.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/knex-orm/knex-orm.git"
+  },
+  "homepage": "https://github.com/knex-orm/knex-orm#readme",
+  "bugs": {
+    "url": "https://github.com/knex-orm/knex-orm/issues"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }

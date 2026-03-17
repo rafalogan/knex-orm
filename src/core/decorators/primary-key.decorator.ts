@@ -1,6 +1,7 @@
 import type { PrimaryKeyOptions } from '../types/column-metadata';
 import { setPrimaryKeyMetadata } from '../metadata/metadata-storage';
 import { getPrototypeConstructor, toSnakeCase } from '../utils/string';
+import { assertValidSqlIdentifier } from '../security/identifier';
 
 /**
  * Decorator that defines the primary key of an entity.
@@ -16,6 +17,7 @@ export function PrimaryKey(options?: PrimaryKeyOptions): PropertyDecorator {
 
     const propertyName = String(propertyKey);
     const columnName = toSnakeCase(propertyName);
+    assertValidSqlIdentifier(columnName, `@PrimaryKey for "${propertyName}"`);
     setPrimaryKeyMetadata(constructor, propertyName, columnName, options);
   };
 }

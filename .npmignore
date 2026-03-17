@@ -1,0 +1,25 @@
+# Source (only dist is published)
+src/
+test/
+examples/
+docs/
+*.ts
+!*.d.ts
+
+# Config (not needed by consumers)
+jest.config.js
+tsconfig*.json
+.eslintrc*
+.prettierrc
+.rules
+.github/
+
+# Build artifacts (not needed by consumers)
+dist/.tsbuildinfo
+
+# Development
+node_modules/
+coverage/
+*.log
+.env*
+.DS_Store

@@ -1,4 +1,5 @@
 import { addIndexMetadata } from '../metadata/metadata-storage';
+import { assertValidSqlIdentifier } from '../security/identifier';
 
 /**
  * Decorator that defines a composite index on the table.
@@ -9,6 +10,9 @@ export function Index(fields: string[]): ClassDecorator {
   return (target: object): void => {
     if (typeof target !== 'function') {
       throw new TypeError('@Index can only be applied to class constructors');
+    }
+    for (const f of fields) {
+      assertValidSqlIdentifier(f, '@Index fields');
     }
     addIndexMetadata(target, fields);
   };

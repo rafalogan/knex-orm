@@ -3,6 +3,14 @@ import { Entity, getEntityMetadata } from '@core/decorators/entity.decorator';
 import { Column } from '@core/decorators/column.decorator';
 
 describe('@Column decorator', () => {
+  describe('compatibilidade de runtime', () => {
+    it('deve ignorar aplicação quando target for undefined', () => {
+      const decorator = Column({ type: 'string' });
+
+      expect(() => decorator(undefined as unknown as object, 'email')).not.toThrow();
+    });
+  });
+
   describe('opções básicas', () => {
     it('deve registrar coluna com type e columnName em snake_case', () => {
       @Entity('users')

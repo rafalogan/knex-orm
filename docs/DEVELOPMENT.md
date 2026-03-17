@@ -74,7 +74,7 @@ knex-orm/
 │   │   └── utils/
 │   ├── adapters/       # Knex, migration, repository
 │   ├── nestjs/         # Integração NestJS
-│   ├── cli/            # CLI knex-orm
+│   ├── cli/            # kor / knex-orm
 │   └── index.ts
 ├── test/
 │   ├── unit/
@@ -109,10 +109,20 @@ knex-orm/
 
 ## 5. Testes
 
+Estratégia conforme Módulo 9 (`docs/knex-orm-superset.md`):
+
+| Comando                 | Descrição                       |
+| ----------------------- | ------------------------------- |
+| `npm test`              | Jest — suite completa           |
+| `npm run test:coverage` | Jest com relatório de cobertura |
+| `bun test`              | Bun test (requer Bun instalado) |
+
+Estrutura: `test/unit/` (mocks) e `test/integration/` (SQLite in-memory).
+
 ```bash
-npm test           # Jest (Node)
-npm run test:node  # Idem
-npm run test:bun   # Bun test
+npm test              # Jest (Node)
+npm run test:coverage # Jest com cobertura
+npm run test:bun      # Bun test (requer Bun)
 ```
 
 - Cada teste 100% independente

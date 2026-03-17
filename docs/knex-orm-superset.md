@@ -138,22 +138,28 @@ knex-orm/
 ├── src/
 │   ├── core/
 │   │   ├── decorators/      # @Entity, @Column, @PrimaryKey, @Index, @Relation
-│   │   ├── interfaces/      # IRepository, IConnection, IMigrationGenerator
-│   │   ├── metadata/        # MetadataStorage (reflect-metadata)
-│   │   └── types/           # ColumnType, RelationType, QueryOptions
+│   │   ├── interfaces/      # IConnection, IRepository (ports)
+│   │   ├── metadata/        # MetadataStorage, EntityScanner
+│   │   ├── security/        # isValidSqlIdentifier, redactConnectionConfig
+│   │   ├── types/           # ColumnType, EntityMetadata, QueryOptions
+│   │   └── utils/           # toSnakeCase, getPrototypeConstructor
 │   ├── adapters/
+│   │   ├── connection/      # ConnectionManager, ConnectionFactory, ConnectionConfig, ConnectionRegistry
 │   │   ├── knex/            # KnexAdapter implementa IConnection
-│   │   ├── migration/       # MigrationGenerator, MigrationRunner
-│   │   └── repository/      # GenericRepository<T>
+│   │   ├── migration/       # MigrationEngine, MigrationGenerator, SchemaBuilder, SchemaDiff, SchemaRegistry
+│   │   │   ├── schema/      # schema-types, schema-builder, schema-diff
+│   │   │   └── storage/     # schema-registry (.orm-schema.json)
+│   │   └── repository/      # Repository<T> (GenericRepository)
 │   ├── nestjs/              # DynamicModule, providers, decorators NestJS
-│   ├── cli/                 # knex-orm generate:migration, generate:repository
+│   ├── cli/                 # kor / knex-orm
 │   └── index.ts             # exports públicos da lib
-├── tests/
+├── test/
 │   ├── unit/
 │   └── integration/         # SQLite in-memory
+├── examples/                # exemplos de entidades para migrate:generate
 ├── package.json
 ├── tsconfig.json
-└── jest.config.ts
+└── jest.config.js
 ```
 
 ---
@@ -305,31 +311,49 @@ class GenericRepository<T> implements IRepository<T> {
 
 ### 5.1 Fluxo do CLI
 
-1. O CLI carrega entidades via `reflect-metadata` e `MetadataStorage`
-2. Lê o schema atual do banco (via `knex.schema` ou `information_schema`)
-3. Calcula o **diff** entre metadata das entidades e schema existente
+1. O CLI carrega entidades via `reflect-metadata` e `MetadataStorage` (a partir do módulo indicado em `--entities`)
+2. Lê o schema anterior do arquivo `.orm-schema.json` (estado rastreado)
+3. Calcula o **diff** entre metadata das entidades e o schema anterior
 4. Gera arquivo de migration no formato Knex (`exports.up`, `exports.down`)
+5. Atualiza `.orm-schema.json` com o novo estado
+
+> **Nota:** O diff é calculado entre entidades e `.orm-schema.json`, não entre entidades e o banco. Para migrar, use `kor migrate:run` ou `knex-orm migrate:run`.
 
 ### 5.2 Comandos
 
-| Comando                                      | Descrição                           |
-| -------------------------------------------- | ----------------------------------- |
-| `knex-orm migration:generate <NomeEntidade>` | Cria migration a partir da entidade |
-| `knex-orm migration:run`                     | Executa `knex.migrate.latest()`     |
-| `knex-orm migration:rollback`                | Executa `knex.migrate.rollback()`   |
+**Binário CLI:** `kor` (atalho recomendado) ou `knex-orm`. Ambos disponíveis após `npm install knex-orm`.
+
+| Comando                                  | Descrição                             |
+| ---------------------------------------- | ------------------------------------- |
+| `kor migrate:generate --entities=<path>` | Gera migration a partir das entidades |
+| `kor migrate:run`                        | Executa `knex.migrate.latest()`       |
+| `kor migrate:rollback`                   | Executa `knex.migrate.rollback()`     |
+
+**Exemplos:**
+
+```bash
+npx kor migrate:generate --entities=./src/entities --migrations-dir=migrations
+npx kor migrate:run
+npx kor migrate:rollback
+npx kor migrate:run --config=./knexfile.js
+```
 
 ### 5.3 Diff de Schema
 
 Operações suportadas:
 
-- `createTable` — tabela não existe
+- `createTable` — tabela não existe no schema anterior
 - `addColumn` — coluna nova na entidade
-- `alterColumn` — tipo/nullable/default alterado
+- `alterColumn` — tipo/nullable/default alterado (gera comentário TODO; alter real depende do banco)
 - `dropColumn` — coluna removida da entidade
 - `addIndex` — `@Index` ou `@Column({ index: true })`
 - `dropIndex` — índice removido
 
-### 5.4 Formato do Arquivo Gerado
+### 5.4 Schema Tracking (`.orm-schema.json`)
+
+O arquivo `.orm-schema.json` armazena o estado anterior do schema (tabelas, colunas, índices) para cálculo do diff. É atualizado automaticamente após cada `migrate:generate` bem-sucedido. **Não confundir com schema do banco** — o diff é entidades vs `.orm-schema.json`.
+
+### 5.5 Formato do Arquivo Gerado
 
 ```typescript
 // migrations/20250311120000_create_users.ts
@@ -356,12 +380,13 @@ export async function down(knex: Knex): Promise<void> {
 
 ## 6. Configuração de Conexões (KnexFile Simplificado)
 
-### 6.1 knex-orm.config.ts
+### 6.1 orm.config.js / knex-orm.config.js
 
-```typescript
-import { KnexORM } from 'knex-orm';
+Crie `orm.config.js` na raiz do projeto (ou use `kor connection:init` para gerar template):
 
-export default KnexORM.configure({
+```javascript
+/** @type {import('knex-orm').OrmConfig} */
+module.exports = {
   default: 'primary',
   connections: {
     primary: {
@@ -373,6 +398,7 @@ export default KnexORM.configure({
         password: process.env.DB_PASSWORD,
         database: process.env.DB_NAME,
       },
+      pool: { min: 0, max: 10 },
     },
     secondary: {
       client: 'mysql2',
@@ -388,31 +414,81 @@ export default KnexORM.configure({
       connection: { filename: './analytics.db' },
     },
   },
-});
+};
 ```
+
+**Múltiplos ambientes** — use chaves `development`, `test`, `production`:
+
+```javascript
+module.exports = {
+  development: {
+    default: 'primary',
+    connections: { primary: { client: 'sqlite3', connection: { filename: ':memory:' } } },
+  },
+  test: { default: 'primary', connections: { primary: { client: 'sqlite3', connection: { filename: ':memory:' } } } },
+  production: {
+    default: 'primary',
+    connections: {
+      primary: {
+        client: 'postgresql',
+        connection: { host: process.env.DB_HOST /* ... */ },
+      },
+    },
+  },
+};
+```
+
+O ambiente é selecionado por `NODE_ENV` (padrão: `development`).
 
 ### 6.2 Bancos Suportados (via Knex)
 
-- PostgreSQL (`pg`)
+- PostgreSQL (`pg` / `postgresql`)
 - MySQL / MySQL2 (`mysql2`)
 - SQLite3 (`sqlite3`)
 - MSSQL (`mssql`)
 - Oracle (`oracledb`)
 
-### 6.3 Connection Registry
+### 6.3 Connection Registry e KnexORM
 
-- **Node vanilla**: `getConnection('secondary')` para obter conexão nomeada
-- **NestJS**: `@InjectConnection('secondary')` para injetar conexão específica
+```typescript
+import { KnexORM } from 'knex-orm';
+
+const orm = await KnexORM.initializeFromPath();
+const knex = orm.getConnection('primary');
+const defaultKnex = orm.getDefaultConnection();
+
+await orm.close();
+```
+
+Ou com config programático:
+
+```typescript
+const orm = await KnexORM.initialize({
+  default: 'primary',
+  connections: { primary: { client: 'sqlite3', connection: { filename: ':memory:' } } },
+});
+const knex = KnexORM.getConnection('secondary');
+```
+
+### 6.4 CLI de Conexões
+
+| Comando               | Descrição                             |
+| --------------------- | ------------------------------------- |
+| `kor connection:init` | Cria `orm.config.js` com template     |
+| `kor connection:test` | Valida todas as conexões configuradas |
+| `kor connection:list` | Lista nomes das conexões              |
 
 ---
 
 ## 7. Integração NestJS
 
+> **Status**: Implementado. Use o subpath `knex-orm/nestjs` para importar o módulo e decorators.
+
 ### 7.1 Configuração do Módulo
 
 ```typescript
 import { Module } from '@nestjs/common';
-import { KnexOrmModule } from 'knex-orm';
+import { KnexOrmModule } from 'knex-orm/nestjs';
 
 @Module({
   imports: [
@@ -466,6 +542,8 @@ export class UserService {
 
 ## 8. Integração Node Vanilla
 
+> **Status**: Implementado. Use `KnexORM.initialize()` e `orm.getRepository(Entity)` para Node sem framework.
+
 ```typescript
 import 'reflect-metadata';
 import { KnexORM } from 'knex-orm';
@@ -488,6 +566,22 @@ async function main() {
   await orm.close();
 }
 ```
+
+### 8.1 API Node Vanilla
+
+| Método                              | Descrição                                           |
+| ----------------------------------- | --------------------------------------------------- |
+| `KnexORM.initialize(config)`        | Inicializa conexões e retorna instância             |
+| `KnexORM.initializeFromPath(path?)` | Carrega config de `orm.config.js` ou `knexfile.js`  |
+| `orm.getRepository(Entity)`         | Retorna `Repository<Entity>` para a conexão default |
+| `orm.getConnection(name?)`          | Retorna instância Knex (conexão nomeada)            |
+| `orm.close()`                       | Fecha todas as conexões                             |
+
+### 8.2 Compatibilidade
+
+- **Node.js** ≥18 (ESM e CJS)
+- **Bun** ≥1.0
+- Sem dependências de framework
 
 ---
 
@@ -537,21 +631,57 @@ A suite suporta **Jest** (Node) e **Bun test** com instruções claras:
 - **Bun test** para execução em Bun (opcional)
 - **SQLite3** para integração em Node
 - **PostgreSQL/MySQL** para integração em Bun
-- **jest-mock-extended** para mocks tipados
+- **jest-mock-extended** para mocks tipados (opcional; `jest.fn()` suficiente)
+
+### 9.6 Implementação (Módulo 9)
+
+| Recurso                        | Status                                                         |
+| ------------------------------ | -------------------------------------------------------------- |
+| Jest + ts-jest                 | ✅ `npm test`                                                  |
+| Coverage thresholds            | ✅ statements 85%, branches 63%, functions 85%, lines 85%      |
+| Bun test                       | ✅ `bun test --tsconfig-override=tsconfig.test.json`           |
+| Repository CRUD integration    | ✅ `test/integration/repository/repository-crud.spec.ts`       |
+| MigrationGenerator integration | ✅ `test/integration/migration/migration-generate-run.spec.ts` |
+| Node Vanilla integration       | ✅ `test/integration/node-vanilla/`                            |
+| Isolamento por suite           | ✅ `beforeEach` / `beforeAll` / `afterAll`                     |
 
 ---
 
 ## 10. Roadmap e Escalabilidade
 
-### 10.1 v1.0 (Escopo deste Documento)
+### 10.1 v1.0 — Estado Atual
+
+**Implementado:**
 
 - [x] Decorators básicos (`@Entity`, `@Column`, `@PrimaryKey`, `@CreatedAt`, `@UpdatedAt`, `@SoftDelete`, `@Index`)
-- [x] GenericRepository com CRUD completo
-- [x] Geração de migrations a partir de entidades
-- [x] Multi-connection (Connection Registry)
-- [x] Integração NestJS (DynamicModule, forRoot, forFeature)
-- [x] Integração Node vanilla
-- [x] Compatibilidade dual runtime (Node.js + Bun)
+- [x] `Repository` (equivalente a GenericRepository) com CRUD completo
+- [x] Geração de migrations a partir de entidades (`migrate:generate`)
+- [x] `migrate:run` e `migrate:rollback` (via knexfile)
+- [x] Schema tracking (`.orm-schema.json`)
+- [x] Diff: createTable, addColumn, dropColumn, dropTable, addIndex, dropIndex
+- [x] `KnexAdapter` (implementa `IConnection`)
+
+**Implementado (Módulo 7):**
+
+- [x] Integração NestJS (`KnexOrmModule`, `forRoot`, `forFeature`, `@InjectRepository`, `@InjectConnection`)
+
+**Ainda não implementado (documentado como referência / roadmap):**
+
+- [ ] `orm schema:sync` (auto-migrate) — previsto para v2.0
+
+**Implementado (Módulo 6):**
+
+- [x] `KnexORM.initialize()` / `KnexORM.initializeFromPath()` e Connection Registry
+- [x] Config `orm.config.js` com múltiplos ambientes e conexões
+- [x] CLI `connection:init`, `connection:test`, `connection:list`
+
+**Implementado (Módulo 8):**
+
+- [x] Integração Node Vanilla (`KnexORM.initialize`, `getRepository`, `find`, `close`)
+
+**Implementado (Módulo 9):**
+
+- [x] Estratégia TDD: Jest, coverage thresholds, integração SQLite, Bun test
 
 ### 10.2 v1.x
 
@@ -564,6 +694,16 @@ A suite suporta **Jest** (Node) e **Bun test** com instruções claras:
 - **Schema validation em runtime**: validação de dados antes de persistir
 - **Migrations automáticas**: auto-migrate em ambiente de desenvolvimento
 - **Plugin system**: extensões para auditoria, multi-tenancy, etc.
+
+### 10.4 Implementação Módulo 10 (Roadmap e Escalabilidade)
+
+| Item                                                  | Status                                |
+| ----------------------------------------------------- | ------------------------------------- |
+| Runtime detection (`isBun`, `isNode`, `getRuntime`)   | ✅ `src/core/runtime.ts`              |
+| package.json: prepublishOnly, engines.bun, repository | ✅                                    |
+| CI/CD: Node + Bun + build                             | ✅ `.github/workflows/ci.yml`         |
+| SemVer + Conventional Commits                         | ✅ `docs/COMMITS_RULES.md`            |
+| Estrutura extensível para v1.x/v2.0                   | ✅ Clean Architecture, ports/adapters |
 
 ---
 
@@ -600,6 +740,18 @@ Configuração recomendada por banco (via Knex `pool`):
 
 - **Nunca** logar connection strings ou credenciais
 - Usar variáveis de ambiente e serviços como Vault em produção
+- Usar `redactConnectionConfig(config)` antes de logar config
+
+### 11.6 Implementação Módulo 11
+
+| Item                                           | Status                                                                 |
+| ---------------------------------------------- | ---------------------------------------------------------------------- |
+| Validação de identificadores SQL               | ✅ `assertValidSqlIdentifier` em @Entity, @Column, @PrimaryKey, @Index |
+| Repository.raw() JSDoc (parameterized queries) | ✅                                                                     |
+| Connection pooling (pool min/max)              | ✅ ConnectionEntry.pool documentado                                    |
+| Redact config para log seguro                  | ✅ `redactConnectionConfig()` exportado                                |
+| Índices (PK, unique, @Index)                   | ✅ Já implementado                                                     |
+| Soft delete                                    | ✅ Já implementado                                                     |
 
 ---
 
@@ -661,8 +813,8 @@ Configuração recomendada por banco (via Knex `pool`):
 
 ### 12.2 Build
 
-- `tsc` para compilação
-- Saída: `dist/` com `.js`, `.cjs`, `.mjs` e `.d.ts` conforme exports
+- `tsup` para compilação (ESM + CJS)
+- Saída: `dist/` com `.mjs` (ESM), `.js` (CJS) e `.d.mts`/`.d.ts` conforme exports
 
 ### 12.3 Versionamento
 
@@ -698,6 +850,17 @@ jobs:
       - run: npm ci && npm run build
       # npm publish --access public (executar apenas em release/tag)
 ```
+
+### 12.5 Implementação Módulo 12
+
+| Item                                                 | Status                    |
+| ---------------------------------------------------- | ------------------------- |
+| LICENSE (MIT)                                        | ✅ `LICENSE`              |
+| package.json: license, homepage, bugs, publishConfig | ✅                        |
+| files: dist, LICENSE, README.md                      | ✅                        |
+| prepublishOnly (build + test)                        | ✅                        |
+| pack:dry-run (validação sem publicar)                | ✅ `npm run pack:dry-run` |
+| .npmignore (exclusões)                               | ✅                        |
 
 ---
 
@@ -875,7 +1038,7 @@ Ou use a diretiva para globals:
 Para integração em Bun, use PostgreSQL ou MySQL (SQLite não suportado):
 
 ```typescript
-// tests/integration/user.repository.bun.test.ts
+// test/integration/user.repository.bun.test.ts
 const knex = Knex({
   client: 'postgresql',
   connection: process.env.TEST_DATABASE_URL ?? 'postgres://localhost:5432/test',
@@ -909,14 +1072,27 @@ jobs:
 
 ### 13.10 Padrão Recomendado
 
-| Cenário                  | Recomendação                                                 |
-| ------------------------ | ------------------------------------------------------------ |
-| **Projeto novo em Node** | Node + KnexORM; SQLite para dev/teste                        |
-| **Projeto novo em Bun**  | Bun + KnexORM; PostgreSQL/MySQL para dev/teste               |
-| **Migração Node → Bun**  | Trocar runtime; manter pg/mysql; migrar testes para Bun test |
-| **Lib consumida no NPM** | Build com `tsc`; consumidores usam Node ou Bun sem mudanças  |
+| Cenário                  | Recomendação                                                             |
+| ------------------------ | ------------------------------------------------------------------------ |
+| **Projeto novo em Node** | Node + KnexORM; SQLite para dev/teste                                    |
+| **Projeto novo em Bun**  | Bun + KnexORM; PostgreSQL/MySQL para dev/teste                           |
+| **Migração Node → Bun**  | Trocar runtime; manter pg/mysql; migrar testes para Bun test             |
+| **Lib consumida no NPM** | Build com `tsup` (ESM + CJS); consumidores usam Node ou Bun sem mudanças |
 
-### 13.11 Diagrama de Decisão
+### 13.11 Implementação Módulo 13
+
+| Item                                                  | Status                              |
+| ----------------------------------------------------- | ----------------------------------- |
+| Detecção de runtime (`isBun`, `isNode`, `getRuntime`) | ✅ `src/core/runtime.ts`            |
+| Abstração env (`getEnv`)                              | ✅ `src/core/runtime.ts`            |
+| Build dual ESM + CJS (tsup)                           | ✅ `.mjs` (ESM), `.js` (CJS)        |
+| package.json exports condicionais                     | ✅ `import` → .mjs, `require` → .js |
+| Typings .d.mts e .d.ts                                | ✅                                  |
+| Scripts test:node, test:bun, dev, start, start:bun    | ✅                                  |
+| CI: Node (Jest) + Bun (unit) + build                  | ✅ `.github/workflows/ci.yml`       |
+| Testes Bun: apenas test/unit (SQLite incompatível)    | ✅                                  |
+
+### 13.12 Diagrama de Decisão
 
 ```mermaid
 flowchart TD

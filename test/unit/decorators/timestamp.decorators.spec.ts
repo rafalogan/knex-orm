@@ -3,6 +3,26 @@ import { Entity, getEntityMetadata } from '@core/decorators/entity.decorator';
 import { CreatedAt, UpdatedAt, SoftDelete } from '@core/decorators/timestamp.decorators';
 
 describe('@CreatedAt, @UpdatedAt, @SoftDelete decorators', () => {
+  describe('compatibilidade de runtime', () => {
+    it('deve ignorar CreatedAt quando target for undefined', () => {
+      const decorator = CreatedAt();
+
+      expect(() => decorator(undefined as unknown as object, 'createdAt')).not.toThrow();
+    });
+
+    it('deve ignorar UpdatedAt quando target for undefined', () => {
+      const decorator = UpdatedAt();
+
+      expect(() => decorator(undefined as unknown as object, 'updatedAt')).not.toThrow();
+    });
+
+    it('deve ignorar SoftDelete quando target for undefined', () => {
+      const decorator = SoftDelete();
+
+      expect(() => decorator(undefined as unknown as object, 'deletedAt')).not.toThrow();
+    });
+  });
+
   describe('@CreatedAt', () => {
     it('deve registrar coluna created_at com type timestamp e default CURRENT_TIMESTAMP', () => {
       @Entity('users')
