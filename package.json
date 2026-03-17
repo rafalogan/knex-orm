@@ -1,6 +1,6 @@
 {
   "name": "knex-orm",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "ORM superset for Knex.js with decorators, NestJS and Bun support",
   "main": "./dist/index.js",
   "bin": {
