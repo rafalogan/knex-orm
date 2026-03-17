@@ -10,7 +10,11 @@ export function toSnakeCase(str: string): string {
  * Gets the class constructor from a property decorator target.
  * For instance properties, target is the prototype; for static, it's the constructor.
  */
-export function getPrototypeConstructor(target: object): (new (...args: unknown[]) => object) | undefined {
+export function getPrototypeConstructor(target: unknown): (new (...args: unknown[]) => object) | undefined {
+  if ((typeof target !== 'object' && typeof target !== 'function') || target === null) {
+    return undefined;
+  }
+
   const ctor = (target as { constructor?: new (...args: unknown[]) => object }).constructor;
   return typeof ctor === 'function' ? ctor : undefined;
 }

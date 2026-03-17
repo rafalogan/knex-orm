@@ -8,6 +8,14 @@ describe('@PrimaryKey decorator', () => {
     // Each test uses a fresh class to avoid pollution
   });
 
+  describe('compatibilidade de runtime', () => {
+    it('deve ignorar aplicação quando target for undefined', () => {
+      const decorator = PrimaryKey();
+
+      expect(() => decorator(undefined as unknown as object, 'id')).not.toThrow();
+    });
+  });
+
   describe('sem opções', () => {
     it('deve registrar primaryKey com propertyName e columnName em snake_case quando aplicado em propriedade', () => {
       @Entity('users')
