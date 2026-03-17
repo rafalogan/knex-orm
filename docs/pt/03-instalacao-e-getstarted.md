@@ -17,13 +17,13 @@ No Bun, evite SQLite (drivers nativos não são suportados). Prefira PostgreSQL 
 ### Com npm
 
 ```bash
-npm install knex-orm knex reflect-metadata
+npm install knx-orm knex reflect-metadata
 ```
 
 ### Com bun
 
 ```bash
-bun add knex-orm knex reflect-metadata
+bun add knx-orm knex reflect-metadata
 ```
 
 Em projetos que usam SQLite, adicione também o driver:
@@ -67,7 +67,7 @@ Este exemplo é baseado no fluxo descrito em `docs/knex-orm-superset.md` (§8) e
 
 ```typescript
 // src/entities/user.ts
-import { Entity, PrimaryKey, Column, CreatedAt, UpdatedAt, SoftDelete } from 'knex-orm';
+import { Entity, PrimaryKey, Column, CreatedAt, UpdatedAt, SoftDelete } from 'knx-orm';
 
 @Entity('users')
 export class User {
@@ -96,7 +96,7 @@ export class User {
 ```typescript
 // src/main.ts
 import 'reflect-metadata';
-import { KnexORM } from 'knex-orm';
+import { KnexORM } from 'knx-orm';
 import { User } from './entities/user';
 
 async function main() {
@@ -139,7 +139,7 @@ Baseado em `test/integration/nestjs/nestjs-crud.spec.ts` e `examples/nestjs/READ
 
 ```typescript
 // src/users/user.entity.ts
-import { Entity, PrimaryKey, Column } from 'knex-orm';
+import { Entity, PrimaryKey, Column } from 'knx-orm';
 
 @Entity('users')
 export class User {
@@ -159,7 +159,7 @@ export class User {
 ```typescript
 // src/app.module.ts
 import { Module } from '@nestjs/common';
-import { KnexOrmModule } from 'knex-orm/nestjs';
+import { KnexOrmModule } from 'knx-orm/nestjs';
 import { User } from './users/user.entity';
 import { UserService } from './users/user.service';
 
@@ -187,8 +187,8 @@ export class AppModule {}
 ```typescript
 // src/users/user.service.ts
 import { Injectable } from '@nestjs/common';
-import type { IRepository } from 'knex-orm';
-import { InjectRepository } from 'knex-orm/nestjs';
+import type { IRepository } from 'knx-orm';
+import { InjectRepository } from 'knx-orm/nestjs';
 import { User } from './user.entity';
 
 @Injectable()
@@ -217,14 +217,14 @@ Depois de instalar e compilar o projeto que consome o knex-orm:
 - Opcionalmente, execute um comando simples do CLI (no projeto consumidor) para validar o ambiente e a introspecção do projeto:
 
 ```bash
-npx kor --help
+npx knx --help
 ```
 
 Se o binário for encontrado e os comandos de ajuda forem exibidos, o pacote está instalado corretamente.  
 Para testar a detecção automática de estrutura, rode:
 
 ```bash
-npx kor migrate:generate
+npx knx migrate:generate
 ```
 
 Em um projeto com entidades e migrations nos diretórios convencionais (ou configurados em `knexfile` / `knex.config`), o comando deve funcionar **sem parâmetros**, gerando migrations a partir das entidades.

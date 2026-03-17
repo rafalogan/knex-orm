@@ -17,13 +17,13 @@ On Bun, avoid SQLite (native‑addon drivers are not supported). Prefer PostgreS
 ### With npm
 
 ```bash
-npm install knex-orm knex reflect-metadata
+npm install knx-orm knex reflect-metadata
 ```
 
 ### With bun
 
 ```bash
-bun add knex-orm knex reflect-metadata
+bun add knx-orm knex reflect-metadata
 ```
 
 For projects using SQLite, also install the driver:
@@ -67,7 +67,7 @@ This example is based on the flow described in `docs/knex-orm-superset.md` (§8)
 
 ```typescript
 // src/entities/user.ts
-import { Entity, PrimaryKey, Column, CreatedAt, UpdatedAt, SoftDelete } from 'knex-orm';
+import { Entity, PrimaryKey, Column, CreatedAt, UpdatedAt, SoftDelete } from 'knx-orm';
 
 @Entity('users')
 export class User {
@@ -96,7 +96,7 @@ export class User {
 ```typescript
 // src/main.ts
 import 'reflect-metadata';
-import { KnexORM } from 'knex-orm';
+import { KnexORM } from 'knx-orm';
 import { User } from './entities/user';
 
 async function main() {
@@ -139,7 +139,7 @@ Based on `test/integration/nestjs/nestjs-crud.spec.ts` and `examples/nestjs/READ
 
 ```typescript
 // src/users/user.entity.ts
-import { Entity, PrimaryKey, Column } from 'knex-orm';
+import { Entity, PrimaryKey, Column } from 'knx-orm';
 
 @Entity('users')
 export class User {
@@ -159,7 +159,7 @@ export class User {
 ```typescript
 // src/app.module.ts
 import { Module } from '@nestjs/common';
-import { KnexOrmModule } from 'knex-orm/nestjs';
+import { KnexOrmModule } from 'knx-orm/nestjs';
 import { User } from './users/user.entity';
 import { UserService } from './users/user.service';
 
@@ -187,8 +187,8 @@ export class AppModule {}
 ```typescript
 // src/users/user.service.ts
 import { Injectable } from '@nestjs/common';
-import type { IRepository } from 'knex-orm';
-import { InjectRepository } from 'knex-orm/nestjs';
+import type { IRepository } from 'knx-orm';
+import { InjectRepository } from 'knx-orm/nestjs';
 import { User } from './user.entity';
 
 @Injectable()
@@ -217,7 +217,7 @@ After installing and building the consumer project:
 - Optionally, run a simple CLI command in the consumer project to validate the environment:
 
 ```bash
-npx kor --help
+npx knx --help
 ```
 
 If the binary is found and the help output is displayed, the package is installed correctly.

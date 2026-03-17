@@ -1,11 +1,11 @@
 ## Overview
 
-knex-orm generates and runs migrations using **Knex** as the underlying engine.  
+knx-orm generates and runs migrations using **Knex** as the underlying engine.  
 On top of that, it provides:
 
 - **Schema diffing** based on entity metadata
 - A **state file** (`.orm-schema.json`) to track the previous schema
-- A **CLI** (`kor` / `knex-orm`) with commands for generation and execution
+- A **CLI** (`knx` / `knx-orm`) with commands for generation and execution
 
 All logic lives under `src/adapters/migration` and is described in `docs/knex-orm-superset.md` (§5).
 
@@ -77,8 +77,8 @@ Scripts in `package.json` point to the main CLI entry:
 
 ```json
 "bin": {
-  "kor": "./dist/cli/migrate-generate.js",
-  "knex-orm": "./dist/cli/migrate-generate.js"
+  "knx": "./dist/cli/migrate-generate.js",
+  "knx-orm": "./dist/cli/migrate-generate.js"
 }
 ```
 
@@ -89,7 +89,7 @@ Commands (as per `docs/knex-orm-superset.md` and `AUDIT.md`):
 The `migrate:generate` command uses the CLI’s **Project Introspection Layer** to auto‑detect project structure:
 
 ```bash
-npx kor migrate:generate
+npx knx migrate:generate
 ```
 
 Path resolution order:
@@ -103,7 +103,7 @@ Path resolution order:
 Example with explicit overrides:
 
 ```bash
-npx kor migrate:generate --entities=./dist/entities --migrations-dir=./migrations
+npx knx migrate:generate --entities=./dist/entities --migrations-dir=./migrations
 ```
 
 Supported parameters:
@@ -115,7 +115,7 @@ Supported parameters:
 ### `migrate:run`
 
 ```bash
-npx kor migrate:run
+npx knx migrate:run
 ```
 
 Executes `knex.migrate.latest()` using the discovered configuration (`orm.config.js`, `knexfile`, etc.).  
@@ -128,16 +128,16 @@ npm run migrate:run
 ### `migrate:rollback`
 
 ```bash
-npx kor migrate:rollback
+npx knx migrate:rollback
 ```
 
 Executes `knex.migrate.rollback()` using the same configuration source.
 
 ### Connection commands
 
-- `kor connection:init` — creates a sample `orm.config.js`.
-- `kor connection:test` — tests configured connections.
-- `kor connection:list` — lists available connection names.
+- `knx connection:init` — creates a sample `orm.config.js`.
+- `knx connection:test` — tests configured connections.
+- `knx connection:list` — lists available connection names.
 
 Matching scripts exist in `package.json` (`connection:init`, `connection:test`, `connection:list`).
 

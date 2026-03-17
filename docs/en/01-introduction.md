@@ -1,6 +1,6 @@
 ## Introduction
 
-**knex-orm** is an NPM library that extends **Knex.js** with an ORM pattern based on decorators, while keeping full compatibility with Knex’s native API.  
+**knx-orm** is an NPM library that extends **Knex.js** with an ORM pattern based on decorators, while keeping full compatibility with Knex’s native API.  
 Instead of replacing Knex, it adds:
 
 - **Entity decorators** (`@Entity`, `@Column`, `@PrimaryKey`, etc.)
@@ -23,7 +23,7 @@ Knex provides a great query builder, but it does not offer:
 - Migrations derived from entities
 - First‑class NestJS integration
 
-knex-orm fills exactly that gap:
+knx-orm fills exactly that gap:
 
 - Keeps Knex as the underlying engine
 - Uses decorators to describe the schema
@@ -36,7 +36,7 @@ knex-orm fills exactly that gap:
 
 Positioning relative to well‑known ORMs:
 
-| Aspect   | knex-orm                                    | TypeORM                             | Prisma                | MikroORM             |
+| Aspect   | knx-orm                                     | TypeORM                             | Prisma                | MikroORM             |
 | -------- | ------------------------------------------- | ----------------------------------- | --------------------- | -------------------- |
 | Base     | Knex.js (query builder)                     | Custom driver                       | Prisma Client         | Custom driver        |
 | Schema   | Decorators on TS classes                    | Decorators                          | Declarative `.prisma` | Decorators           |
@@ -78,7 +78,7 @@ On Bun, native‑addon drivers (like `sqlite3`) are not supported; prefer Postgr
   - Injection of `IRepository<Entity>` using `@InjectRepository`
   - Optional `@InjectConnection` when direct Knex access is needed
 - **CLI tools and pipelines**
-  - Using `kor` / `knex-orm` binaries to generate and run migrations
+  - Using `knx` / `knx-orm` binaries to generate and run migrations
   - Running under CI with Node or Bun
 
 ---

@@ -1,6 +1,6 @@
 ## Introdução
 
-O **knex-orm** é uma biblioteca NPM que estende o **Knex.js** com um padrão de ORM baseado em decorators, mantendo compatibilidade total com a API nativa do Knex.  
+O **knx-orm** é uma biblioteca NPM que estende o **Knex.js** com um padrão de ORM baseado em decorators, mantendo compatibilidade total com a API nativa do Knex.  
 Em vez de substituir o Knex, ele adiciona:
 
 - **Entidades com decorators** (`@Entity`, `@Column`, `@PrimaryKey`, etc.)
@@ -23,7 +23,7 @@ O Knex oferece um ótimo query builder, mas não fornece:
 - Migrations derivadas de entidades
 - Integração de primeira classe com NestJS
 
-O knex-orm cobre exatamente esse espaço:
+O knx-orm cobre exatamente esse espaço:
 
 - Mantém o Knex como engine principal
 - Fornece decorators que descrevem o schema
@@ -36,7 +36,7 @@ O knex-orm cobre exatamente esse espaço:
 
 Resumo de posicionamento em relação a ORMs conhecidos:
 
-| Aspecto        | knex-orm                                    | TypeORM                             | Prisma                | MikroORM             |
+| Aspecto        | knx-orm                                     | TypeORM                             | Prisma                | MikroORM             |
 | -------------- | ------------------------------------------- | ----------------------------------- | --------------------- | -------------------- |
 | Base           | Knex.js (query builder)                     | Próprio driver                      | Prisma Client         | Próprio driver       |
 | Definição      | Decorators em classes TS                    | Decorators                          | `.prisma` declarativo | Decorators           |

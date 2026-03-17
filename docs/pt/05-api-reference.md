@@ -1,6 +1,6 @@
 ## Visão geral
 
-Esta referência descreve os **exports públicos** do pacote `knex-orm`, com base em `src/index.ts` e nos tipos/implementações reais.  
+Esta referência descreve os **exports públicos** do pacote `knx-orm`, com base em `src/index.ts` e nos tipos/implementações reais.  
 Para detalhes de arquitetura e decisões, consulte também `docs/knex-orm-superset.md`.
 
 ---
@@ -153,7 +153,7 @@ Na implementação atual, `IRepository<T>` é um alias de `Repository<T>` (veja 
 ### Exemplo de uso
 
 ```typescript
-import { Repository } from 'knex-orm';
+import { Repository } from 'knx-orm';
 import type { Knex } from 'knex';
 import { Product } from './product.entity';
 
@@ -184,7 +184,7 @@ Essas APIs são usadas principalmente pelo CLI e por ferramentas de automação;
 ### Exemplo conceitual de geração de migrations
 
 ```typescript
-import { EntityScanner, MigrationEngine } from 'knex-orm';
+import { EntityScanner, MigrationEngine } from 'knx-orm';
 
 const entities = EntityScanner.scanFromPaths(['./dist/entities']);
 
@@ -244,7 +244,7 @@ function getEnv(key: string): string | undefined;
 ### Exemplo
 
 ```typescript
-import { getRuntime, getEnv } from 'knex-orm';
+import { getRuntime, getEnv } from 'knx-orm';
 
 const runtime = getRuntime(); // 'node' ou 'bun'
 const dbHost = getEnv('DB_HOST') ?? 'localhost';
@@ -321,7 +321,7 @@ class KnexORM {
 ### Exemplo
 
 ```typescript
-import { KnexORM } from 'knex-orm';
+import { KnexORM } from 'knx-orm';
 import { User } from './entities/user';
 
 const orm = await KnexORM.initialize({
@@ -344,7 +344,7 @@ await orm.close();
 
 ## Módulo NestJS
 
-O subpath `knex-orm/nestjs` exporta:
+O subpath `knx-orm/nestjs` exporta:
 
 - `KnexOrmModule`
 - `InjectRepository`

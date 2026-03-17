@@ -1,6 +1,6 @@
 ## Visão geral
 
-Este guia mostra como usar as principais funcionalidades expostas pelo pacote `knex-orm`, com exemplos baseados no código real (`src/` e `test/integration/**`):
+Este guia mostra como usar as principais funcionalidades expostas pelo pacote `knx-orm`, com exemplos baseados no código real (`src/` e `test/integration/**`):
 
 - Decorators de entidade
 - `Repository<T>` e tipos relacionados
@@ -25,7 +25,7 @@ Os decorators vivem em `src/core/decorators` e são reexportados em `src/index.t
 ### Exemplo mínimo
 
 ```typescript
-import { Entity, PrimaryKey, Column } from 'knex-orm';
+import { Entity, PrimaryKey, Column } from 'knx-orm';
 
 @Entity('products')
 export class Product {
@@ -45,7 +45,7 @@ Esse padrão é o mesmo usado nos testes de integração de repositório (`repos
 ### Exemplo com timestamps e soft delete
 
 ```typescript
-import { Entity, PrimaryKey, Column, CreatedAt, UpdatedAt, SoftDelete } from 'knex-orm';
+import { Entity, PrimaryKey, Column, CreatedAt, UpdatedAt, SoftDelete } from 'knx-orm';
 
 @Entity('articles')
 export class Article {
@@ -84,7 +84,7 @@ Você normalmente não precisa instanciar o repositório manualmente, mas é út
 
 ```typescript
 import knex from 'knex';
-import { Repository } from 'knex-orm';
+import { Repository } from 'knx-orm';
 import { Product } from './product.entity';
 
 const db = knex({
@@ -193,7 +193,7 @@ As APIs de alto nível para gerenciamento de conexões estão em `src/adapters/c
 ### Inicialização programática
 
 ```typescript
-import { KnexORM } from 'knex-orm';
+import { KnexORM } from 'knx-orm';
 import { User } from './entities/user';
 
 const orm = await KnexORM.initialize({
@@ -217,7 +217,7 @@ await orm.close();
 Conforme `docs/knex-orm-superset.md`:
 
 ```typescript
-import { KnexORM } from 'knex-orm';
+import { KnexORM } from 'knx-orm';
 
 const orm = await KnexORM.initializeFromPath(); // procura orm.config.js / knex-orm.config.js
 const knex = orm.getConnection('primary');      // instância Knex
@@ -229,7 +229,7 @@ Consulte o arquivo de types em `@adapters/connection` para o formato exato de `O
 
 ## Integração com NestJS
 
-O submódulo `knex-orm/nestjs` reexporta:
+O submódulo `knx-orm/nestjs` reexporta:
 
 - `KnexOrmModule`
 - `InjectRepository`
@@ -242,7 +242,7 @@ O submódulo `knex-orm/nestjs` reexporta:
 
 ```typescript
 import { Module } from '@nestjs/common';
-import { KnexOrmModule } from 'knex-orm/nestjs';
+import { KnexOrmModule } from 'knx-orm/nestjs';
 import { Post } from './post.entity';
 import { PostService } from './post.service';
 
@@ -269,8 +269,8 @@ export class AppModule {}
 
 ```typescript
 import { Injectable } from '@nestjs/common';
-import type { IRepository } from 'knex-orm';
-import { InjectRepository, InjectConnection } from 'knex-orm/nestjs';
+import type { IRepository } from 'knx-orm';
+import { InjectRepository, InjectConnection } from 'knx-orm/nestjs';
 import type { Knex } from 'knex';
 import { Post } from './post.entity';
 
@@ -297,7 +297,7 @@ Esse exemplo segue de perto o teste `nestjs-crud.spec.ts`.
 
 ## CLI e migrations (resumo)
 
-O CLI é exposto pelos binários `kor` e `knex-orm` (configurados em `package.json`). Internamente, ele usa:
+O CLI é exposto pelos binários `knx` e `knx-orm` (configurados em `package.json`). Internamente, ele usa:
 
 - `EntityScanner` para encontrar entidades
 - `SchemaRegistry` para ler/escrever `.orm-schema.json`
@@ -306,12 +306,12 @@ O CLI é exposto pelos binários `kor` e `knex-orm` (configurados em `package.js
 
 ### Comandos principais
 
-- `kor migrate:generate --entities=./src/entities`
-- `kor migrate:run`
-- `kor migrate:rollback`
-- `kor connection:init`
-- `kor connection:test`
-- `kor connection:list`
+- `knx migrate:generate --entities=./src/entities`
+- `knx migrate:run`
+- `knx migrate:rollback`
+- `knx connection:init`
+- `knx connection:test`
+- `knx connection:list`
 
 Detalhes completos estão no documento de **Migrações** (`08-migracoes.md`).
 

@@ -1,11 +1,11 @@
 ## Visão geral
 
-O knex-orm gera e executa migrations usando o próprio **Knex** como engine.  
+O knx-orm gera e executa migrations usando o próprio **Knex** como engine.  
 Por cima disso, a lib oferece:
 
 - **Diff de schema** baseado em metadata de entidades
 - **Arquivo de estado** (`.orm-schema.json`) para rastrear o schema anterior
-- **CLI** (`kor`/`knex-orm`) com comandos de geração e execução
+- **CLI** (`knx`/`knx-orm`) com comandos de geração e execução
 
 Toda a lógica é implementada em `src/adapters/migration` e descrita em `docs/knex-orm-superset.md` (§5).
 
@@ -77,8 +77,8 @@ Os scripts em `package.json` apontam para o binário principal:
 
 ```json
 "bin": {
-  "kor": "./dist/cli/migrate-generate.js",
-  "knex-orm": "./dist/cli/migrate-generate.js"
+  "knx": "./dist/cli/migrate-generate.js",
+  "knx-orm": "./dist/cli/migrate-generate.js"
 }
 ```
 
@@ -89,7 +89,7 @@ Os comandos expostos (conforme `docs/knex-orm-superset.md` e `AUDIT.md`) são:
 O comando `migrate:generate` usa a **Project Introspection Layer** do CLI para detectar automaticamente a estrutura do projeto:
 
 ```bash
-npx kor migrate:generate
+npx knx migrate:generate
 ```
 
 Ordem de resolução dos paths:
@@ -103,7 +103,7 @@ Ordem de resolução dos paths:
 Exemplo com override explícito:
 
 ```bash
-npx kor migrate:generate --entities=./dist/entities --migrations-dir=./migrations
+npx knx migrate:generate --entities=./dist/entities --migrations-dir=./migrations
 ```
 
 Parâmetros suportados:
@@ -115,7 +115,7 @@ Parâmetros suportados:
 ### `migrate:run`
 
 ```bash
-npx kor migrate:run
+npx knx migrate:run
 ```
 
 Executa `knex.migrate.latest()` usando a configuração encontrada (`orm.config.js`, `knexfile`, etc.).  
@@ -128,16 +128,16 @@ npm run migrate:run
 ### `migrate:rollback`
 
 ```bash
-npx kor migrate:rollback
+npx knx migrate:rollback
 ```
 
 Executa `knex.migrate.rollback()` com a mesma fonte de configuração.
 
 ### Comandos de conexão
 
-- `kor connection:init` — cria um `orm.config.js` de exemplo.
-- `kor connection:test` — testa as conexões configuradas.
-- `kor connection:list` — lista os nomes de conexões disponíveis.
+- `knx connection:init` — cria um `orm.config.js` de exemplo.
+- `knx connection:test` — testa as conexões configuradas.
+- `knx connection:list` — lista os nomes de conexões disponíveis.
 
 Os scripts correspondentes também existem em `package.json` (`connection:init`, `connection:test`, `connection:list`).
 

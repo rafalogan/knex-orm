@@ -1,4 +1,4 @@
-# knex-orm
+# knx-orm
 
 > NPM library that extends Knex.js with an ORM pattern based on decorators, maintaining full compatibility with Knex's native API.
 
@@ -56,20 +56,20 @@ KnexORM Superset adds an ORM layer on top of Knex.js without replacing it: decor
 
 ```bash
 # With npm
-npm install knex-orm knex reflect-metadata
+npm install knx-orm knex reflect-metadata
 
 # With bun
-bun add knex-orm knex reflect-metadata
+bun add knx-orm knex reflect-metadata
 ```
 
 ## CLI
 
-The package exposes two binaries: **`kor`** (shortcut) and `knex-orm`.
+The package exposes two binaries: **`knx`** (shortcut) and `knx-orm` (binary name; npm package is `knx-orm`).
 
 ```bash
-npx kor migrate:generate --entities=./src/entities
-npx kor migrate:run
-npx kor connection:init
+npx knx migrate:generate --entities=./src/entities
+npx knx migrate:run
+npx knx connection:init
 ```
 
 ## Configuration
@@ -92,7 +92,7 @@ knex-orm ships a ready-to-use NestJS module via the `knex-orm/nestjs` sub-path. 
 ### Installation
 
 ```bash
-npm install knex-orm knex reflect-metadata pg   # or mysql2, sqlite3, etc.
+npm install knx-orm knex reflect-metadata pg   # or mysql2, sqlite3, etc.
 ```
 
 > `@nestjs/common` and `@nestjs/core` are already peer dependencies of your NestJS project — no need to reinstall them.
@@ -102,7 +102,7 @@ npm install knex-orm knex reflect-metadata pg   # or mysql2, sqlite3, etc.
 ```typescript
 // src/users/user.entity.ts
 import 'reflect-metadata';
-import { Entity, PrimaryKey, Column, CreatedAt, UpdatedAt, SoftDelete } from 'knex-orm';
+import { Entity, PrimaryKey, Column, CreatedAt, UpdatedAt, SoftDelete } from 'knx-orm';
 
 @Entity('users')
 export class User {
@@ -131,7 +131,7 @@ export class User {
 ```typescript
 // src/app.module.ts
 import { Module } from '@nestjs/common';
-import { KnexOrmModule } from 'knex-orm/nestjs';
+import { KnexOrmModule } from 'knx-orm/nestjs';
 import { UsersModule } from './users/users.module';
 
 @Module({
@@ -162,7 +162,7 @@ export class AppModule {}
 ```typescript
 // src/users/users.module.ts
 import { Module } from '@nestjs/common';
-import { KnexOrmModule } from 'knex-orm/nestjs';
+import { KnexOrmModule } from 'knx-orm/nestjs';
 import { User } from './user.entity';
 import { UsersService } from './users.service';
 import { UsersController } from './users.controller';
@@ -180,8 +180,8 @@ export class UsersModule {}
 ```typescript
 // src/users/users.service.ts
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { InjectRepository } from 'knex-orm/nestjs';
-import { IRepository } from 'knex-orm';
+import { InjectRepository } from 'knx-orm/nestjs';
+import { IRepository } from 'knx-orm';
 import { User } from './user.entity';
 
 @Injectable()
@@ -282,7 +282,7 @@ export class UsersController {
 ### 6. Inject raw connection (advanced)
 
 ```typescript
-import { InjectConnection } from 'knex-orm/nestjs';
+import { InjectConnection } from 'knx-orm/nestjs';
 import { Knex } from 'knex';
 
 @Injectable()
@@ -305,10 +305,10 @@ export class ReportsService {
 
 | Symbol | Imported from | Description |
 |---|---|---|
-| `KnexOrmModule` | `knex-orm/nestjs` | Root module (`forRoot` / `forFeature`) |
-| `@InjectRepository(Entity)` | `knex-orm/nestjs` | Injects `IRepository<Entity>` |
-| `@InjectConnection(name?)` | `knex-orm/nestjs` | Injects the `Knex` instance |
-| `IRepository<T>` | `knex-orm` | Generic repository interface |
+| `KnexOrmModule` | `knx-orm/nestjs` | Root module (`forRoot` / `forFeature`) |
+| `@InjectRepository(Entity)` | `knx-orm/nestjs` | Injects `IRepository<Entity>` |
+| `@InjectConnection(name?)` | `knx-orm/nestjs` | Injects the `Knex` instance |
+| `IRepository<T>` | `knx-orm` | Generic repository interface |
 
 ---
 
