@@ -67,9 +67,12 @@ bun add knx-orm knex reflect-metadata
 The package exposes two binaries: **`knx`** (shortcut) and `knx-orm` (binary name; npm package is `knx-orm`).
 
 ```bash
-npx knx migrate:generate --entities=./src/entities
+npx knx migrate:generate --entities=./src/entities   # entities → migrations
 npx knx migrate:run
 npx knx connection:init
+
+# inverse flow (migrations → entities)
+npx knx entity:generate
 ```
 
 ## Configuration

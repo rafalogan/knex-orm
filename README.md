@@ -118,13 +118,16 @@ O pacote exporta dois binários, definidos em `package.json`:
 Comandos principais (com detecção automática de estrutura via Project Introspection Layer):
 
 ```bash
-npx knx migrate:generate              # detecta entities/migrations (CONFIG → CONVENTION → FLAGS)
+npx knx migrate:generate              # entities → migrations (CONFIG → CONVENTION → FLAGS)
 npx knx migrate:generate --entities=./dist/entities --migrations-dir=./migrations
 npx knx migrate:run
 npx knx migrate:rollback
 npx knx connection:init
 npx knx connection:test
 npx knx connection:list
+
+# fluxo inverso (migrations → entidades)
+npx knx entity:generate               # detecta migrations/entities por CONFIG → CONVENTION
 ```
 
 Detalhes completos em [`docs/pt/08-migracoes.md`](https://github.com/rafalogan/knex-orm/blob/main/docs/pt/08-migracoes.md).

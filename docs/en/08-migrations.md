@@ -84,7 +84,7 @@ Scripts in `package.json` point to the main CLI entry:
 
 Commands (as per `docs/knex-orm-superset.md` and `AUDIT.md`):
 
-### `migrate:generate`
+### `migrate:generate` — entities → migrations
 
 The `migrate:generate` command uses the CLI’s **Project Introspection Layer** to auto‑detect project structure:
 
@@ -111,6 +111,28 @@ Supported parameters:
 - `--entities` — directory (or file) from which compiled entities are imported.
 - `--migrations-dir` — directory where migration files will be written.
 - `--config` — optional path to a config file (`orm.config.js` / `knexfile`), when used alongside execution.
+
+### `entity:generate` — migrations → entities
+
+The `entity:generate` command performs the **inverse** flow: it scans existing Knex migrations and generates `knx-orm` entity classes.
+
+```bash
+npx knx entity:generate
+```
+
+Resolution order is the same as for `migrate:generate`:
+
+1. **CONFIG**: looks for `orm.config.js`, `knexfile.*` or `knex.config.*` and uses configured `migrationsDir` / entities directory when present.
+2. **CONVENTION**: if no config is found, falls back to:
+   - Migrations: `./migrations`, `./dist/migrations`, `./src/migrations`
+   - Entities: `./dist/entities`, `./src/entities`, `./entities`
+3. **CLI FLAGS (future)**: the command is designed to support overrides in future versions, mirroring `migrate:generate`.
+
+The generated entities:
+
+- Use `@Entity`, `@PrimaryKey`, `@Column`, `@CreatedAt`, `@UpdatedAt` and `@SoftDelete` decorators.
+- Derive class names from table names (e.g. `users` → `User`).
+- Map SQL types to TypeScript types (`string`, `number`, `boolean`, `Date`) according to `ColumnType` rules.
 
 ### `migrate:run`
 
