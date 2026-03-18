@@ -61,10 +61,10 @@ async function main(): Promise<void> {
   if (cmd === 'migrate:generate') await runMigrateGenerate(args);
   else if (cmd === 'migrate:run') await runMigrateRun(args);
   else if (cmd === 'migrate:rollback') await runMigrateRollback(args);
-  else if (cmd === 'connection:init') await runConnectionInit(args);
+  else if (cmd === 'connection:init') await runConnectionInit();
   else if (cmd === 'connection:test') await runConnectionTest(args);
   else if (cmd === 'connection:list') await runConnectionList(args);
-  else if (cmd === 'entity:generate') await runEntityGenerate(args);
+  else if (cmd === 'entity:generate') await runEntityGenerate();
 }
 
 export async function handleEntityGenerateFromCwd(startCwd: string = process.cwd()): Promise<void> {
@@ -345,7 +345,6 @@ async function runConnectionList(args: string[]): Promise<void> {
 }
 
 if (require.main === module) {
-   
   main().catch((err) => {
     console.error(err);
     process.exit(1);

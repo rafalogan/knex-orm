@@ -42,7 +42,7 @@ const CONFIG_CANDIDATES = [
 function findProjectRoot(start: string): string {
   let current = resolve(start);
   // stop when filesystem root is reached
-   
+
   while (true) {
     const pkg = join(current, 'package.json');
     const git = join(current, '.git');

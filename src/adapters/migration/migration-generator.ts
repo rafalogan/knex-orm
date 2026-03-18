@@ -56,8 +56,7 @@ export async function down(knex: Knex): Promise<void> {
 
     const downBody = downStatements.length > 0 ? downStatements.map((s) => `  ${s}`).join('\n') : '  // No changes';
 
-    const content =
-      `// Migration: ${name}\n` + header + upBody + '\n}\n' + downHeader + downBody + '\n}\n';
+    const content = `// Migration: ${name}\n` + header + upBody + '\n}\n' + downHeader + downBody + '\n}\n';
     return { content, up: upBody, down: downBody };
   }
 

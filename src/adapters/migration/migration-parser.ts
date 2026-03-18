@@ -171,7 +171,7 @@ export class MigrationParser {
     } as unknown as { schema: RecordingSchemaBuilder };
 
     const req = createRequire(resolve(process.cwd(), 'package.json'));
-     
+
     const mod = req(absolute) as { up?: (knex: typeof fakeKnex) => Promise<void> | void };
     if (!mod.up || typeof mod.up !== 'function') {
       throw new Error(`Migration ${path} does not export an up() function`);
