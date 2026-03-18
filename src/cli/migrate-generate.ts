@@ -23,7 +23,8 @@ type Command =
   | 'migrate:rollback'
   | 'connection:init'
   | 'connection:test'
-  | 'connection:list';
+  | 'connection:list'
+  | 'entity:generate';
 
 const ALL_COMMANDS: Command[] = [
   'migrate:generate',
@@ -32,6 +33,7 @@ const ALL_COMMANDS: Command[] = [
   'connection:init',
   'connection:test',
   'connection:list',
+  'entity:generate',
 ];
 
 async function main(): Promise<void> {
@@ -46,10 +48,11 @@ async function main(): Promise<void> {
         '  migrate:rollback   Rollback last migration\n' +
         '  connection:init    Create orm.config.js template\n' +
         '  connection:test    Test database connections\n' +
-        '  connection:list    List configured connections\n\n' +
+        '  connection:list    List configured connections\n' +
+        '  entity:generate    Generate entities from migrations\n\n' +
         'Examples:\n' +
         '  knx migrate:generate --entities=./src/entities\n' +
-        '  knx migrate:run\n' +
+        '  knx entity:generate\n' +
         '  knx connection:init',
     );
     process.exit(1);
@@ -61,6 +64,54 @@ async function main(): Promise<void> {
   else if (cmd === 'connection:init') await runConnectionInit(args);
   else if (cmd === 'connection:test') await runConnectionTest(args);
   else if (cmd === 'connection:list') await runConnectionList(args);
+  else if (cmd === 'entity:generate') await runEntityGenerate(args);
+}
+
+export async function handleEntityGenerateFromCwd(startCwd: string = process.cwd()): Promise<void> {
+  const { resolveProjectContextForMigrateGenerate } = await import('./project-introspection.js');
+  const { MigrationParser, EntityFromMigrationGenerator } = await import(
+    '../adapters/migration/index.js'
+  );
+  const { existsSync, mkdirSync, readdirSync } = await import('node:fs');
+  const { join, extname, basename } = await import('node:path');
+
+  const ctx = await resolveProjectContextForMigrateGenerate({}, startCwd);
+  const rootDir = ctx.paths.rootDir;
+  const migrationsDir = ctx.paths.migrationsDir ?? join(rootDir, 'migrations');
+  const entitiesDir =
+    ctx.paths.entitiesDir ?? ctx.paths.srcDir ?? ctx.paths.distDir ?? join(rootDir, 'entities');
+
+  if (!existsSync(migrationsDir)) {
+    console.error(`Migrations directory not found: ${migrationsDir}`);
+    process.exit(1);
+  }
+  if (!existsSync(entitiesDir)) {
+    mkdirSync(entitiesDir, { recursive: true });
+  }
+
+  const parser = new MigrationParser();
+  const generator = new EntityFromMigrationGenerator();
+
+  const files = readdirSync(migrationsDir).filter((f: string) => {
+    const ext = extname(f);
+    return ext === '.js' || ext === '.cjs' || ext === '.mjs' || ext === '.ts';
+  });
+
+  for (const file of files) {
+    const full = join(migrationsDir, file);
+    const parsed = await parser.parse(full);
+    const code = generator.generate(parsed);
+    const className = basename(parsed.tableName)
+      .replace(/(^\w|_\w)/g, (m: string) => m.replace('_', '').toUpperCase());
+    const outPath = join(entitiesDir, `${className}.ts`);
+    await (await import('node:fs/promises')).writeFile(outPath, code, 'utf-8');
+  }
+
+  console.log(`Entities generated in ${entitiesDir}`);
+}
+
+async function runEntityGenerate(_args: string[]): Promise<void> {
+  await handleEntityGenerateFromCwd(process.cwd());
 }
 
 async function runMigrateGenerate(args: string[]): Promise<void> {
@@ -304,7 +355,10 @@ async function runConnectionList(args: string[]): Promise<void> {
   }
 }
 
-main().catch((err) => {
-  console.error(err);
-  process.exit(1);
-});
+if (require.main === module) {
+  // eslint-disable-next-line @typescript-eslint/no-floating-promises
+  main().catch((err) => {
+    console.error(err);
+    process.exit(1);
+  });
+}

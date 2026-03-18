@@ -6,4 +6,6 @@ export { SchemaRegistry } from './storage/schema-registry';
 export { MigrationGenerator } from './migration-generator';
 export { MigrationWriter } from './migration-writer';
 export { MigrationEngine } from './migration-engine';
+export { MigrationParser } from './migration-parser';
+export { EntityFromMigrationGenerator } from './entity-from-migration-generator';
 export type { GenerateOptions, GenerateResult } from './migration-engine';
