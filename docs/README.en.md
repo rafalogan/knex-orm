@@ -2,11 +2,11 @@
 
 > NPM library that extends Knex.js with an ORM pattern based on decorators, maintaining full compatibility with Knex's native API.
 
-[![Build](https://img.shields.io/badge/build-tsup-blue)](../package.json)
-[![Tests](https://img.shields.io/badge/tests-jest%20%7C%20bun-green)](../package.json)
-[![License](https://img.shields.io/badge/license-MIT-yellow)](../package.json)
+[![Build](https://img.shields.io/badge/build-tsup-blue)](https://github.com/rafalogan/knex-orm/blob/main/package.json)
+[![Tests](https://img.shields.io/badge/tests-jest%20%7C%20bun-green)](https://github.com/rafalogan/knex-orm/blob/main/package.json)
+[![License](https://img.shields.io/badge/license-MIT-yellow)](https://github.com/rafalogan/knex-orm/blob/main/LICENSE)
 
-🇧🇷 [Português](../README.md) &nbsp;|&nbsp; 🇺🇸 English
+🇧🇷 [Português](https://github.com/rafalogan/knex-orm/blob/main/README.md) &nbsp;|&nbsp; 🇺🇸 English
 
 ## Table of Contents
 
@@ -420,39 +420,39 @@ export class User {
 
 | # | Document | Description |
 |---|----------|-------------|
-| 01 | [Introduction](./en/01-introduction.md) | What it is, motivation, positioning |
-| 02 | [Architecture](./en/02-architecture.md) | Design, layers, patterns |
-| 03 | [Installation & Get Started](./en/03-installation-and-getstarted.md) | Step-by-step setup |
-| 04 | [Usage Guide](./en/04-usage-guide.md) | Decorators, repository, examples |
-| 05 | [API Reference](./en/05-api-reference.md) | Full public API reference |
-| 06 | [Configuration](./en/06-configuration.md) | Connection options, multi-database |
-| 07 | [Testing](./en/07-testing.md) | How to run and write tests |
-| 08 | [Migrations](./en/08-migrations.md) | CLI, generating and running migrations |
-| 09 | [Contributing](./en/09-contributing.md) | Contribution flow, TDD, rules |
-| 10 | [Changelog](./en/10-changelog.md) | Version history |
+| 01 | [Introduction](https://github.com/rafalogan/knex-orm/blob/main/docs/en/01-introduction.md) | What it is, motivation, positioning |
+| 02 | [Architecture](https://github.com/rafalogan/knex-orm/blob/main/docs/en/02-architecture.md) | Design, layers, patterns |
+| 03 | [Installation & Get Started](https://github.com/rafalogan/knex-orm/blob/main/docs/en/03-installation-and-getstarted.md) | Step-by-step setup |
+| 04 | [Usage Guide](https://github.com/rafalogan/knex-orm/blob/main/docs/en/04-usage-guide.md) | Decorators, repository, examples |
+| 05 | [API Reference](https://github.com/rafalogan/knex-orm/blob/main/docs/en/05-api-reference.md) | Full public API reference |
+| 06 | [Configuration](https://github.com/rafalogan/knex-orm/blob/main/docs/en/06-configuration.md) | Connection options, multi-database |
+| 07 | [Testing](https://github.com/rafalogan/knex-orm/blob/main/docs/en/07-testing.md) | How to run and write tests |
+| 08 | [Migrations](https://github.com/rafalogan/knex-orm/blob/main/docs/en/08-migrations.md) | CLI, generating and running migrations |
+| 09 | [Contributing](https://github.com/rafalogan/knex-orm/blob/main/docs/en/09-contributing.md) | Contribution flow, TDD, rules |
+| 10 | [Changelog](https://github.com/rafalogan/knex-orm/blob/main/docs/en/10-changelog.md) | Version history |
 
 ### 🇧🇷 Português
 
 | # | Documento | Descrição |
 |---|-----------|-----------|
-| 01 | [Introdução](./pt/01-introducao.md) | O que é, motivação, posicionamento |
-| 02 | [Arquitetura](./pt/02-arquitetura.md) | Design, camadas, padrões |
-| 03 | [Instalação & Get Started](./pt/03-instalacao-e-getstarted.md) | Setup passo a passo |
-| 04 | [Guia de uso](./pt/04-guia-de-uso.md) | Decorators, repositório, exemplos |
-| 05 | [API Reference](./pt/05-api-reference.md) | Referência completa das APIs públicas |
-| 06 | [Configuração](./pt/06-configuracao.md) | Opções de conexão, multi-banco |
-| 07 | [Testes](./pt/07-testes.md) | Como rodar e escrever testes |
-| 08 | [Migrações](./pt/08-migracoes.md) | CLI, geração e execução de migrations |
-| 09 | [Contribuindo](./pt/09-contribuindo.md) | Fluxo de contribuição, TDD, regras |
-| 10 | [Changelog](./pt/10-changelog.md) | Histórico de versões |
+| 01 | [Introdução](https://github.com/rafalogan/knex-orm/blob/main/docs/pt/01-introducao.md) | O que é, motivação, posicionamento |
+| 02 | [Arquitetura](https://github.com/rafalogan/knex-orm/blob/main/docs/pt/02-arquitetura.md) | Design, camadas, padrões |
+| 03 | [Instalação & Get Started](https://github.com/rafalogan/knex-orm/blob/main/docs/pt/03-instalacao-e-getstarted.md) | Setup passo a passo |
+| 04 | [Guia de uso](https://github.com/rafalogan/knex-orm/blob/main/docs/pt/04-guia-de-uso.md) | Decorators, repositório, exemplos |
+| 05 | [API Reference](https://github.com/rafalogan/knex-orm/blob/main/docs/pt/05-api-reference.md) | Referência completa das APIs públicas |
+| 06 | [Configuração](https://github.com/rafalogan/knex-orm/blob/main/docs/pt/06-configuracao.md) | Opções de conexão, multi-banco |
+| 07 | [Testes](https://github.com/rafalogan/knex-orm/blob/main/docs/pt/07-testes.md) | Como rodar e escrever testes |
+| 08 | [Migrações](https://github.com/rafalogan/knex-orm/blob/main/docs/pt/08-migracoes.md) | CLI, geração e execução de migrations |
+| 09 | [Contribuindo](https://github.com/rafalogan/knex-orm/blob/main/docs/pt/09-contribuindo.md) | Fluxo de contribuição, TDD, regras |
+| 10 | [Changelog](https://github.com/rafalogan/knex-orm/blob/main/docs/pt/10-changelog.md) | Histórico de versões |
 
 ### Internal reference
 
 | File | Description |
 |------|-------------|
-| [knex-orm-superset.md](./knex-orm-superset.md) | Full architecture document: overview, decorators, GenericRepository, migrations, multi-connection, NestJS, Bun, testing, NPM publishing |
-| [DEVELOPMENT.md](./DEVELOPMENT.md) | Development guide: TDD, rules (.rules), best practices |
-| [COMMITS_RULES.md](./COMMITS_RULES.md) | Conventional commit rules for agents and humans |
+| [knex-orm-superset.md](https://github.com/rafalogan/knex-orm/blob/main/docs/knex-orm-superset.md) | Full architecture document: overview, decorators, GenericRepository, migrations, multi-connection, NestJS, Bun, testing, NPM publishing |
+| [DEVELOPMENT.md](https://github.com/rafalogan/knex-orm/blob/main/docs/DEVELOPMENT.md) | Development guide: TDD, rules (.rules), best practices |
+| [COMMITS_RULES.md](https://github.com/rafalogan/knex-orm/blob/main/docs/COMMITS_RULES.md) | Conventional commit rules for agents and humans |
 
 ## Commit Rules
 
@@ -462,7 +462,7 @@ The project uses **Conventional Commits** for commit messages. All messages must
 - Types: `feat`, `fix`, `docs`, `refactor`, `perf`, `test`, `build`, `ci`, `chore`, `revert`, `security`
 - Subject: imperative mood, ≤72 chars, no trailing period
 
-See [COMMITS_RULES.md](./COMMITS_RULES.md) for full rules.
+See [COMMITS_RULES.md](https://github.com/rafalogan/knex-orm/blob/main/docs/COMMITS_RULES.md) for full rules.
 
 ### References
 
@@ -481,4 +481,4 @@ See [COMMITS_RULES.md](./COMMITS_RULES.md) for full rules.
 
 ## License
 
-MIT — see [LICENSE](../LICENSE) for the full text.
+MIT — see [LICENSE](https://github.com/rafalogan/knex-orm/blob/main/LICENSE) for the full text.

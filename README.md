@@ -2,11 +2,11 @@
 
 > Biblioteca NPM que estende Knex.js com padrão ORM baseado em decorators, mantendo compatibilidade total com a API nativa do Knex.
 
-[![Build](https://img.shields.io/badge/build-tsup-blue)](./package.json)
-[![Tests](https://img.shields.io/badge/tests-jest%20%7C%20bun-green)](./package.json)
-[![License](https://img.shields.io/badge/license-MIT-yellow)](./LICENSE)
+[![Build](https://img.shields.io/badge/build-tsup-blue)](https://github.com/rafalogan/knex-orm/blob/main/package.json)
+[![Tests](https://img.shields.io/badge/tests-jest%20%7C%20bun-green)](https://github.com/rafalogan/knex-orm/blob/main/package.json)
+[![License](https://img.shields.io/badge/license-MIT-yellow)](https://github.com/rafalogan/knex-orm/blob/main/LICENSE)
 
-🇧🇷 Português &nbsp;|&nbsp; 🇺🇸 [English](./docs/README.en.md)
+🇧🇷 Português &nbsp;|&nbsp; 🇺🇸 [English](https://github.com/rafalogan/knex-orm/blob/main/docs/README.en.md)
 
 ---
 
@@ -72,39 +72,39 @@ main().catch(console.error);
 
 | # | Documento | Descrição |
 |---|-----------|-----------|
-| 01 | [Introdução](./docs/pt/01-introducao.md) | O que é, motivação, posicionamento |
-| 02 | [Arquitetura](./docs/pt/02-arquitetura.md) | Design, camadas, padrões |
-| 03 | [Instalação & Get Started](./docs/pt/03-instalacao-e-getstarted.md) | Setup passo a passo |
-| 04 | [Guia de uso](./docs/pt/04-guia-de-uso.md) | Decorators, repositório, exemplos |
-| 05 | [API Reference](./docs/pt/05-api-reference.md) | Referência completa das APIs públicas |
-| 06 | [Configuração](./docs/pt/06-configuracao.md) | Opções de conexão, multi-banco |
-| 07 | [Testes](./docs/pt/07-testes.md) | Como rodar e escrever testes |
-| 08 | [Migrações](./docs/pt/08-migracoes.md) | CLI, geração e execução de migrations |
-| 09 | [Contribuindo](./docs/pt/09-contribuindo.md) | Fluxo de contribuição, TDD, regras |
-| 10 | [Changelog](./docs/pt/10-changelog.md) | Histórico de versões |
+| 01 | [Introdução](https://github.com/rafalogan/knex-orm/blob/main/docs/pt/01-introducao.md) | O que é, motivação, posicionamento |
+| 02 | [Arquitetura](https://github.com/rafalogan/knex-orm/blob/main/docs/pt/02-arquitetura.md) | Design, camadas, padrões |
+| 03 | [Instalação & Get Started](https://github.com/rafalogan/knex-orm/blob/main/docs/pt/03-instalacao-e-getstarted.md) | Setup passo a passo |
+| 04 | [Guia de uso](https://github.com/rafalogan/knex-orm/blob/main/docs/pt/04-guia-de-uso.md) | Decorators, repositório, exemplos |
+| 05 | [API Reference](https://github.com/rafalogan/knex-orm/blob/main/docs/pt/05-api-reference.md) | Referência completa das APIs públicas |
+| 06 | [Configuração](https://github.com/rafalogan/knex-orm/blob/main/docs/pt/06-configuracao.md) | Opções de conexão, multi-banco |
+| 07 | [Testes](https://github.com/rafalogan/knex-orm/blob/main/docs/pt/07-testes.md) | Como rodar e escrever testes |
+| 08 | [Migrações](https://github.com/rafalogan/knex-orm/blob/main/docs/pt/08-migracoes.md) | CLI, geração e execução de migrations |
+| 09 | [Contribuindo](https://github.com/rafalogan/knex-orm/blob/main/docs/pt/09-contribuindo.md) | Fluxo de contribuição, TDD, regras |
+| 10 | [Changelog](https://github.com/rafalogan/knex-orm/blob/main/docs/pt/10-changelog.md) | Histórico de versões |
 
 ### 🇺🇸 English
 
 | # | Document | Description |
 |---|----------|-------------|
-| 01 | [Introduction](./docs/en/01-introduction.md) | What it is, motivation, positioning |
-| 02 | [Architecture](./docs/en/02-architecture.md) | Design, layers, patterns |
-| 03 | [Installation & Get Started](./docs/en/03-installation-and-getstarted.md) | Step-by-step setup |
-| 04 | [Usage Guide](./docs/en/04-usage-guide.md) | Decorators, repository, examples |
-| 05 | [API Reference](./docs/en/05-api-reference.md) | Full public API reference |
-| 06 | [Configuration](./docs/en/06-configuration.md) | Connection options, multi-database |
-| 07 | [Testing](./docs/en/07-testing.md) | How to run and write tests |
-| 08 | [Migrations](./docs/en/08-migrations.md) | CLI, generating and running migrations |
-| 09 | [Contributing](./docs/en/09-contributing.md) | Contribution flow, TDD, rules |
-| 10 | [Changelog](./docs/en/10-changelog.md) | Version history |
+| 01 | [Introduction](https://github.com/rafalogan/knex-orm/blob/main/docs/en/01-introduction.md) | What it is, motivation, positioning |
+| 02 | [Architecture](https://github.com/rafalogan/knex-orm/blob/main/docs/en/02-architecture.md) | Design, layers, patterns |
+| 03 | [Installation & Get Started](https://github.com/rafalogan/knex-orm/blob/main/docs/en/03-installation-and-getstarted.md) | Step-by-step setup |
+| 04 | [Usage Guide](https://github.com/rafalogan/knex-orm/blob/main/docs/en/04-usage-guide.md) | Decorators, repository, examples |
+| 05 | [API Reference](https://github.com/rafalogan/knex-orm/blob/main/docs/en/05-api-reference.md) | Full public API reference |
+| 06 | [Configuration](https://github.com/rafalogan/knex-orm/blob/main/docs/en/06-configuration.md) | Connection options, multi-database |
+| 07 | [Testing](https://github.com/rafalogan/knex-orm/blob/main/docs/en/07-testing.md) | How to run and write tests |
+| 08 | [Migrations](https://github.com/rafalogan/knex-orm/blob/main/docs/en/08-migrations.md) | CLI, generating and running migrations |
+| 09 | [Contributing](https://github.com/rafalogan/knex-orm/blob/main/docs/en/09-contributing.md) | Contribution flow, TDD, rules |
+| 10 | [Changelog](https://github.com/rafalogan/knex-orm/blob/main/docs/en/10-changelog.md) | Version history |
 
 ### Referência interna
 
 | Documento | Descrição |
 |-----------|-----------|
-| [knex-orm-superset.md](./docs/knex-orm-superset.md) | Documento mestre de arquitetura: visão geral, decorators, repositório, migrations, multi-conexão, NestJS, Bun, testes, publicação NPM |
-| [DEVELOPMENT.md](./docs/DEVELOPMENT.md) | Guia de desenvolvimento: TDD, regras (.rules), boas práticas |
-| [COMMITS_RULES.md](./docs/COMMITS_RULES.md) | Regras de commit convencional para agentes e humanos |
+| [knex-orm-superset.md](https://github.com/rafalogan/knex-orm/blob/main/docs/knex-orm-superset.md) | Documento mestre de arquitetura: visão geral, decorators, repositório, migrations, multi-conexão, NestJS, Bun, testes, publicação NPM |
+| [DEVELOPMENT.md](https://github.com/rafalogan/knex-orm/blob/main/docs/DEVELOPMENT.md) | Guia de desenvolvimento: TDD, regras (.rules), boas práticas |
+| [COMMITS_RULES.md](https://github.com/rafalogan/knex-orm/blob/main/docs/COMMITS_RULES.md) | Regras de commit convencional para agentes e humanos |
 
 ---
 
@@ -127,7 +127,7 @@ npx knx connection:test
 npx knx connection:list
 ```
 
-Detalhes completos em `docs/pt/08-migracoes.md`.
+Detalhes completos em [`docs/pt/08-migracoes.md`](https://github.com/rafalogan/knex-orm/blob/main/docs/pt/08-migracoes.md).
 
 ---
 
@@ -388,9 +388,9 @@ Do `package.json`:
 
 - Leia primeiro:
   - `.rules`
-  - `docs/DEVELOPMENT.md`
-  - `docs/COMMITS_RULES.md`
-  - `docs/pt/09-contribuindo.md`
+  - [`docs/DEVELOPMENT.md`](https://github.com/rafalogan/knex-orm/blob/main/docs/DEVELOPMENT.md)
+  - [`docs/COMMITS_RULES.md`](https://github.com/rafalogan/knex-orm/blob/main/docs/COMMITS_RULES.md)
+  - [`docs/pt/09-contribuindo.md`](https://github.com/rafalogan/knex-orm/blob/main/docs/pt/09-contribuindo.md)
 - Resumo do fluxo:
   1. Fork → branch (`feat/...`)  
   2. TDD (teste primeiro)  
@@ -402,5 +402,5 @@ Do `package.json`:
 
 ## Licença
 
-Este projeto é licenciado sob **MIT**. Consulte `LICENSE` para o texto completo.
+Este projeto é licenciado sob **MIT**. Consulte [`LICENSE`](https://github.com/rafalogan/knex-orm/blob/main/LICENSE) para o texto completo.
 
