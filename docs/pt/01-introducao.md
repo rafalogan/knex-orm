@@ -1,6 +1,6 @@
 ## Introdução
 
-O **knex-orm** é uma biblioteca NPM que estende o **Knex.js** com um padrão de ORM baseado em decorators, mantendo compatibilidade total com a API nativa do Knex.  
+O **knx-orm** é uma biblioteca NPM que estende o **Knex.js** com um padrão de ORM baseado em decorators, mantendo compatibilidade total com a API nativa do Knex.  
 Em vez de substituir o Knex, ele adiciona:
 
 - **Entidades com decorators** (`@Entity`, `@Column`, `@PrimaryKey`, etc.)
@@ -23,7 +23,7 @@ O Knex oferece um ótimo query builder, mas não fornece:
 - Migrations derivadas de entidades
 - Integração de primeira classe com NestJS
 
-O knex-orm cobre exatamente esse espaço:
+O knx-orm cobre exatamente esse espaço:
 
 - Mantém o Knex como engine principal
 - Fornece decorators que descrevem o schema
@@ -36,14 +36,14 @@ O knex-orm cobre exatamente esse espaço:
 
 Resumo de posicionamento em relação a ORMs conhecidos:
 
-| Aspecto        | knex-orm                                    | TypeORM                             | Prisma                | MikroORM             |
-| -------------- | ------------------------------------------- | ----------------------------------- | --------------------- | -------------------- |
-| Base           | Knex.js (query builder)                     | Próprio driver                      | Prisma Client         | Próprio driver       |
-| Definição      | Decorators em classes TS                    | Decorators                          | `.prisma` declarativo | Decorators           |
-| Migrations     | Geração a partir de entidades + Knex nativo | Sincronização ou migrations manuais | `prisma migrate`      | Migrations manuais   |
-| SQL raw        | Usa diretamente `knex(...)`                 | `QueryRunner`                       | Limitado              | API própria          |
-| Multi‑DB       | Via Knex (PG, MySQL, SQLite, MSSQL, Oracle) | Nativo                              | Nativo                | Nativo               |
-| NestJS         | Módulo dedicado (`KnexOrmModule`)           | Módulo oficial                      | Módulo oficial        | Módulo oficial       |
+| Aspecto    | knx-orm                                     | TypeORM                             | Prisma                | MikroORM           |
+| ---------- | ------------------------------------------- | ----------------------------------- | --------------------- | ------------------ |
+| Base       | Knex.js (query builder)                     | Próprio driver                      | Prisma Client         | Próprio driver     |
+| Definição  | Decorators em classes TS                    | Decorators                          | `.prisma` declarativo | Decorators         |
+| Migrations | Geração a partir de entidades + Knex nativo | Sincronização ou migrations manuais | `prisma migrate`      | Migrations manuais |
+| SQL raw    | Usa diretamente `knex(...)`                 | `QueryRunner`                       | Limitado              | API própria        |
+| Multi‑DB   | Via Knex (PG, MySQL, SQLite, MSSQL, Oracle) | Nativo                              | Nativo                | Nativo             |
+| NestJS     | Módulo dedicado (`KnexOrmModule`)           | Módulo oficial                      | Módulo oficial        | Módulo oficial     |
 
 **Diferencial principal:** para quem já usa Knex, a migração é incremental — é possível continuar escrevendo queries com `knex('tabela')...` onde fizer sentido, e usar o ORM onde traz mais produtividade.
 
@@ -110,4 +110,3 @@ Sempre consulte `docs/knex-orm-superset.md` e o `CHANGELOG` para o estado exato 
 ## Licença
 
 O projeto é distribuído sob a licença **MIT** (ver arquivo `LICENSE` na raiz). Isso permite uso em projetos open‑source e proprietários, inclusive em ambiente corporativo, desde que a licença seja preservada.
-

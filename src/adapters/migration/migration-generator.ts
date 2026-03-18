@@ -5,7 +5,7 @@ import type { ColumnSchema, TableSchema } from './schema/schema-types';
  * Gera código de migration Knex a partir de operações de diff.
  */
 export class MigrationGenerator {
-  generate(ops: MigrationOp[], _name: string): { content: string; up: string; down: string } {
+  generate(ops: MigrationOp[], name: string): { content: string; up: string; down: string } {
     const upStatements: string[] = [];
     const downStatements: string[] = [];
 
@@ -56,7 +56,7 @@ export async function down(knex: Knex): Promise<void> {
 
     const downBody = downStatements.length > 0 ? downStatements.map((s) => `  ${s}`).join('\n') : '  // No changes';
 
-    const content = header + upBody + '\n}\n' + downHeader + downBody + '\n}\n';
+    const content = `// Migration: ${name}\n` + header + upBody + '\n}\n' + downHeader + downBody + '\n}\n';
     return { content, up: upBody, down: downBody };
   }
 

@@ -1,6 +1,6 @@
 ## Overview
 
-This guide shows how to use the main features exported by `knex-orm`, with examples based on the real code (`src/` and `test/integration/**`):
+This guide shows how to use the main features exported by `knx-orm`, with examples based on the real code (`src/` and `test/integration/**`):
 
 - Entity decorators
 - `Repository<T>` and related types
@@ -25,7 +25,7 @@ Decorators live under `src/core/decorators` and are re‑exported from `src/inde
 ### Minimal example
 
 ```typescript
-import { Entity, PrimaryKey, Column } from 'knex-orm';
+import { Entity, PrimaryKey, Column } from 'knx-orm';
 
 @Entity('products')
 export class Product {
@@ -45,7 +45,7 @@ This pattern is the same used in the repository integration tests (`repository-c
 ### Example with timestamps and soft delete
 
 ```typescript
-import { Entity, PrimaryKey, Column, CreatedAt, UpdatedAt, SoftDelete } from 'knex-orm';
+import { Entity, PrimaryKey, Column, CreatedAt, UpdatedAt, SoftDelete } from 'knx-orm';
 
 @Entity('articles')
 export class Article {
@@ -84,7 +84,7 @@ You usually don’t need to instantiate the repository manually, but it helps to
 
 ```typescript
 import knex from 'knex';
-import { Repository } from 'knex-orm';
+import { Repository } from 'knx-orm';
 import { Product } from './product.entity';
 
 const db = knex({
@@ -148,9 +148,9 @@ const likeResults = await articleRepo.find({
 ```typescript
 const page = await articleRepo.paginate({ page: 1, limit: 10 });
 
-console.log(page.meta.total);      // total records
+console.log(page.meta.total); // total records
 console.log(page.meta.totalPages); // number of pages
-console.log(page.data);            // records on the current page
+console.log(page.data); // records on the current page
 ```
 
 #### Example: soft delete
@@ -193,7 +193,7 @@ High‑level connection APIs live under `src/adapters/connection` and are export
 ### Programmatic initialization
 
 ```typescript
-import { KnexORM } from 'knex-orm';
+import { KnexORM } from 'knx-orm';
 import { User } from './entities/user';
 
 const orm = await KnexORM.initialize({
@@ -217,10 +217,10 @@ await orm.close();
 As described in `docs/knex-orm-superset.md`:
 
 ```typescript
-import { KnexORM } from 'knex-orm';
+import { KnexORM } from 'knx-orm';
 
 const orm = await KnexORM.initializeFromPath(); // looks for orm.config.js / knex-orm.config.js
-const knex = orm.getConnection('primary');      // Knex instance
+const knex = orm.getConnection('primary'); // Knex instance
 ```
 
 See `@adapters/connection` types for the exact `OrmConfig` shape.
@@ -229,7 +229,7 @@ See `@adapters/connection` types for the exact `OrmConfig` shape.
 
 ## NestJS integration
 
-The `knex-orm/nestjs` submodule re‑exports:
+The `knx-orm/nestjs` submodule re‑exports:
 
 - `KnexOrmModule`
 - `InjectRepository`
@@ -242,7 +242,7 @@ The `knex-orm/nestjs` submodule re‑exports:
 
 ```typescript
 import { Module } from '@nestjs/common';
-import { KnexOrmModule } from 'knex-orm/nestjs';
+import { KnexOrmModule } from 'knx-orm/nestjs';
 import { Post } from './post.entity';
 import { PostService } from './post.service';
 
@@ -269,8 +269,8 @@ export class AppModule {}
 
 ```typescript
 import { Injectable } from '@nestjs/common';
-import type { IRepository } from 'knex-orm';
-import { InjectRepository, InjectConnection } from 'knex-orm/nestjs';
+import type { IRepository } from 'knx-orm';
+import { InjectRepository, InjectConnection } from 'knx-orm/nestjs';
 import type { Knex } from 'knex';
 import { Post } from './post.entity';
 
@@ -297,7 +297,7 @@ This example closely follows the `nestjs-crud.spec.ts` integration test.
 
 ## CLI and migrations (summary)
 
-The CLI is exposed via the `kor` and `knex-orm` binaries (configured in `package.json`). Internally it uses:
+The CLI is exposed via the `knx` and `knx-orm` binaries (configured in `package.json`). Internally it uses:
 
 - `EntityScanner` to find entities
 - `SchemaRegistry` to read/write `.orm-schema.json`
@@ -306,12 +306,12 @@ The CLI is exposed via the `kor` and `knex-orm` binaries (configured in `package
 
 ### Main commands
 
-- `kor migrate:generate --entities=./src/entities`
-- `kor migrate:run`
-- `kor migrate:rollback`
-- `kor connection:init`
-- `kor connection:test`
-- `kor connection:list`
+- `knx migrate:generate --entities=./src/entities`
+- `knx migrate:run`
+- `knx migrate:rollback`
+- `knx connection:init`
+- `knx connection:test`
+- `knx connection:list`
 
 Full details are available in the **Migrations** document (`08-migrations.md`).
 
@@ -323,4 +323,3 @@ Full details are available in the **Migrations** document (`08-migrations.md`).
 - **Soft delete**: remember that `find()` hides rows with `deleted_at` by default; use `withDeleted: true` if you need to include them.
 - **DB types on Bun**: use PostgreSQL or MySQL. SQLite via `sqlite3` is not supported on Bun.
 - **TypeScript config**: ensure `experimentalDecorators` and `emitDecoratorMetadata` are enabled in the **consumer project**, not just in the library.
-

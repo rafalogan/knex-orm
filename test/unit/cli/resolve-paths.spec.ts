@@ -1,11 +1,7 @@
 import { mkdtempSync, rmSync, mkdirSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
-import {
-  EntitiesPathNotFoundError,
-  MigrationsDirNotFoundError,
-  resolvePaths,
-} from '../../../src/cli/resolve-paths';
+import { EntitiesPathNotFoundError, MigrationsDirNotFoundError, resolvePaths } from '../../../src/cli/resolve-paths';
 
 describe('resolvePaths', () => {
   let cwd: string;
@@ -27,10 +23,7 @@ describe('resolvePaths', () => {
     mkdirSync(entitiesAbs, { recursive: true });
     mkdirSync(migrationsAbs, { recursive: true });
 
-    const result = await resolvePaths(
-      { entities: entitiesRel, migrationsDir: migrationsRel },
-      cwd,
-    );
+    const result = await resolvePaths({ entities: entitiesRel, migrationsDir: migrationsRel }, cwd);
 
     expect(result.entitiesPath).toBe(entitiesAbs);
     expect(result.migrationsDir).toBe(migrationsAbs);
@@ -90,4 +83,3 @@ describe('resolvePaths', () => {
     await expect(resolvePaths({}, cwd)).rejects.toBeInstanceOf(MigrationsDirNotFoundError);
   });
 });
-

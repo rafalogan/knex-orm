@@ -1,11 +1,11 @@
 ## Visão geral
 
-O knex-orm gera e executa migrations usando o próprio **Knex** como engine.  
+O knx-orm gera e executa migrations usando o próprio **Knex** como engine.  
 Por cima disso, a lib oferece:
 
 - **Diff de schema** baseado em metadata de entidades
 - **Arquivo de estado** (`.orm-schema.json`) para rastrear o schema anterior
-- **CLI** (`kor`/`knex-orm`) com comandos de geração e execução
+- **CLI** (`knx`/`knx-orm`) com comandos de geração e execução
 
 Toda a lógica é implementada em `src/adapters/migration` e descrita em `docs/knex-orm-superset.md` (§5).
 
@@ -77,19 +77,19 @@ Os scripts em `package.json` apontam para o binário principal:
 
 ```json
 "bin": {
-  "kor": "./dist/cli/migrate-generate.js",
-  "knex-orm": "./dist/cli/migrate-generate.js"
+  "knx": "./dist/cli/migrate-generate.js",
+  "knx-orm": "./dist/cli/migrate-generate.js"
 }
 ```
 
 Os comandos expostos (conforme `docs/knex-orm-superset.md` e `AUDIT.md`) são:
 
-### `migrate:generate`
+### `migrate:generate` — entidades → migrations
 
 O comando `migrate:generate` usa a **Project Introspection Layer** do CLI para detectar automaticamente a estrutura do projeto:
 
 ```bash
-npx kor migrate:generate
+npx knx migrate:generate
 ```
 
 Ordem de resolução dos paths:
@@ -103,7 +103,7 @@ Ordem de resolução dos paths:
 Exemplo com override explícito:
 
 ```bash
-npx kor migrate:generate --entities=./dist/entities --migrations-dir=./migrations
+npx knx migrate:generate --entities=./dist/entities --migrations-dir=./migrations
 ```
 
 Parâmetros suportados:
@@ -112,10 +112,32 @@ Parâmetros suportados:
 - `--migrations-dir` — pasta onde as migrations serão geradas.
 - `--config` — caminho opcional para arquivo de configuração (`orm.config.js`/`knexfile`), quando usado em conjunto com execução.
 
+### `entity:generate` — migrations → entidades
+
+O comando `entity:generate` executa o fluxo **inverso**: lê migrations Knex existentes e gera classes de entidade com decorators do `knx-orm`.
+
+```bash
+npx knx entity:generate
+```
+
+A ordem de resolução é a mesma de `migrate:generate`:
+
+1. **CONFIG**: procura `orm.config.js`, `knexfile.*` ou `knex.config.*` e usa `migrationsDir` / diretório de entidades configurados quando existirem.
+2. **CONVENTION**: se não houver config, cai em:
+   - Migrations: `./migrations`, `./dist/migrations`, `./src/migrations`
+   - Entities: `./dist/entities`, `./src/entities`, `./entities`
+3. **CLI FLAGS (futuro)**: o comando já foi desenhado para, em versões futuras, aceitar overrides de diretórios, espelhando `migrate:generate`.
+
+As entidades geradas:
+
+- Usam decorators `@Entity`, `@PrimaryKey`, `@Column`, `@CreatedAt`, `@UpdatedAt` e `@SoftDelete` sempre que possível.
+- Derivam o nome da classe a partir do nome da tabela (ex.: `users` → `User`).
+- Fazem o mapeamento de tipos SQL → tipos TypeScript (`string`, `number`, `boolean`, `Date`) seguindo as regras de `ColumnType`.
+
 ### `migrate:run`
 
 ```bash
-npx kor migrate:run
+npx knx migrate:run
 ```
 
 Executa `knex.migrate.latest()` usando a configuração encontrada (`orm.config.js`, `knexfile`, etc.).  
@@ -128,16 +150,16 @@ npm run migrate:run
 ### `migrate:rollback`
 
 ```bash
-npx kor migrate:rollback
+npx knx migrate:rollback
 ```
 
 Executa `knex.migrate.rollback()` com a mesma fonte de configuração.
 
 ### Comandos de conexão
 
-- `kor connection:init` — cria um `orm.config.js` de exemplo.
-- `kor connection:test` — testa as conexões configuradas.
-- `kor connection:list` — lista os nomes de conexões disponíveis.
+- `knx connection:init` — cria um `orm.config.js` de exemplo.
+- `knx connection:test` — testa as conexões configuradas.
+- `knx connection:list` — lista os nomes de conexões disponíveis.
 
 Os scripts correspondentes também existem em `package.json` (`connection:init`, `connection:test`, `connection:list`).
 
@@ -186,4 +208,3 @@ Esse formato é compatível com o sistema de migrations nativo do Knex e pode se
 - **Automatize em CI**:
   - Em pipelines, é comum gerar migrations localmente e apenas executar `migrate:run` em produção.
   - Evite gerar migrations automaticamente em ambientes de produção.
-

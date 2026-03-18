@@ -178,4 +178,3 @@ No CI típico, você deve:
 3. Rodar o build.
 
 O documento de arquitetura (`docs/knex-orm-superset.md` §12 e §13) contém exemplos de workflows GitHub Actions que podem ser adaptados.
-

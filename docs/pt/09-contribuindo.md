@@ -206,4 +206,3 @@ Ainda que não haja um arquivo específico de Code of Conduct neste repositório
 - Zero tolerância a discriminação de qualquer tipo.
 
 Qualquer comportamento que viole esses princípios pode resultar em bloqueio de contribuições e/ou reporte à plataforma.
-

@@ -194,4 +194,3 @@ For deeper technical details:
 - `docs/knex-orm-superset.md` — full architecture description, including diagrams, internal APIs and roadmap.
 - `docs/AUDIT.md` — audit between documentation and implementation, useful to see what is roadmap vs already implemented.
 - `docs/DEVELOPMENT.md` — internal development guide, folder structure and code conventions.
-

@@ -1,11 +1,11 @@
 # Exemplo NestJS — KnexORM
 
-Exemplo mínimo de integração do `knex-orm` com NestJS.
+Exemplo mínimo de integração do `knx-orm` com NestJS.
 
 ## Instalação
 
 ```bash
-npm i knex-orm @nestjs/core @nestjs/common knex reflect-metadata
+npm i knx-orm @nestjs/core @nestjs/common knex reflect-metadata
 ```
 
 ## Uso
@@ -13,7 +13,7 @@ npm i knex-orm @nestjs/core @nestjs/common knex reflect-metadata
 Importe `KnexOrmModule` em seu `AppModule`:
 
 ```typescript
-import { KnexOrmModule } from 'knex-orm/nestjs';
+import { KnexOrmModule } from 'knx-orm/nestjs';
 
 @Module({
   imports: [
@@ -29,8 +29,8 @@ export class AppModule {}
 Use `@InjectRepository(Entity)` e `@InjectConnection(name?)` nos serviços:
 
 ```typescript
-import { InjectRepository, InjectConnection } from 'knex-orm/nestjs';
-import type { IRepository } from 'knex-orm';
+import { InjectRepository, InjectConnection } from 'knx-orm/nestjs';
+import type { IRepository } from 'knx-orm';
 
 @Injectable()
 export class UserService {

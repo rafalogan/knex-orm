@@ -152,7 +152,6 @@ export class Repository<T extends Record<string, unknown>> {
   /** find() com FindOptions: select, where, orderBy (objeto), limit, offset, withDeleted. */
   async find(options?: FindOptions<T>): Promise<T[]> {
     let qb = this.query();
-    const cols = this.metadata.columns ?? {};
     const selectCols = options?.select?.map((p) => this.propToColumn(String(p))) ?? ['*'];
     qb = qb.select(selectCols as [string, ...string[]]);
     if (this.metadata.softDelete && !options?.withDeleted) {

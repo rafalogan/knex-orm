@@ -1,4 +1,3 @@
-import { join } from 'path';
 import type { Knex } from 'knex';
 import { ConnectionFactory } from '@adapters/connection/connection-factory';
 import type { ConnectionEntry } from '@adapters/connection/connection-config';

@@ -206,4 +206,3 @@ Even though there is no dedicated Code of Conduct file in this repository, follo
 - Zero tolerance for any kind of discrimination.
 
 Violations may result in contribution blocks and/or platform‑level reports.
-

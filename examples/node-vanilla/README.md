@@ -5,14 +5,14 @@ Exemplo mínimo de uso do KnexORM em Node.js sem framework (Module 8).
 ## Instalação
 
 ```bash
-npm i knex-orm knex reflect-metadata sqlite3
+npm i knx-orm knex reflect-metadata sqlite3
 ```
 
 ## Uso
 
 ```typescript
 import 'reflect-metadata';
-import { KnexORM } from 'knex-orm';
+import { KnexORM } from 'knx-orm';
 import { User } from './entities/user';
 
 async function main() {
@@ -35,7 +35,7 @@ async function main() {
 
 ## Executar o exemplo
 
-Após build do pacote (`npm run build` na raiz) e com `knex-orm` instalado ou linkado:
+Após build do pacote (`npm run build` na raiz) e com `knx-orm` instalado ou linkado:
 
 ```bash
 npx ts-node main.ts

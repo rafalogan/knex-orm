@@ -1,6 +1,6 @@
 ## Overview
 
-This section explains how to configure connections and environments for knex-orm, based on:
+This section explains how to configure connections and environments for knx-orm, based on:
 
 - `docs/knex-orm-superset.md` (section 6)
 - Types and implementations in `src/adapters/connection`
@@ -14,7 +14,7 @@ The configuration format is described by the `OrmConfig` type, exported from `sr
 A typical example:
 
 ```javascript
-/** @type {import('knex-orm').OrmConfig} */
+/** @type {import('knx-orm').OrmConfig} */
 module.exports = {
   default: 'primary',
   connections: {
@@ -85,18 +85,18 @@ The active environment is typically selected using `NODE_ENV`.
 
 ## Supported databases and drivers
 
-knex-orm delegates all DB communication to **Knex**.  
+knx-orm delegates all DB communication to **Knex**.  
 Database drivers must be added in the **consumer** project.
 
 Summary table (from superset §6.3 and §13.2):
 
-| Database  | Recommended driver | Node.js | Bun  |
-| --------- | ------------------ | ------- | ---- |
-| PostgreSQL | `pg`              | ✅      | ✅   |
-| MySQL     | `mysql2`           | ✅      | ✅   |
-| SQLite    | `sqlite3`          | ✅      | ⚠️   |
-| MSSQL     | `mssql`            | ✅      | ⚠️\* |
-| Oracle    | `oracledb`         | ✅      | ⚠️\* |
+| Database   | Recommended driver | Node.js | Bun  |
+| ---------- | ------------------ | ------- | ---- |
+| PostgreSQL | `pg`               | ✅      | ✅   |
+| MySQL      | `mysql2`           | ✅      | ✅   |
+| SQLite     | `sqlite3`          | ✅      | ⚠️   |
+| MSSQL      | `mssql`            | ✅      | ⚠️\* |
+| Oracle     | `oracledb`         | ✅      | ⚠️\* |
 
 ⚠️ On Bun, native‑addon drivers (`node-gyp`) often don’t work; check the driver/Knex docs before using in production.
 
@@ -118,7 +118,7 @@ Typical variables used in `orm.config.js`:
 The superset doc also suggests a `getEnv` abstraction (exported from `src/core/runtime.ts`) to deal with Node and Bun:
 
 ```typescript
-import { getEnv } from 'knex-orm';
+import { getEnv } from 'knx-orm';
 
 const host = getEnv('DB_HOST') ?? 'localhost';
 ```
@@ -139,7 +139,7 @@ Internally, the connection module (`src/adapters/connection`) uses:
 From a user perspective, you interact with this via `KnexORM`:
 
 ```typescript
-import { KnexORM } from 'knex-orm';
+import { KnexORM } from 'knx-orm';
 
 const orm = await KnexORM.initializeFromPath(); // or initialize(config)
 
@@ -183,4 +183,3 @@ Check Knex and driver documentation for concrete recommendations.
 - **Don’t commit secrets**: use environment variables or a secret management service.
 - **Use `redactConnectionConfig` when logging configs**: never log plain passwords or full connection strings.
 - **Keep `OrmConfig` simple**: move conditional logic (e.g. driver choice by runtime) into TypeScript code when needed.
-

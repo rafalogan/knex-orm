@@ -124,4 +124,3 @@ async function loadConfigFromKnexfile(cwd: string): Promise<SimpleConfig | undef
 
   return undefined;
 }
-

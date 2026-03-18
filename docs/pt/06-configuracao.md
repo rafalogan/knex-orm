@@ -1,6 +1,6 @@
 ## Visão geral
 
-Esta seção descreve como configurar conexões e ambientes para usar o knex-orm, com base em:
+Esta seção descreve como configurar conexões e ambientes para usar o knx-orm, com base em:
 
 - `docs/knex-orm-superset.md` (seção 6)
 - Tipos e implementações em `src/adapters/connection`
@@ -14,7 +14,7 @@ O formato de configuração é descrito pelo tipo `OrmConfig`, exportado em `src
 Um exemplo típico:
 
 ```javascript
-/** @type {import('knex-orm').OrmConfig} */
+/** @type {import('knx-orm').OrmConfig} */
 module.exports = {
   default: 'primary',
   connections: {
@@ -85,16 +85,16 @@ O ambiente ativo é normalmente selecionado por `NODE_ENV`.
 
 ## Bancos suportados e drivers
 
-O knex-orm delega totalmente ao **Knex** a comunicação com o banco.  
+O knx-orm delega totalmente ao **Knex** a comunicação com o banco.  
 Drivers de banco devem ser adicionados no projeto consumidor.
 
 Tabela resumida (conforme superset §6.3 e §13.2):
 
-| Banco      | Driver recomendado | Node.js | Bun   |
-| ---------- | ------------------ | ------- | ----- |
-| PostgreSQL | `pg`               | ✅      | ✅    |
-| MySQL      | `mysql2`           | ✅      | ✅    |
-| SQLite     | `sqlite3`          | ✅      | ⚠️    |
+| Banco      | Driver recomendado | Node.js | Bun  |
+| ---------- | ------------------ | ------- | ---- |
+| PostgreSQL | `pg`               | ✅      | ✅   |
+| MySQL      | `mysql2`           | ✅      | ✅   |
+| SQLite     | `sqlite3`          | ✅      | ⚠️   |
 | MSSQL      | `mssql`            | ✅      | ⚠️\* |
 | Oracle     | `oracledb`         | ✅      | ⚠️\* |
 
@@ -118,7 +118,7 @@ Exemplo de variáveis típicas usadas no `orm.config.js`:
 O superset também sugere uma abstração `getEnv` (exposta em `src/core/runtime.ts`) para lidar com Node e Bun:
 
 ```typescript
-import { getEnv } from 'knex-orm';
+import { getEnv } from 'knx-orm';
 
 const host = getEnv('DB_HOST') ?? 'localhost';
 ```
@@ -139,7 +139,7 @@ Internamente, o módulo de conexão (`src/adapters/connection`) usa:
 Do ponto de vista do usuário, você interage com isso via `KnexORM`:
 
 ```typescript
-import { KnexORM } from 'knex-orm';
+import { KnexORM } from 'knx-orm';
 
 const orm = await KnexORM.initializeFromPath(); // ou initialize(config)
 
@@ -183,4 +183,3 @@ Consulte a documentação do Knex e do driver específico para recomendações.
 - **Não faça commit de segredos**: use variáveis de ambiente ou serviços de secret management.
 - **Use `redactConnectionConfig` ao logar configs**: nunca logue senhas ou connection strings em claro.
 - **Mantenha o `OrmConfig` simples**: delegue lógica condicional (escolha de driver por runtime, etc.) para código TypeScript quando necessário.
-
