@@ -74,4 +74,3 @@ The ideas below come from the roadmap described in `docs/knex-orm-superset.md`. 
   - Plugin system (auditing, multitenancy, etc.).
 
 Use tags and GitHub releases as the source of truth for actual version history and dates.
-

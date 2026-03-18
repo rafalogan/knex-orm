@@ -48,16 +48,11 @@ describe('project-introspection', () => {
   });
 
   it('resolveProjectContextForMigrateGenerate should propagate not-found errors', async () => {
-    await expect(resolveProjectContextForMigrateGenerate({}, cwd)).rejects.toBeInstanceOf(
-      EntitiesPathNotFoundError,
-    );
+    await expect(resolveProjectContextForMigrateGenerate({}, cwd)).rejects.toBeInstanceOf(EntitiesPathNotFoundError);
 
     const entitiesAbs = resolve(cwd, './dist/entities');
     mkdirSync(entitiesAbs, { recursive: true });
 
-    await expect(resolveProjectContextForMigrateGenerate({}, cwd)).rejects.toBeInstanceOf(
-      MigrationsDirNotFoundError,
-    );
+    await expect(resolveProjectContextForMigrateGenerate({}, cwd)).rejects.toBeInstanceOf(MigrationsDirNotFoundError);
   });
 });
-

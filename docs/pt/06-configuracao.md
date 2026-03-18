@@ -90,11 +90,11 @@ Drivers de banco devem ser adicionados no projeto consumidor.
 
 Tabela resumida (conforme superset §6.3 e §13.2):
 
-| Banco      | Driver recomendado | Node.js | Bun   |
-| ---------- | ------------------ | ------- | ----- |
-| PostgreSQL | `pg`               | ✅      | ✅    |
-| MySQL      | `mysql2`           | ✅      | ✅    |
-| SQLite     | `sqlite3`          | ✅      | ⚠️    |
+| Banco      | Driver recomendado | Node.js | Bun  |
+| ---------- | ------------------ | ------- | ---- |
+| PostgreSQL | `pg`               | ✅      | ✅   |
+| MySQL      | `mysql2`           | ✅      | ✅   |
+| SQLite     | `sqlite3`          | ✅      | ⚠️   |
 | MSSQL      | `mssql`            | ✅      | ⚠️\* |
 | Oracle     | `oracledb`         | ✅      | ⚠️\* |
 
@@ -183,4 +183,3 @@ Consulte a documentação do Knex e do driver específico para recomendações.
 - **Não faça commit de segredos**: use variáveis de ambiente ou serviços de secret management.
 - **Use `redactConnectionConfig` ao logar configs**: nunca logue senhas ou connection strings em claro.
 - **Mantenha o `OrmConfig` simples**: delegue lógica condicional (escolha de driver por runtime, etc.) para código TypeScript quando necessário.
-

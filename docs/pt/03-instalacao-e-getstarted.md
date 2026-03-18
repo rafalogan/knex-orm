@@ -228,5 +228,3 @@ npx knx migrate:generate
 ```
 
 Em um projeto com entidades e migrations nos diretórios convencionais (ou configurados em `knexfile` / `knex.config`), o comando deve funcionar **sem parâmetros**, gerando migrations a partir das entidades.
-
-

@@ -28,7 +28,7 @@ export class SchemaBuilder {
     const columns: Record<string, ColumnSchema> = {};
     const cols = meta.columns ?? {};
 
-    for (const [prop, colMeta] of Object.entries(cols)) {
+    for (const [, colMeta] of Object.entries(cols)) {
       const col: ColumnSchema = {
         columnName: colMeta.columnName,
         type: colMeta.type,
@@ -61,7 +61,7 @@ export class SchemaBuilder {
       };
     }
     const indexes: Array<{ fields: string[] }> = [...(meta.indexes ?? [])];
-    for (const [_, colMeta] of Object.entries(cols)) {
+    for (const [, colMeta] of Object.entries(cols)) {
       if (colMeta.index) {
         indexes.push({ fields: [colMeta.columnName] });
       }

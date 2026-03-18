@@ -90,13 +90,13 @@ Database drivers must be added in the **consumer** project.
 
 Summary table (from superset §6.3 and §13.2):
 
-| Database  | Recommended driver | Node.js | Bun  |
-| --------- | ------------------ | ------- | ---- |
-| PostgreSQL | `pg`              | ✅      | ✅   |
-| MySQL     | `mysql2`           | ✅      | ✅   |
-| SQLite    | `sqlite3`          | ✅      | ⚠️   |
-| MSSQL     | `mssql`            | ✅      | ⚠️\* |
-| Oracle    | `oracledb`         | ✅      | ⚠️\* |
+| Database   | Recommended driver | Node.js | Bun  |
+| ---------- | ------------------ | ------- | ---- |
+| PostgreSQL | `pg`               | ✅      | ✅   |
+| MySQL      | `mysql2`           | ✅      | ✅   |
+| SQLite     | `sqlite3`          | ✅      | ⚠️   |
+| MSSQL      | `mssql`            | ✅      | ⚠️\* |
+| Oracle     | `oracledb`         | ✅      | ⚠️\* |
 
 ⚠️ On Bun, native‑addon drivers (`node-gyp`) often don’t work; check the driver/Knex docs before using in production.
 
@@ -183,4 +183,3 @@ Check Knex and driver documentation for concrete recommendations.
 - **Don’t commit secrets**: use environment variables or a secret management service.
 - **Use `redactConnectionConfig` when logging configs**: never log plain passwords or full connection strings.
 - **Keep `OrmConfig` simple**: move conditional logic (e.g. driver choice by runtime) into TypeScript code when needed.
-

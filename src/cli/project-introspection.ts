@@ -2,10 +2,7 @@ import { existsSync } from 'node:fs';
 import { readFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { resolvePaths, type CliFlags } from './resolve-paths';
-import {
-  EntitiesPathNotFoundError,
-  MigrationsDirNotFoundError,
-} from './resolve-paths';
+import { EntitiesPathNotFoundError, MigrationsDirNotFoundError } from './resolve-paths';
 
 export type ConfigSource = 'none' | 'knexfile' | 'knexConfig' | 'ormConfig' | 'workspace';
 
@@ -45,7 +42,7 @@ const CONFIG_CANDIDATES = [
 function findProjectRoot(start: string): string {
   let current = resolve(start);
   // stop when filesystem root is reached
-  // eslint-disable-next-line no-constant-condition
+   
   while (true) {
     const pkg = join(current, 'package.json');
     const git = join(current, '.git');
@@ -140,7 +137,7 @@ export async function detectProjectStructure(startCwd: string = process.cwd()): 
   };
 }
 
-export interface MigrateGenerateFlags extends CliFlags {}
+export type MigrateGenerateFlags = CliFlags;
 
 export async function resolveProjectContextForMigrateGenerate(
   flags: MigrateGenerateFlags,
@@ -160,4 +157,3 @@ export async function resolveProjectContextForMigrateGenerate(
 }
 
 export { EntitiesPathNotFoundError, MigrationsDirNotFoundError };
-

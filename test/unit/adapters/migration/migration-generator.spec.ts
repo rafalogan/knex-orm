@@ -1,6 +1,6 @@
 import { MigrationGenerator } from '@adapters/migration/migration-generator';
 import type { MigrationOp } from '@adapters/migration/schema/schema-diff';
-import type { TableSchema, ColumnSchema } from '@adapters/migration/schema/schema-types';
+import type { ColumnSchema } from '@adapters/migration/schema/schema-types';
 
 describe('MigrationGenerator', () => {
   let generator: MigrationGenerator;

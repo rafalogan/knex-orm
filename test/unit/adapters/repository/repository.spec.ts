@@ -34,7 +34,7 @@ function createThenableChain<T>(defaultValue: T) {
       resolveValue = v;
     },
     insert: jest.fn().mockImplementation(() => chain),
-    returning: jest.fn().mockImplementation((_cols?: string) => Promise.resolve(resolveValue)),
+    returning: jest.fn().mockImplementation(() => Promise.resolve(resolveValue)),
     select: jest.fn().mockImplementation(() => chain),
     where: jest.fn().mockImplementation(() => chain),
     whereNull: jest.fn().mockImplementation(() => chain),
@@ -56,7 +56,7 @@ function createThenableChain<T>(defaultValue: T) {
 function createMockKnex(): Knex {
   const chain = createThenableChain<unknown[]>([]);
 
-  const knexFn = jest.fn((_tableName: string) => chain);
+  const knexFn = jest.fn(() => chain);
   (knexFn as Knex).raw = jest.fn().mockResolvedValue([]);
   (knexFn as Knex).transaction = jest
     .fn()

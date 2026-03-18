@@ -35,4 +35,3 @@ describe('EntityFromMigrationGenerator', () => {
     expect(code).toContain('deletedAt?: Date;');
   });
 });
-

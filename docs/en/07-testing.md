@@ -178,4 +178,3 @@ In a typical CI pipeline, you should:
 3. Run the build.
 
 The architecture doc (`docs/knex-orm-superset.md` §12 and §13) includes GitHub Actions workflow examples that can be adapted.
-

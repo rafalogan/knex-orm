@@ -86,7 +86,6 @@ export class SchemaDiff {
       }
     }
 
-    const prevKeys = new Set(prevIdx.map((i) => prevKey(i.fields)));
     for (const idx of prevIdx) {
       const key = prevKey(idx.fields);
       if (!currKeys.has(key)) {

@@ -69,17 +69,14 @@ async function main(): Promise<void> {
 
 export async function handleEntityGenerateFromCwd(startCwd: string = process.cwd()): Promise<void> {
   const { resolveProjectContextForMigrateGenerate } = await import('./project-introspection.js');
-  const { MigrationParser, EntityFromMigrationGenerator } = await import(
-    '../adapters/migration/index.js'
-  );
+  const { MigrationParser, EntityFromMigrationGenerator } = await import('../adapters/migration/index.js');
   const { existsSync, mkdirSync, readdirSync } = await import('node:fs');
   const { join, extname, basename } = await import('node:path');
 
   const ctx = await resolveProjectContextForMigrateGenerate({}, startCwd);
   const rootDir = ctx.paths.rootDir;
   const migrationsDir = ctx.paths.migrationsDir ?? join(rootDir, 'migrations');
-  const entitiesDir =
-    ctx.paths.entitiesDir ?? ctx.paths.srcDir ?? ctx.paths.distDir ?? join(rootDir, 'entities');
+  const entitiesDir = ctx.paths.entitiesDir ?? ctx.paths.srcDir ?? ctx.paths.distDir ?? join(rootDir, 'entities');
 
   if (!existsSync(migrationsDir)) {
     console.error(`Migrations directory not found: ${migrationsDir}`);
@@ -101,8 +98,7 @@ export async function handleEntityGenerateFromCwd(startCwd: string = process.cwd
     const full = join(migrationsDir, file);
     const parsed = await parser.parse(full);
     const code = generator.generate(parsed);
-    const className = basename(parsed.tableName)
-      .replace(/(^\w|_\w)/g, (m: string) => m.replace('_', '').toUpperCase());
+    const className = basename(parsed.tableName).replace(/(^\w|_\w)/g, (m: string) => m.replace('_', '').toUpperCase());
     const outPath = join(entitiesDir, `${className}.ts`);
     await (await import('node:fs/promises')).writeFile(outPath, code, 'utf-8');
   }
@@ -110,7 +106,7 @@ export async function handleEntityGenerateFromCwd(startCwd: string = process.cwd
   console.log(`Entities generated in ${entitiesDir}`);
 }
 
-async function runEntityGenerate(_args: string[]): Promise<void> {
+async function runEntityGenerate(): Promise<void> {
   await handleEntityGenerateFromCwd(process.cwd());
 }
 
@@ -126,10 +122,7 @@ async function runMigrateGenerate(args: string[]): Promise<void> {
   if (migrationsFlag !== undefined) flags.migrationsDir = migrationsFlag;
 
   try {
-    const ctx = await resolveProjectContextForMigrateGenerate(
-      flags,
-      process.cwd(),
-    );
+    const ctx = await resolveProjectContextForMigrateGenerate(flags, process.cwd());
     entitiesPath = ctx.entitiesPath;
     migrationsDir = ctx.migrationsDir;
   } catch (err) {
@@ -195,11 +188,7 @@ async function loadKnexForMigrate(configPath?: string): Promise<import('knex').K
   const pathFromFlags = configPath ? resolve(cwd, configPath) : undefined;
   const pathFromIntrospection =
     ctx.paths.configFiles.ormConfig ?? ctx.paths.configFiles.knexfile ?? ctx.paths.configFiles.knexConfig;
-  const path =
-    pathFromFlags ??
-    pathFromIntrospection ??
-    loader.findConfigPath() ??
-    undefined;
+  const path = pathFromFlags ?? pathFromIntrospection ?? loader.findConfigPath() ?? undefined;
 
   const toTry = path ? [path] : [join(cwd, 'knexfile.js'), join(cwd, 'knexfile.cjs')];
 
@@ -264,7 +253,7 @@ async function runMigrateRollback(args: string[]): Promise<void> {
   }
 }
 
-async function runConnectionInit(_args: string[]): Promise<void> {
+async function runConnectionInit(): Promise<void> {
   const { writeFile } = await import('node:fs/promises');
   const { join } = await import('node:path');
   const { detectProjectStructure } = await import('./project-introspection.js');
@@ -301,7 +290,7 @@ async function runConnectionTest(args: string[]): Promise<void> {
   const loader = new ConnectionConfigLoader();
   const ctx = await detectProjectStructure(process.cwd());
   const rootDir = ctx.paths.rootDir;
-  const pathFromFlags = configPath ? require('node:path').resolve(rootDir, configPath) : undefined;
+  const pathFromFlags = configPath ? (await import('node:path')).resolve(rootDir, configPath) : undefined;
   const pathFromIntrospection =
     ctx.paths.configFiles.ormConfig ?? ctx.paths.configFiles.knexfile ?? ctx.paths.configFiles.knexConfig;
   const path = pathFromFlags ?? pathFromIntrospection ?? loader.findConfigPath();
@@ -336,7 +325,7 @@ async function runConnectionList(args: string[]): Promise<void> {
   const loader = new ConnectionConfigLoader();
   const ctx = await detectProjectStructure(process.cwd());
   const rootDir = ctx.paths.rootDir;
-  const pathFromFlags = configPath ? require('node:path').resolve(rootDir, configPath) : undefined;
+  const pathFromFlags = configPath ? (await import('node:path')).resolve(rootDir, configPath) : undefined;
   const pathFromIntrospection =
     ctx.paths.configFiles.ormConfig ?? ctx.paths.configFiles.knexfile ?? ctx.paths.configFiles.knexConfig;
   const path = pathFromFlags ?? pathFromIntrospection ?? loader.findConfigPath();
@@ -356,7 +345,7 @@ async function runConnectionList(args: string[]): Promise<void> {
 }
 
 if (require.main === module) {
-  // eslint-disable-next-line @typescript-eslint/no-floating-promises
+   
   main().catch((err) => {
     console.error(err);
     process.exit(1);

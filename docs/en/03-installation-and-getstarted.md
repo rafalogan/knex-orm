@@ -221,4 +221,3 @@ npx knx --help
 ```
 
 If the binary is found and the help output is displayed, the package is installed correctly.
-

@@ -79,7 +79,7 @@ class RecordingTableBuilder {
     return this.addColumn(name, 'bigInteger');
   }
 
-  string(name: string, _length?: number): ColumnBuilder {
+  string(name: string): ColumnBuilder {
     return this.addColumn(name, 'string');
   }
 
@@ -171,7 +171,7 @@ export class MigrationParser {
     } as unknown as { schema: RecordingSchemaBuilder };
 
     const req = createRequire(resolve(process.cwd(), 'package.json'));
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
+     
     const mod = req(absolute) as { up?: (knex: typeof fakeKnex) => Promise<void> | void };
     if (!mod.up || typeof mod.up !== 'function') {
       throw new Error(`Migration ${path} does not export an up() function`);
@@ -186,14 +186,23 @@ export class MigrationParser {
       throw new Error(`Migration ${path} did not call schema.createTable`);
     }
 
-    const columns: ParsedColumn[] = schema.columns.map((c) => ({
-      name: c.name,
-      type: c.type,
-      nullable: c.nullable,
-      primary: c.primary,
-      unique: c.unique,
-      defaultValue: c.defaultValue,
-    }));
+    const columns: ParsedColumn[] = schema.columns.map((c) => {
+      const col: ParsedColumn = {
+        name: c.name,
+        type: c.type,
+        defaultValue: c.defaultValue,
+      };
+      if (c.nullable !== undefined) {
+        col.nullable = c.nullable;
+      }
+      if (c.primary !== undefined) {
+        col.primary = c.primary;
+      }
+      if (c.unique !== undefined) {
+        col.unique = c.unique;
+      }
+      return col;
+    });
 
     const foreignKeys: ParsedForeignKey[] = schema.columns
       .filter((c) => c.referencedTable && c.referencedColumn)
@@ -211,4 +220,3 @@ export class MigrationParser {
     };
   }
 }
-

@@ -32,14 +32,7 @@ export class EntityFromMigrationGenerator {
   generate(table: ParsedTable): string {
     const className = toPascalCase(table.tableName);
 
-    const imports = [
-      'Entity',
-      'PrimaryKey',
-      'Column',
-      'CreatedAt',
-      'UpdatedAt',
-      'SoftDelete',
-    ];
+    const imports = ['Entity', 'PrimaryKey', 'Column', 'CreatedAt', 'UpdatedAt', 'SoftDelete'];
 
     const importLine = `import { ${imports.join(', ')} } from 'knx-orm';`;
 
@@ -78,7 +71,9 @@ export class EntityFromMigrationGenerator {
         continue;
       }
 
-      const columnOptions: string[] = [`type: '${tsType === 'number' ? 'integer' : tsType === 'Date' ? 'timestamp' : 'string'}'`];
+      const columnOptions: string[] = [
+        `type: '${tsType === 'number' ? 'integer' : tsType === 'Date' ? 'timestamp' : 'string'}'`,
+      ];
       if (optional) columnOptions.push('nullable: true');
       if (col.unique) columnOptions.push('unique: true');
 
@@ -93,4 +88,3 @@ export class EntityFromMigrationGenerator {
     return lines.join('\n');
   }
 }
-

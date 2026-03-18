@@ -148,9 +148,9 @@ const likeResults = await articleRepo.find({
 ```typescript
 const page = await articleRepo.paginate({ page: 1, limit: 10 });
 
-console.log(page.meta.total);      // total de registros
+console.log(page.meta.total); // total de registros
 console.log(page.meta.totalPages); // quantidade de páginas
-console.log(page.data);            // registros da página atual
+console.log(page.data); // registros da página atual
 ```
 
 #### Exemplo: soft delete
@@ -220,7 +220,7 @@ Conforme `docs/knex-orm-superset.md`:
 import { KnexORM } from 'knx-orm';
 
 const orm = await KnexORM.initializeFromPath(); // procura orm.config.js / knex-orm.config.js
-const knex = orm.getConnection('primary');      // instância Knex
+const knex = orm.getConnection('primary'); // instância Knex
 ```
 
 Consulte o arquivo de types em `@adapters/connection` para o formato exato de `OrmConfig`.
@@ -323,4 +323,3 @@ Detalhes completos estão no documento de **Migrações** (`08-migracoes.md`).
 - **Soft delete**: lembre-se que `find()` esconde registros com `deleted_at` por padrão; use `withDeleted: true` se quiser encontrá-los.
 - **Tipos de banco em Bun**: use PostgreSQL ou MySQL. SQLite via `sqlite3` não é suportado em Bun.
 - **Configuração TypeScript**: certifique-se de que `experimentalDecorators` e `emitDecoratorMetadata` estão habilitados no projeto consumidor, não apenas na lib.
-

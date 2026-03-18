@@ -186,4 +186,3 @@ Esse formato é compatível com o sistema de migrations nativo do Knex e pode se
 - **Automatize em CI**:
   - Em pipelines, é comum gerar migrations localmente e apenas executar `migrate:run` em produção.
   - Evite gerar migrations automaticamente em ambientes de produção.
-

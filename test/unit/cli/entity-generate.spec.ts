@@ -50,4 +50,3 @@ describe('CLI entity:generate', () => {
     expect(content).toContain('@Column');
   });
 });
-

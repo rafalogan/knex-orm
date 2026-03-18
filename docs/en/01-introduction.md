@@ -36,14 +36,14 @@ knx-orm fills exactly that gap:
 
 Positioning relative to well‑known ORMs:
 
-| Aspect   | knx-orm                                     | TypeORM                             | Prisma                | MikroORM             |
-| -------- | ------------------------------------------- | ----------------------------------- | --------------------- | -------------------- |
-| Base     | Knex.js (query builder)                     | Custom driver                       | Prisma Client         | Custom driver        |
-| Schema   | Decorators on TS classes                    | Decorators                          | Declarative `.prisma` | Decorators           |
-| Migrate  | Generation from entities + Knex migrations  | Sync or manual migrations           | `prisma migrate`      | Manual migrations    |
-| Raw SQL  | Direct Knex access                          | `QueryRunner`                       | Limited               | Custom API           |
-| Multi‑DB | Through Knex (PG, MySQL, SQLite, MSSQL etc) | Native                               | Native                | Native               |
-| NestJS   | Dedicated module (`KnexOrmModule`)          | Official module                     | Official module       | Official module      |
+| Aspect   | knx-orm                                     | TypeORM                   | Prisma                | MikroORM          |
+| -------- | ------------------------------------------- | ------------------------- | --------------------- | ----------------- |
+| Base     | Knex.js (query builder)                     | Custom driver             | Prisma Client         | Custom driver     |
+| Schema   | Decorators on TS classes                    | Decorators                | Declarative `.prisma` | Decorators        |
+| Migrate  | Generation from entities + Knex migrations  | Sync or manual migrations | `prisma migrate`      | Manual migrations |
+| Raw SQL  | Direct Knex access                          | `QueryRunner`             | Limited               | Custom API        |
+| Multi‑DB | Through Knex (PG, MySQL, SQLite, MSSQL etc) | Native                    | Native                | Native            |
+| NestJS   | Dedicated module (`KnexOrmModule`)          | Official module           | Official module       | Official module   |
 
 **Main differentiator:** for teams already using Knex, adoption is incremental — you can keep using `knex('table')...` where it makes sense, and use the ORM where it adds most value.
 
@@ -111,4 +111,3 @@ Always check `docs/knex-orm-superset.md` and the `CHANGELOG` for the exact statu
 
 The project is distributed under the **MIT** license (see the `LICENSE` file at the repo root).  
 This allows usage in open‑source and proprietary projects, including commercial environments, as long as the license is preserved.
-

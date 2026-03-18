@@ -355,4 +355,3 @@ The `knx-orm/nestjs` subpath exports:
 - `KNEX_ORM_CONNECTION_MANAGER`
 
 These APIs are described in detail in `docs/en/04-usage-guide.md` (NestJS section); refer there for complete examples.
-

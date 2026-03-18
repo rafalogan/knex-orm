@@ -74,4 +74,3 @@ As ideias abaixo vêm do roadmap descrito em `docs/knex-orm-superset.md`. Elas i
   - Sistema de plugins (auditoria, multi‑tenant, etc.).
 
 Consulte o repositório (tags e releases) para o histórico real de versões e datas.
-
